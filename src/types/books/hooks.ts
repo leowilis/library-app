@@ -1,31 +1,32 @@
+import { api } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
-import { getBooksApi, getRecommendedBooksApi, getCategoriesApi } from "./api";
+
+export const fetchBooks = {
+  Book: "books",
+  Books_Detail: "bookDetail",
+  Books_Recommended: "booksRecommended",
+}
+
+export const endPoints = {
+  Book: "/api/books",
+  Books_Detail: (id: number) => `/api/books/${id}`,
+  Books_Recommended: "/api/books/recommended",
+}
 
 export const useBooks = (params?: {
-  page?: number;
-  limit?: number;
-  categoryId?: number;
   q?: string;
-}) => {
-  return useQuery({
-    queryKey: ["books", params],
-    queryFn: () => getBooksApi(params),
-  });
-};
-
-export const useRecommendedBooks = (params?: {
+  categoryId?: number;
+  authorId?: number;
+  minRating?: number;
   page?: number;
   limit?: number;
 }) => {
   return useQuery({
-    queryKey: ["books-recommend", params],
-    queryFn: () => getRecommendedBooksApi(params),
-  });
-};
-
-export const useCategories = () => {
-  return useQuery({
-    queryKey: ["categories"],
-    queryFn: getCategoriesApi,
-  });
-};
+    queryKey: [fetchBooks.Book, params],
+    queryFn: async () => {
+      const data = await api.get(endPoints.Book, { params })
+      return data;
+},
+  })
+}
+  

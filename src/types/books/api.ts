@@ -1,27 +1,37 @@
-import { api } from "@/lib/api";
-import type { BooksResponse, CategoriesResponse } from "./type";
+import type { Author } from "./author"
+import type { Category } from "./category"
 
-export const getBooksApi = async (params?: {
-  page?: number;
-  limit?: number;
-  categoryId?: number;
-  authorId?: number;
-  minRating?: number;
-  q?: string;
-}): Promise<BooksResponse> => {
-  const response = await api.get("/api/books", { params });
-  return response.data;
-};
+export interface Book {
+  id: number
+  title: string
+  description: string | null
+  isbn: string
+  publishedYear: number | null
+  coverImage: string | null
+  rating: number
+  reviewCount: number
+  totalCopies: number
+  availableCopies: number
+  borrowCount: number
+  authorId: number
+  categoryId: number
+  author?: Author
+  category?: Category
+  createdAt: string
+  updatedAt: string
+}
 
-export const getRecommendedBooksApi = async (params?: {
-  page?: number;
-  limit?: number;
-}): Promise<BooksResponse> => {
-  const response = await api.get("/api/books/recommended", { params });
-  return response.data;
-};
+export interface CreateBookPayload {
+  title: string
+  isbn: string
+  categoryId: number
+  authorId?: number
+  authorName?: string
+  coverImage?: string
+  description?: string
+  publishedYear?: number
+  totalCopies?: number
+  availableCopies?: number
+}
 
-export const getCategoriesApi = async (): Promise<CategoriesResponse> => {
-  const response = await api.get("/api/categories");
-  return response.data;
-};
+export interface GetBooksParams extends 
