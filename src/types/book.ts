@@ -1,5 +1,5 @@
-import type { Author } from "./author"
-import type { Category } from "./category"
+import type { Author } from './author'
+import type { Category } from './category'
 
 export interface Book {
   id: number
@@ -27,9 +27,9 @@ export interface CreateBookPayload {
   categoryId: number
   authorId?: number
   authorName?: string
-  coverImage?: string
   description?: string
   publishedYear?: number
+  coverImage?: string
   totalCopies?: number
   availableCopies?: number
 }

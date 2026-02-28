@@ -1,27 +1,27 @@
-import store from "@/app/store";
-import { logout } from "@/types/auth/hooks";
-import axios from "axios";
+import axios from 'axios'
+import { store } from '@/store/index'
+import { logout } from '@/store/authSlice'
 
-export const api = axios.create({
+const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
-});
+})
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-
+  const token = store.getState().auth.token
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    config.headers.Authorization = `Bearer ${token}`
   }
-
-  return config;
-});
+  return config
+})
 
 api.interceptors.response.use(
   (response) => response.data,
   (error) => {
     if (error.response?.status === 401) {
-      store.dispatch(logout());
+      store.dispatch(logout())
     }
-    return Promise.reject(error);
-  },
-);
+    return Promise.reject(error)
+  }
+)
+
+export default api
