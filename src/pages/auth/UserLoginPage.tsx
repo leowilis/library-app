@@ -1,7 +1,8 @@
-import { useLogin } from "@/features/auth/hooks";
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import {  useState } from "react";
+import { Link } from "react-router-dom";
+import { toast } from 'sonner'
 import { Button } from "@/components/ui/button";
+import { useLogin } from "@/hooks/useAuth";
 
 // Logo & Icons
 import Logo from "@/assets/logo/logo.svg";
@@ -9,24 +10,21 @@ import EyeOpen from "@/assets/icon/eye.svg";
 import EyeOff from "@/assets/icon/eyeclose.svg";
 
 export default function UserLogin() {
-  const navigate = useNavigate();
-  const login = useLogin();
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-
-  useEffect(() => {
-    if (login.isSuccess) {
-      navigate("/");
-    }
-  }, [login.isSuccess, navigate]);
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const { mutate: login, isPending } = useLogin()
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    login.mutate({ email, password });
-  };
+    e.preventDefault()
+    login(
+      { email, password },
+      {
+        onSuccess: () => toast.success('Welcome back!'),
+        onError: () => toast.error('Wrong email or password'),
+      }
+    )
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center px-6">
