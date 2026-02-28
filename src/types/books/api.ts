@@ -34,4 +34,4 @@ export interface CreateBookPayload {
   availableCopies?: number
 }
 
-export interface GetBooksParams extends 
+export interface UpdateBookPayload extends Partial<CreateBookPayload> {}
