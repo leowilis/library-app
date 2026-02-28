@@ -1,15 +1,15 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import LoginPage from "./pages/auth/UserLoginPage";
+import { Routes, Route } from "react-router-dom";
+import UserLogin from "./pages/auth/UserLoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
 
-function App() {
+export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/login" />} />
-      <Route path="/login" element={<LoginPage />} />
+      <Route path="/" element={<Homepage/>} />
+      <Route path="/login" element={<UserLogin/>} />
       <Route path="/register" element={<RegisterPage />} />
     </Routes>
   );
 }
 
-export default App;
+

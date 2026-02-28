@@ -1,12 +1,14 @@
 import { useLogin } from "@/features/auth/hooks";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+
+// Logo & Icons
 import Logo from "@/assets/logo/logo.svg";
 import EyeOpen from "@/assets/icon/eye.svg";
 import EyeOff from "@/assets/icon/eyeclose.svg";
-import { Button } from "@/components/ui/button";
 
-export default function LoginPage() {
+export default function UserLogin() {
   const navigate = useNavigate();
   const login = useLogin();
 

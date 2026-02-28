@@ -1,4 +1,4 @@
-import type { Book } from "@/features/books/type";
+import type { Book } from "@/types/books/type";
 import { useNavigate } from "react-router-dom";
 
 interface BookCardProps {
