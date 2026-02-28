@@ -1,35 +1,31 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { useLogin } from "@/hooks/useAuth";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useState } from 'react'
+import { toast } from 'sonner'
+import { useLogin } from '@/hooks/useAuth'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 // Logo & Icons
 import Logo from "@/assets/logo/logo.svg";
 import EyeOpen from "@/assets/icon/eye.svg";
 import EyeOff from "@/assets/icon/eyeclose.svg";
 
-export default function UserLogin() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const { mutate: login, isPending } = useLogin();
+export default function AdminLogin() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const { mutate: login, isPending } = useLogin()
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     login(
       { email, password },
       {
-        onSuccess: () => toast.success("Welcome back!"),
-        onError: () =>
-          toast.error(
-            "Login failed! wrong email or password. Please try again.",
-          ),
-      },
-    );
-  };
+        onSuccess: () => toast.success('Welcome, Admin!'),
+        onError: () => toast.error('Login failed! Wrong email or password. Please try again.'),
+      }
+    )
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center px-6">
@@ -109,14 +105,8 @@ export default function UserLogin() {
           </Button>
         </form>
 
-        {/* Register link */}
-        <p className="text-center text-sm text-neutral-950 mt-4">
-          Don't have an account?{" "}
-          <Link to="/register" className="text-blue-600 font-medium">
-            Register
-          </Link>
-        </p>
+        
       </div>
     </div>
-  );
+  )
 }

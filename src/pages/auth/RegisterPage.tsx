@@ -1,44 +1,56 @@
 import { useState } from "react";
+import { useRegister } from "@/hooks/useAuth";
+import { toast } from 'sonner'
 import { useNavigate, Link } from "react-router-dom";
-import { useRegister } from "@/features/auth/hooks";
+import { ROUTES } from "@/constants";
 import { Button } from "@/components/ui/button";
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+
+// Logo & Icons
 import Logo from "@/assets/logo/logo.svg";
 import EyeOpen from "@/assets/icon/eye.svg";
 import EyeOff from "@/assets/icon/eyeclose.svg";
 
 export default function RegisterPage() {
-  const navigate = useNavigate();
-  const register = useRegister();
+  const navigate = useNavigate()
+  const { mutate: register, isPending } = useRegister()
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    password: '',
+    confirmPassword: '',
+  })
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value })
+  }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-
-    if (password !== confirmPassword) {
-      setError("Password is not match!");
-      return;
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (form.password !== form.confirmPassword) {
+      toast.error('Passwords do not match')
+      return
     }
-
-    setLoading(true);
-    try {
-      await register({ name, email, password });
-      navigate("/login");
-    } catch {
-      setError("Failed to register. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    register(
+      {
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        password: form.password,
+      },
+      {
+        onSuccess: () => {
+          toast.success('Account created successfully! Please log in.')
+          navigate(ROUTES.Login)
+        },
+        onError: () => toast.error('Failed to create account. Please try again.'),
+      }
+    )
+  }
 
   return (
     <div className="flex items-center justify-center px-6 py-20">
@@ -59,11 +71,12 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {/* Name */}
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-semibold">Name</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+            <Label htmlFor="name" className="text-sm font-semibold">Name</Label>
+            <Input 
+              id="name"
+              name="name"
+              value={form.name}
+              onChange={handleChange}
               className="border border-gray-300 rounded-md px-3 py-3 text-sm outline-none focus:border-blue-500"
               required
             />
@@ -71,11 +84,13 @@ export default function RegisterPage() {
 
           {/* Email */}
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-bold">Email</label>
-            <input
+            <Label htmlFor="email" className="text-sm font-bold">Email</Label>
+            <Input
+              id="email"
+              name="email"
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={form.email}
+              onChange={handleChange}
               className="border border-gray-300 rounded-md px-3 py-3 text-sm outline-none focus:border-blue-500"
               required
             />
@@ -83,11 +98,13 @@ export default function RegisterPage() {
 
           {/* Phone */}
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-bold">Nomor Handphone</label>
-            <input
+            <Label htmlFor="phone" className="text-sm font-bold">Nomor Handphone</Label>
+            <Input
+              id="phone"
+              name="phone"
               type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              value={form.phone}
+              onChange={handleChange}
               className="border border-gray-300 rounded-md px-3 py-3 text-sm outline-none focus:border-blue-500"
               required
             />
@@ -95,12 +112,14 @@ export default function RegisterPage() {
 
           {/* Password */}
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-bold">Password</label>
+            <Label htmlFor="password" className="text-sm font-bold">Password</Label>
             <div className="relative">
-              <input
+              <Input
+                id="password"
+                name="password"
                 type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={form.password}
+                onChange={handleChange}
                 className="w-full border border-gray-300 rounded-md px-3 py-3 text-sm outline-none focus:border-blue-500"
                 required
               />
@@ -109,7 +128,7 @@ export default function RegisterPage() {
                 type="button"
                 onClick={() => {
                   setShowPassword(!showPassword);
-                  setShowConfirmPassword(!showConfirmPassword);
+                  setShowConfirm(!showConfirm);
                 }}
                 className="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer p-0 text-gray-400"
               >
@@ -125,12 +144,14 @@ export default function RegisterPage() {
 
           {/* Confirm Password */}
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-bold">Confirm Password</label>
+            <Label htmlFor="confirmPassword" className="text-sm font-bold">Confirm Password</Label>
             <div className="relative">
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+              <Input
+                id="confirmPassword"
+                name="confirmPassword"
+                type={showConfirm ? "text" : "password"}
+                value={form.confirmPassword}
+                onChange={handleChange}
                 className="w-full border border-gray-300 rounded-md px-3 py-3 text-sm outline-none focus:border-blue-500"
                 required
               />
@@ -139,7 +160,7 @@ export default function RegisterPage() {
                 type="button"
                 onClick={() => {
                   setShowPassword(!showPassword);
-                  setShowConfirmPassword(!showConfirmPassword);
+                  setShowConfirm(!showConfirm);
                 }}
                 className="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer p-0 text-gray-400"
               >
@@ -153,13 +174,10 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          {/* Error */}
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-
           {/* Button */}
           <Button
             type="submit"
-            disabled={loading}
+            disabled={isPending}
             size={"xl"}
             style={{
               backgroundColor: "#1C65DA",
@@ -168,7 +186,7 @@ export default function RegisterPage() {
               borderRadius: "9999px",
             }}
           >
-            {loading ? "Loading..." : "Submit"}
+            {isPending ? "Loading..." : "Submit"}
           </Button>
         </form>
 
