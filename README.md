@@ -1,73 +1,127 @@
-# React + TypeScript + Vite
+# 📘 Portfolio Website — Next.js (Based on Figma)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> A modern responsive portfolio website built with React.js, TypeScript, Tailwind CSS, Shadcn UI, Redux Toolkit, and TanStack Query.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 📌 Table of Contents
+1. Project Overview
+2. Design Reference
+3. Live Preview
+4. Tech Stack
+5. Features
+6. Code Structure
+7. Getting Started
+8. Deployment
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🧠 1. Project Overview
 
-## Expanding the ESLint configuration
+This project is a portfolio website built using **Next.js 20** with a mobile-first responsive design.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+It is a result of slicing a Figma design into a functional web experience, implementing modern frontend best practices and reusable components.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+**Goal**
+- Transform a Figma design into a responsive website
+- Apply clean, maintainable, and scalable frontend code
+- Deploy to a production environment
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+---
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 🎨 2. Design Reference
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+**Figma Design:**  
+https://www.figma.com/design/YDdMopW8nI2pcxTxXD3Mck/Library-App?node-id=39412-6528&p=f&t=jCXRUJT3gt2yRdOt-0
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+**Design Implementation Notes:**
+- Layout consistency with grid and spacing
+- Scalable typography
+- Well-defined color system
+- Responsive behavior across devices
+- Component reuse
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
+
+## 👀 3. Live Preview
+
+*(Add screenshot images here in Notion)*
+
+Example placeholders:
+
+📱 Mobile Preview  
+🌐 Desktop Preview  
+🎨 Figma reference
+
+---
+
+## 🛠 4. Tech Stack
+
+| Category | Technology |
+|----------|------------|
+| Framework | Next.js 20 |
+| Language | TypeScript |
+| Styling | Tailwind CSS |
+| UI Kit | Shadcn |
+| Animation | Framer Motion |
+| Icons | SVG/Custom |
+
+---
+
+## 🚀 5. Features
+
+✔ Responsive design (Desktop & Mobile)  
+✔ Animation using Framer Motion  
+✔ Reusable UI components  
+✔ Carousel & card animations  
+✔ CTA sections and buttons  
+✔ Dynamic FAQ component with carousel navigation
+
+---
+
+## 🗂 6. Code Structure
+
+src/
+├── app/
+| ├──api/
+| | ├──contact/
+| |   └──route.tsx
+│ ├── page.tsx
+│ └── layout.tsx
+├── components/
+│ ├── containers/
+| ├── ui/
+└── lib/
+
+
+
+- **app/** — Main pages & layout  
+- **components/ui/** — Shared UI components  
+- **components/containers/** — UI sections  
+- **assets/** — Static images/icons  
+- **lib/** — Utility functions
+
+---
+
+## 🏁 7. Getting Started
+
+## Install dependencies
+
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+
+## Run development server
+
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+
+## Open app
+
+http://localhost:3000
