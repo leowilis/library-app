@@ -1,5 +1,5 @@
 import { useLogin } from "@/features/auth/hooks";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Logo from "@/assets/logo/logo.svg";
 import EyeOpen from "@/assets/icon/eye.svg";
@@ -13,26 +13,17 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-
-    try {
-      const response = await login({ email, password });
-      if (response.user.role === "admin") {
-        navigate("/admin/dashboard");
-      } else {
-        navigate("/home");
-      }
-    } catch {
-      setError("Email or password is incorrect");
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    if (login.isSuccess) {
+      navigate("/");
     }
+  }, [login.isSuccess, navigate]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    login.mutate({ email, password });
   };
 
   return (
@@ -89,13 +80,10 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Error */}
-          {error && <p className="text-sm text-red-500">{error}</p>}
-
           {/* Button */}
           <Button
             type="submit"
-            disabled={loading}
+            disabled={login.isPending}
             size={"xl"}
             style={{
               backgroundColor: "#1C65DA",
@@ -104,7 +92,7 @@ export default function LoginPage() {
               borderRadius: "9999px",
             }}
           >
-            {loading ? "Loading..." : "Login"}
+            {login.isPending ? "Loading..." : "Login"}
           </Button>
         </form>
 
