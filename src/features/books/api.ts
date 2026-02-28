@@ -1,4 +1,4 @@
-import { api } from "@/lib/axios";
+import api from "@/services/axios";
 import type { BooksResponse, CategoriesResponse } from "./type";
 
 export const getBooksApi = async (params?: {
