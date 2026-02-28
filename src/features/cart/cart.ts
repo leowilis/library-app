@@ -1,27 +1,27 @@
-import type { Book } from "../books/type"
+import type { Book } from "../books/type";
 
 export interface CartItem {
-  id: number
-  bookId: number
-  book: Book
+  id: number;
+  bookId: number;
+  book: Book;
 }
 
 export interface Cart {
-  cartId: number
-  items: CartItem[]
-  itemCount: number
+  cartId: number;
+  items: CartItem[];
+  itemCount: number;
 }
 
 export interface AddToCartPayload {
-  bookId: number
+  bookId: number;
 }
 
 export interface CheckoutPayload {
   user: {
-    name: string
-    email: string
-    phone: string | null
-  }
-  items: CartItem[]
-  itemCount: number
+    name: string;
+    email: string;
+    phone: string | null;
+  };
+  items: CartItem[];
+  itemCount: number;
 }

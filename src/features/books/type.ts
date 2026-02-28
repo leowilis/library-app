@@ -26,8 +26,8 @@ export interface Book {
   categoryId: number;
   createdAt: string;
   updatedAt: string;
-  author: Author;
-  category: Category;
+  author?: Author;
+  category?: Category;
 }
 
 export interface BooksResponse {

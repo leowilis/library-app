@@ -1,12 +1,12 @@
-import type { Book } from "@/features/books/type"
-import { useNavigate } from "react-router-dom"
+import type { Book } from "@/features/books/type";
+import { useNavigate } from "react-router-dom";
 
 interface BookCardProps {
-  book: Book
+  book: Book;
 }
 
 export default function BookCard({ book }: BookCardProps) {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   return (
     <div
@@ -30,5 +30,5 @@ export default function BookCard({ book }: BookCardProps) {
         <span className="text-xs text-gray-500">{book.rating}</span>
       </div>
     </div>
-  )
+  );
 }
