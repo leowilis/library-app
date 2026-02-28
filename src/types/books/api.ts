@@ -1,37 +1,11 @@
-import type { Author } from "./author"
-import type { Category } from "./category"
+export const fetchBooks = {
+  Book: "books",
+  Books_Detail: "bookDetail",
+  Books_Recommended: "booksRecommended",
+};
 
-export interface Book {
-  id: number
-  title: string
-  description: string | null
-  isbn: string
-  publishedYear: number | null
-  coverImage: string | null
-  rating: number
-  reviewCount: number
-  totalCopies: number
-  availableCopies: number
-  borrowCount: number
-  authorId: number
-  categoryId: number
-  author?: Author
-  category?: Category
-  createdAt: string
-  updatedAt: string
-}
-
-export interface CreateBookPayload {
-  title: string
-  isbn: string
-  categoryId: number
-  authorId?: number
-  authorName?: string
-  coverImage?: string
-  description?: string
-  publishedYear?: number
-  totalCopies?: number
-  availableCopies?: number
-}
-
-export interface UpdateBookPayload extends Partial<CreateBookPayload> {}
+export const endPoints = {
+  Book: "/api/books",
+  Books_Detail: (id: number) => `/api/books/${id}`,
+  Books_Recommended: "/api/books/recommended",
+};

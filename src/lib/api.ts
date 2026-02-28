@@ -1,5 +1,5 @@
 import store from "@/app/store";
-import { logout } from "@/hooks/authSlice";
+import { logout } from "@/types/auth/hooks";
 import axios from "axios";
 
 export const api = axios.create({

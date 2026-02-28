@@ -1,4 +1,4 @@
-import type { Book } from "../books/api";
+import type { Book } from "../books/type";
 
 export interface CartItem {
   id: number;

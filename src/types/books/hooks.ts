@@ -1,18 +1,8 @@
 import { api } from "@/lib/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { Book, CreateBookPayload, UpdateBookPayload } from "./api";
+import type { Book, CreateBookPayload, UpdateBookPayload } from "./type";
+import { endPoints, fetchBooks } from "./api";
 
-export const fetchBooks = {
-  Book: "books",
-  Books_Detail: "bookDetail",
-  Books_Recommended: "booksRecommended",
-};
-
-export const endPoints = {
-  Book: "/api/books",
-  Books_Detail: (id: number) => `/api/books/${id}`,
-  Books_Recommended: "/api/books/recommended",
-};
 
 export const useBooks = (params?: {
   q?: string;
