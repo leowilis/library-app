@@ -122,7 +122,7 @@ export default function Home() {
       {/* Popular Authors */}
       <div>
         <h2 className="text-xl font-bold text-gray-900 mb-4">Popular Authors</h2>
-        <div className="flex gap-4 overflow-x-auto pb-2">
+        <div className="flex flex-col gap-4 overflow-x-auto pb-2">
           {popularAuthors?.map((author: any) => (
             <AuthorCard
               key={author.id}

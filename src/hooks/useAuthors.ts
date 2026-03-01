@@ -17,7 +17,7 @@ export const usePopularAuthors = (limit?: number) => {
     queryKey: [Query_Keys.AuthorsPopular],
     queryFn: async () => {
       const data = await api.get(EndPoints.AuthorsPopular, { params: { limit } })
-      return data.data.Authors
+      return data.data.authors
     },
   })
 }
