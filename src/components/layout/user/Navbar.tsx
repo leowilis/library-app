@@ -39,7 +39,7 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="w-full px-4 py-4 relative" ref={menuRef}>
+    <nav className="w-full px-4 py-4 relative bg-white" ref={menuRef}>
       <div className="flex justify-between items-center">
 
         {/* Logo */}
@@ -73,7 +73,7 @@ export default function Navbar() {
 
       {/* Dropdown */}
       {menuOpen && (
-        <div className="absolute top-full left-0 right-0 bg-white shadow-md z-50 px-4 py-2">
+        <div className="absolute top-19 left-4 right-4 rounded-2xl bg-white shadow-md z-50 px-4 py-2">
           {token ? (
             <div className="flex flex-col">
               {[
@@ -84,15 +84,14 @@ export default function Navbar() {
                 <button
                   key={label}
                   onClick={() => handleNavigate(route)}
-                  className="text-left py-3 text-sm text-gray-700 border-b border-gray-100"
+                  className="text-left py-4 text-sm text-gray-950 font-semibold border-gray-100"
                 >
                   {label}
                 </button>
               ))}
               <button
                 onClick={handleLogout}
-                className="text-left py-3 text-sm font-semibold"
-                style={{ color: 'var(--accent-red)' }}
+                className="text-left py-3 text-sm font-semibold text-[#EE1D52]"
               >
                 Logout
               </button>
@@ -101,15 +100,13 @@ export default function Navbar() {
             <div className="flex gap-3 py-2">
               <button
                 onClick={() => handleNavigate(ROUTES.Login)}
-                className="flex-1 py-2.5 rounded-full text-sm font-semibold border-2 text-gray-700"
-                style={{ borderColor: 'var(--primary-300)' }}
+                className="flex-1 py-2.5 rounded-full text-sm font-bold border border-neutral-300"
               >
                 Login
               </button>
               <button
                 onClick={() => handleNavigate(ROUTES.Register)}
-                className="flex-1 py-2.5 rounded-full text-sm font-semibold text-white"
-                style={{ backgroundColor: 'var(--primary-300)' }}
+                className="flex-1 py-2.5 rounded-full text-sm font-bold text-white bg-[#1C65DA]"
               >
                 Register
               </button>
