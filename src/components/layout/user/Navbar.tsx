@@ -20,8 +20,6 @@ export default function Navbar() {
           <button><img src={Bag} alt="checkout"/></button>
           <button><img src={Menubar} alt="Mobile Menu"/></button>
         </div>
-
-
       </div>
     </nav>
   );
