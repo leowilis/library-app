@@ -4,8 +4,8 @@ import { useCategories } from "@/hooks/useCategories";
 import { useRecommendedBooks } from "@/hooks/useBooks";
 import { usePopularAuthors } from "@/hooks/useAuthors";
 import { ROUTES } from "@/constants";
-import HeroBanner from "@/components/user/Background";
 import AuthorCard from "@/components/user/AuthorCard";
+import Background from "@/components/user/Background";
 import BookCard from "@/common/BookCard";
 
 import fictionIcon from "@/assets/categoriesIcon/fiction.svg";
@@ -46,37 +46,42 @@ export default function Home() {
   };
 
   return (
-    <div className="space-y-8">
-      <HeroBanner />
+    <main className="space-y-8">
+      <Background />
 
       {/* Categories */}
-      <section>
-        <div className="grid grid-cols-3 gap-3">
-          {categories?.map((cat: { id: number; name: string }) => (
-            <button
-              key={cat.id}
-              onClick={() => handleCategoryClick(cat.id)}
-              className="flex flex-col items-center justify-center gap-2 p-4 rounded-2xl shadow-sm transition-all"
-              style={{
-                backgroundColor: activeCategory === cat.id ? "var(--primary-200)" : "white",
-                border: activeCategory === cat.id ? "2px solid var(--primary-300)" : "2px solid transparent",
-              }}
-            >
-              {CATEGORY_ICONS[cat.name] && (
-                <img
-                  src={CATEGORY_ICONS[cat.name]}
-                  alt={cat.name}
-                  className="w-8 h-8 object-contain"
-                />
-              )}
-              <span className="text-xs font-semibold text-gray-700 text-center">{cat.name}</span>
-            </button>
-          ))}
+      <div>
+        <div className="grid grid-cols-3 gap-3 px-2 py-4">
+          {categories
+            ?.filter((cat: { id: number; name: string }) => CATEGORY_ICONS[cat.name])
+            .map((cat: { id: number; name: string }) => (
+              <button
+                key={cat.id}
+                onClick={() => handleCategoryClick(cat.id)}
+                className="flex flex-col items-center justify-center gap-2 p-4 rounded-2xl shadow-sm transition-all"
+                style={{
+                  backgroundColor: activeCategory === cat.id ? "var(--primary-200)" : "white",
+                  border: activeCategory === cat.id ? "2px solid var(--primary-300)" : "2px solid transparent",
+                }}
+              >
+                <div
+                  className="w-12 h-12 rounded-xl flex items-center justify-center"
+                  style={{ backgroundColor: "var(--primary-100)" }}
+                >
+                  <img
+                    src={CATEGORY_ICONS[cat.name]}
+                    alt={cat.name}
+                    className="w-7 h-7 object-contain"
+                  />
+                </div>
+                <span className="text-xs font-semibold text-gray-700 text-center">{cat.name}</span>
+              </button>
+            ))}
         </div>
-      </section>
+      </div>
 
       {/* Recommendations */}
-      <section>
+      <div>
         <h2 className="text-xl font-bold text-gray-900 mb-4">
           {activeCategory
             ? categories?.find((c: { id: number }) => c.id === activeCategory)?.name
@@ -92,26 +97,30 @@ export default function Home() {
         ) : (
           <div className="grid grid-cols-2 gap-4">
             {recommended?.map((book: any) => (
-              <div key={book.id} onClick={() => navigate(ROUTES.BookDetail(book.id))}>
-                <BookCard book={book} />
-              </div>
+              <BookCard
+                key={book.id}
+                book={book}
+                onClick={() => navigate(ROUTES.BookDetail(book.id))}
+              />
             ))}
           </div>
         )}
 
         {recommended && recommended.length >= 8 && (
-          <button
-            onClick={() => setPage((prev) => prev + 1)}
-            className="w-full mt-4 py-3 rounded-xl font-semibold text-sm"
-            style={{ backgroundColor: "var(--primary-200)", color: "var(--primary-300)" }}
-          >
-            Load More
-          </button>
+          <div className="flex justify-center mt-4">
+            <button
+              onClick={() => setPage((prev) => prev + 1)}
+              className="px-10 py-2.5 rounded-full text-sm font-bold text-gray-700"
+              style={{ border: "150px solid var(--neutral-300)" }}
+            >
+              Load More
+            </button>
+          </div>
         )}
-      </section>
+      </div>
 
       {/* Popular Authors */}
-      <section>
+      <div>
         <h2 className="text-xl font-bold text-gray-900 mb-4">Popular Authors</h2>
         <div className="flex gap-4 overflow-x-auto pb-2">
           {popularAuthors?.map((author: any) => (
@@ -122,7 +131,7 @@ export default function Home() {
             />
           ))}
         </div>
-      </section>
-    </div>
+      </div>
+    </main>
   );
 }

@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
-// Logo & Icons
 import Logo from "@/assets/logo/logo.svg";
 import EyeOpen from "@/assets/icon/eye.svg";
 import EyeOff from "@/assets/icon/eyeclose.svg";
@@ -31,10 +30,17 @@ export default function RegisterPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+
     if (form.password !== form.confirmPassword) {
       toast.error('Passwords do not match')
       return
     }
+
+    if (form.phone.length < 8 || form.phone.length > 20) {
+      toast.error('Phone must be 8-20 characters')
+      return
+    }
+
     register(
       {
         name: form.name,
@@ -47,7 +53,10 @@ export default function RegisterPage() {
           toast.success('Account created successfully! Please log in.')
           navigate(ROUTES.Login)
         },
-        onError: () => toast.error('Failed to create account. Please try again.'),
+        onError: (error: any) => {
+          const message = error?.response?.data?.message ?? 'Failed to create account. Please try again.'
+          toast.error(message)
+        },
       }
     )
   }
@@ -62,7 +71,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Title */}
-        <h1 className="text-2xl font-bold mb-1">Register</h1>
+        <h1 className="text-2xl font-bold mb-3">Register</h1>
         <p className="text-neutral-700 text-sm font-semibold mb-6">
           Create your account to start borrowing books.
         </p>
@@ -71,13 +80,13 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {/* Name */}
           <div className="flex flex-col gap-1">
-            <Label htmlFor="name" className="text-sm font-semibold">Name</Label>
-            <Input 
+            <Label htmlFor="name" className="text-sm font-bold">Name</Label>
+            <Input
               id="name"
               name="name"
               value={form.name}
               onChange={handleChange}
-              className="border border-gray-300 rounded-md px-3 py-3 text-sm outline-none focus:border-blue-500"
+              className="border border-gray-300 rounded-xl px-3 py-5 text-sm outline-none focus:border-blue-500"
               required
             />
           </div>
@@ -91,7 +100,7 @@ export default function RegisterPage() {
               type="email"
               value={form.email}
               onChange={handleChange}
-              className="border border-gray-300 rounded-md px-3 py-3 text-sm outline-none focus:border-blue-500"
+              className="border border-gray-300 rounded-xl px-3 py-5 text-sm outline-none focus:border-blue-500"
               required
             />
           </div>
@@ -105,7 +114,7 @@ export default function RegisterPage() {
               type="tel"
               value={form.phone}
               onChange={handleChange}
-              className="border border-gray-300 rounded-md px-3 py-3 text-sm outline-none focus:border-blue-500"
+              className="border border-gray-300 rounded-xl px-3 py-5 text-sm outline-none focus:border-blue-500"
               required
             />
           </div>
@@ -120,24 +129,15 @@ export default function RegisterPage() {
                 type={showPassword ? "text" : "password"}
                 value={form.password}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded-md px-3 py-3 text-sm outline-none focus:border-blue-500"
+                className="w-full border border-gray-300 rounded-xl px-3 py-5 text-sm outline-none focus:border-blue-500"
                 required
               />
-              {/* Show password */}
               <button
                 type="button"
-                onClick={() => {
-                  setShowPassword(!showPassword);
-                  setShowConfirm(!showConfirm);
-                }}
+                onClick={() => setShowPassword((prev) => !prev)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer p-0 text-gray-400"
               >
-                <img
-                  src={showPassword ? EyeOff : EyeOpen}
-                  width={20}
-                  height={20}
-                  alt="toggle password"
-                />
+                <img src={showPassword ? EyeOff : EyeOpen} width={20} height={20} alt="toggle password" />
               </button>
             </div>
           </div>
@@ -152,29 +152,20 @@ export default function RegisterPage() {
                 type={showConfirm ? "text" : "password"}
                 value={form.confirmPassword}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded-md px-3 py-3 text-sm outline-none focus:border-blue-500"
+                className="w-full border border-gray-300 rounded-xl px-3 py-5 text-sm outline-none focus:border-blue-500"
                 required
               />
-              {/* Show password */}
               <button
                 type="button"
-                onClick={() => {
-                  setShowPassword(!showPassword);
-                  setShowConfirm(!showConfirm);
-                }}
+                onClick={() => setShowConfirm((prev) => !prev)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer p-0 text-gray-400"
               >
-                <img
-                  src={showPassword ? EyeOff : EyeOpen}
-                  width={20}
-                  height={20}
-                  alt="toggle password"
-                />
+                <img src={showConfirm ? EyeOff : EyeOpen} width={20} height={20} alt="toggle confirm password" />
               </button>
             </div>
           </div>
 
-          {/* Button */}
+          {/* Submit */}
           <Button
             type="submit"
             disabled={isPending}
@@ -193,11 +184,11 @@ export default function RegisterPage() {
         {/* Login link */}
         <p className="text-center text-sm text-neutral-950 mt-6">
           Already have an account?{" "}
-          <Link to="/login" className="text-blue-600 font-medium">
+          <Link to={ROUTES.Login} className="text-blue-600 font-medium">
             Log in
           </Link>
         </p>
       </div>
     </div>
-  );
+  )
 }
