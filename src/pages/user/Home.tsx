@@ -51,14 +51,14 @@ export default function Home() {
 
       {/* Categories */}
       <div>
-        <div className="grid grid-cols-3 gap-3 px-2 py-4">
+        <div className="grid grid-cols-3 gap-3 py-3">
           {categories
             ?.filter((cat: { id: number; name: string }) => CATEGORY_ICONS[cat.name])
             .map((cat: { id: number; name: string }) => (
               <button
                 key={cat.id}
                 onClick={() => handleCategoryClick(cat.id)}
-                className="flex flex-col items-center justify-center gap-2 p-4 rounded-2xl shadow-sm transition-all"
+                className="flex flex-col items-center justify-center gap-2 p-4 rounded-2xl shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md"
                 style={{
                   backgroundColor: activeCategory === cat.id ? "var(--primary-200)" : "white",
                   border: activeCategory === cat.id ? "2px solid var(--primary-300)" : "2px solid transparent",
@@ -82,7 +82,7 @@ export default function Home() {
 
       {/* Recommendations */}
       <div>
-        <h2 className="text-xl font-bold text-gray-900 mb-4">
+        <h2 className="text-3xl font-bold text-gray-900 mb-4">
           {activeCategory
             ? categories?.find((c: { id: number }) => c.id === activeCategory)?.name
             : "Recommendation"}
