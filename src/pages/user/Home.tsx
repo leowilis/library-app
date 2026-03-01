@@ -26,7 +26,9 @@ const CATEGORY_ICONS: Record<string, string> = {
 
 export default function Home() {
   const navigate = useNavigate();
-  const [activeCategory, setActiveCategory] = useState<number | undefined>(undefined);
+  const [activeCategory, setActiveCategory] = useState<number | undefined>(
+    undefined,
+  );
   const [page, setPage] = useState(1);
 
   const { data: categories } = useCategories();
@@ -38,7 +40,7 @@ export default function Home() {
     limit: 8,
   });
 
-  const { data: popularAuthors } = usePopularAuthors(6);
+  const { data: popularAuthors } = usePopularAuthors(4);
 
   const handleCategoryClick = (id: number) => {
     setActiveCategory((prev) => (prev === id ? undefined : id));
@@ -53,20 +55,26 @@ export default function Home() {
       <div>
         <div className="grid grid-cols-3 gap-3 py-3">
           {categories
-            ?.filter((cat: { id: number; name: string }) => CATEGORY_ICONS[cat.name])
+            ?.filter(
+              (cat: { id: number; name: string }) => CATEGORY_ICONS[cat.name],
+            )
             .map((cat: { id: number; name: string }) => (
               <button
                 key={cat.id}
                 onClick={() => handleCategoryClick(cat.id)}
-                className="flex flex-col items-center justify-center gap-2 p-4 rounded-2xl shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md"
+                className="flex flex-col items-center justify-center gap-3 p-4 rounded-2xl shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md"
                 style={{
-                  backgroundColor: activeCategory === cat.id ? "var(--primary-200)" : "white",
-                  border: activeCategory === cat.id ? "2px solid var(--primary-300)" : "2px solid transparent",
+                  backgroundColor:
+                    activeCategory === cat.id ? "var(--primary-200)" : "white",
+                  border:
+                    activeCategory === cat.id
+                      ? "2px solid var(--primary-300)"
+                      : "2px solid transparent",
                 }}
               >
                 <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center"
-                  style={{ backgroundColor: "var(--primary-100)" }}
+                  className="w-30 h-15 rounded-lg flex items-center justify-center"
+                  style={{ backgroundColor: "#E0ECFF" }}
                 >
                   <img
                     src={CATEGORY_ICONS[cat.name]}
@@ -74,7 +82,9 @@ export default function Home() {
                     className="w-7 h-7 object-contain"
                   />
                 </div>
-                <span className="text-xs font-semibold text-gray-700 text-center">{cat.name}</span>
+                <span className="text-xs font-semibold text-gray-700 text-center">
+                  {cat.name}
+                </span>
               </button>
             ))}
         </div>
@@ -84,14 +94,18 @@ export default function Home() {
       <div>
         <h2 className="text-3xl font-bold text-gray-900 mb-4">
           {activeCategory
-            ? categories?.find((c: { id: number }) => c.id === activeCategory)?.name
+            ? categories?.find((c: { id: number }) => c.id === activeCategory)
+                ?.name
             : "Recommendation"}
         </h2>
 
         {isFetching ? (
           <div className="grid grid-cols-2 gap-4">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-56 rounded-2xl bg-gray-100 animate-pulse" />
+              <div
+                key={i}
+                className="h-56 rounded-2xl bg-gray-100 animate-pulse"
+              />
             ))}
           </div>
         ) : (
@@ -110,8 +124,7 @@ export default function Home() {
           <div className="flex justify-center mt-4">
             <button
               onClick={() => setPage((prev) => prev + 1)}
-              className="px-10 py-2.5 rounded-full text-sm font-bold text-gray-700"
-              style={{ border: "150px solid var(--neutral-300)" }}
+              className="px-10 py-2.5 rounded-full text-sm font-bold text-gray-700 border border-gray-300"
             >
               Load More
             </button>
@@ -121,8 +134,10 @@ export default function Home() {
 
       {/* Popular Authors */}
       <div>
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Popular Authors</h2>
-        <div className="flex flex-col gap-4 overflow-x-auto pb-2">
+        <h2 className="text-3xl font-bold text-gray-900 mb-7">
+          Popular Authors
+        </h2>
+        <div className="flex flex-col gap-6">
           {popularAuthors?.map((author: any) => (
             <AuthorCard
               key={author.id}

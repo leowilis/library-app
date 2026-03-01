@@ -39,7 +39,7 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="w-full px-4 py-4 relative bg-white" ref={menuRef}>
+    <nav className="w-full px-4 py-4 relative bg-white shadow-sm" ref={menuRef}>
       <div className="flex justify-between items-center">
 
         {/* Logo */}
