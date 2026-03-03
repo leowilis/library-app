@@ -48,12 +48,12 @@ export default function Home() {
   };
 
   return (
-    <main className="space-y-8">
+    <main className="space-y-8 md:space-y-12">
       <Background />
 
       {/* Categories */}
-      <div>
-        <div className="grid grid-cols-3 gap-3 py-3">
+      <section className="px-4 md:px-8">
+        <div className="grid grid-cols-3 md:grid-cols-6 gap-3 md:gap-4 py-3">
           {categories
             ?.filter(
               (cat: { id: number; name: string }) => CATEGORY_ICONS[cat.name],
@@ -61,38 +61,30 @@ export default function Home() {
             .map((cat: { id: number; name: string }) => (
               <button
                 key={cat.id}
-                onClick={() => handleCategoryClick(cat.id)}
-                className="flex flex-col items-center justify-center gap-3 p-4 rounded-2xl shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md"
-                style={{
-                  backgroundColor:
-                    activeCategory === cat.id ? "var(--primary-200)" : "white",
-                  border:
-                    activeCategory === cat.id
-                      ? "2px solid var(--primary-300)"
-                      : "2px solid transparent",
-                }}
+                onClick={() => navigate(ROUTES.Category(cat.id))}
+                className="flex flex-col items-start gap-5 p-3 md:p-4 rounded-2xl bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md"
               >
                 <div
-                  className="w-30 h-15 rounded-lg flex items-center justify-center"
+                  className="w-full h-15 md:h-20 rounded-xl flex items-center justify-center"
                   style={{ backgroundColor: "#E0ECFF" }}
                 >
                   <img
                     src={CATEGORY_ICONS[cat.name]}
                     alt={cat.name}
-                    className="w-7 h-7 object-contain"
+                    className="w-11 h-11 md:w-14 md:h-14 object-contain"
                   />
                 </div>
-                <span className="text-xs font-semibold text-gray-700 text-center">
+                <span className="text-xs md:text-sm font-semibold text-gray-950 text-left">
                   {cat.name}
                 </span>
               </button>
             ))}
         </div>
-      </div>
+      </section>
 
       {/* Recommendations */}
-      <div>
-        <h2 className="text-3xl font-bold text-gray-900 mb-4">
+      <section className="px-4 md:px-8">
+        <h2 className="text-3xl font-bold text-gray-900 mb-4 md:mb-6">
           {activeCategory
             ? categories?.find((c: { id: number }) => c.id === activeCategory)
                 ?.name
@@ -100,16 +92,16 @@ export default function Home() {
         </h2>
 
         {isFetching ? (
-          <div className="grid grid-cols-2 gap-4">
-            {[...Array(4)].map((_, i) => (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {[...Array(8)].map((_, i) => (
               <div
                 key={i}
-                className="h-56 rounded-2xl bg-gray-100 animate-pulse"
+                className="h-56 md:h-80 rounded-2xl bg-gray-100 animate-pulse"
               />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {recommended?.map((book: any) => (
               <BookCard
                 key={book.id}
@@ -121,23 +113,23 @@ export default function Home() {
         )}
 
         {recommended && recommended.length >= 8 && (
-          <div className="flex justify-center mt-4">
+          <div className="flex justify-center mt-4 md:mt-8">
             <button
               onClick={() => setPage((prev) => prev + 1)}
-              className="px-10 py-2.5 rounded-full text-sm font-bold text-gray-700 border border-gray-300"
+              className="px-10 py-2.5 rounded-full text-sm font-bold text-gray-700 border border-gray-300 transition hover:bg-gray-200"
             >
               Load More
             </button>
           </div>
         )}
-      </div>
+      </section>
 
       {/* Popular Authors */}
-      <div>
-        <h2 className="text-3xl font-bold text-gray-900 mb-7">
+      <div className="px-4 md:py-12 md:px-10 md:justify-center md:items-center ">
+        <h2 className="text-3xl font-bold text-gray-900 mb-7 md:text-4xl md:mb-8">
           Popular Authors
         </h2>
-        <div className="flex flex-col gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-4 ">
           {popularAuthors?.map((author: any) => (
             <AuthorCard
               key={author.id}

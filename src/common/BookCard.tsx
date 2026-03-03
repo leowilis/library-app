@@ -9,17 +9,17 @@ interface BookCardProps {
 export default function BookCard({ book, onClick }: BookCardProps) {
   return (
     <button
-      onClick={onClick}
-      className="flex flex-col rounded-xl overflow-hidden bg-white shadow-sm text-left w-full"
-    >
-      <div className="w-full h-[370px] bg-gray-100">
-        {book.coverImage ? (
-          <img
-            src={book.coverImage}
-            alt={book.title}
-            className="w-full h-full object-cover"
-          />
-        ) : (
+  onClick={onClick}
+  className="group flex flex-col rounded-xl overflow-hidden bg-white shadow-sm text-left w-full transition-transform duration-300 hover:-translate-y-1 hover:shadow-md"
+>
+  <div className="relative aspect-3/4 w-full bg-gray-100 overflow-hidden">
+    {book.coverImage ? (
+      <img
+        src={book.coverImage}
+        alt={book.title}
+        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+      />
+    ) : (
           <div
             className="w-full h-full flex items-center justify-center text-4xl"
           ></div>

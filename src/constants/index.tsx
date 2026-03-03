@@ -77,8 +77,9 @@ export const ROUTES = {
 
   // User
   Home: "/",
+  Search: "/search",
   BookDetail: (id: number) => `/books/${id}`,
-  Category: "/category",
+  Category: (id: number) => `/category/${id}`,
   BooksByAuthors: (id: number) => `/authors/${id}`,
   Cart: "/cart",
   CheckOut: "/checkout",

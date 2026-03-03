@@ -45,16 +45,16 @@ const SOCIAL_LINKS = [
 
 export default function Footer() {
   return (
-    <footer className="bg-white mt-10 py-10 px-6 border-t border-gray-300">
+    <footer className="bg-white mt-10 py-10 px-6 border-t border-gray-300 md:w-full md:p-18">
       <div className="flex flex-col items-center gap-4 text-center">
         {/* Logo + Name */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 md:mb-5">
           <img src={Logo} alt="Booky" width={32} height={32} />
-          <span className="text-4xl font-extrabold text-gray-900">Booky</span>
+          <span className="text-4xl font-extrabold text-gray-900 md:text-3xl ">Booky</span>
         </div>
 
         {/* Description */}
-        <p className="text-md font-semibold text-neutral-950 max-w-lg leading-relaxed">
+        <p className="text-md font-semibold text-neutral-950 leading-relaxed">
           Discover inspiring stories & timeless knowledge, ready to borrow anytime.
           Explore online or visit our nearest library branch.
         </p>
