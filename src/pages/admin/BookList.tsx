@@ -10,7 +10,7 @@ import { Star } from "lucide-react";
 const PAGE_SIZE = 10;
 
 // Dropdown Menu Component for Actions
-const ActionDropdown = ({ bookId, onPreview, onEdit, onDelete }: any) => {
+const ActionDropdown = ({ onPreview, onEdit, onDelete }: any) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -208,8 +208,6 @@ export default function AdminBookList() {
                   <td className="px-4 py-3 text-gray-600">{book.stock ?? 0}</td>
                   <td className="px-4 py-3">
                     <ActionDropdown
-                      bookId={book.id}
-                      // FIXED: Navigate to Admin Preview route for Desktop
                       onPreview={() => navigate(`/admin/books/${book.id}`)}
                       onEdit={() => navigate(`/admin/books/${book.id}/edit`)}
                       onDelete={() => setDeleteId(book.id)}
@@ -231,7 +229,7 @@ export default function AdminBookList() {
                 className="h-28 bg-gray-100 rounded-2xl animate-pulse"
               />
             ))
-          : filtered.map((book: any, idx: number) => (
+          : filtered.map((book: any) => (
               <div key={book.id} className="bg-white rounded-xl p-4 shadow-sm">
                 <div className="flex gap-3">
                   <div className="w-[92px] h-[138px] overflow-hidden">
@@ -264,8 +262,6 @@ export default function AdminBookList() {
                   </div>
                   <div className="flex items-start font-bold">
                     <ActionDropdown
-                      bookId={book.id}
-                      // Navigate to the Admin Preview route
                       onPreview={() => navigate(`/admin/books/${book.id}`)}
                       onEdit={() => navigate(`/admin/books/${book.id}/edit`)}
                       onDelete={() => setDeleteId(book.id)}

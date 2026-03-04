@@ -26,9 +26,7 @@ const CATEGORY_ICONS: Record<string, string> = {
 
 export default function Home() {
   const navigate = useNavigate();
-  const [activeCategory, setActiveCategory] = useState<number | undefined>(
-    undefined,
-  );
+  const [activeCategory] = useState<number | undefined>(undefined);
   const [page, setPage] = useState(1);
 
   const { data: categories } = useCategories();
@@ -37,15 +35,10 @@ export default function Home() {
     by: "rating",
     categoryId: activeCategory,
     page,
-    limit: 10, // Changed from 8 to 10 to fit the 5-column layout (2 rows of 5)
+    limit: 10,
   });
 
   const { data: popularAuthors } = usePopularAuthors(4);
-
-  const handleCategoryClick = (id: number) => {
-    setActiveCategory((prev) => (prev === id ? undefined : id));
-    setPage(1);
-  };
 
   return (
     <main className="space-y-8 md:space-y-12">
@@ -92,7 +85,6 @@ export default function Home() {
         </h2>
 
         {isFetching ? (
-          // Skeleton Loader: Updated to 5 columns
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6">
             {[...Array(10)].map((_, i) => (
               <div
@@ -102,7 +94,6 @@ export default function Home() {
             ))}
           </div>
         ) : (
-          // Book Grid: Updated to 5 columns
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6">
             {recommended?.map((book: any) => (
               <BookCard

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { EndPoints, Query_Keys } from '@/constants'
-import type { Book, CreateBookPayload, UpdateBookPayload } from '@/types/book'
+import type { CreateBookPayload, UpdateBookPayload } from '@/types/book'
 import { api } from '@/lib/api'
 
 export const useBooks = (params?: {

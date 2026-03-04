@@ -1,5 +1,4 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { Star } from "lucide-react";
 import { useAuthorBooks } from "@/hooks/useAuthors";
 import { ROUTES } from "@/constants";
 import BookCard from "../user/BookCard";
