@@ -54,10 +54,10 @@ export default function AdminBorrowedList() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold text-gray-900">Borrowed List</h1>
+      <h1 className="text-2xl font-bold text-gray-900 md:font-extrabold md:text-3xl">Borrowed List</h1>
 
       {/* Search */}
-      <div className="flex items-center gap-2 bg-white rounded-xl px-4 py-2.5 border border-gray-200 w-full md:w-80">
+      <div className="flex items-center gap-2 bg-white rounded-xl px-4 py-2.5 border border-neutral-300 w-full md:w-[600px] md:rounded-full">
         <Search size={15} className="text-neutral-600" />
         <input
           value={search}
@@ -68,7 +68,7 @@ export default function AdminBorrowedList() {
       </div>
 
       {/* Status filters */}
-      <div className="flex gap-2 overflow-x-auto pb-1">
+      <div className="flex gap-2 overflow-x-auto pb-1 md:gap-3">
         {STATUS_FILTERS.map(({ label, value }) => (
           <button
             key={label}

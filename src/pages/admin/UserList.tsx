@@ -33,7 +33,7 @@ export default function AdminUserList() {
       <h1 className="text-2xl font-bold text-gray-900">User</h1>
 
       {/* Search */}
-      <div className="flex items-center gap-2 bg-white rounded-xl px-4 py-2.5 border border-gray-200 w-full md:w-80">
+      <div className="flex items-center gap-2 bg-white rounded-full px-4 py-2.5 border border-gray-200 w-full md:w-80">
         <Search size={16} className="text-gray-400" />
         <input
           value={search}
@@ -86,23 +86,62 @@ export default function AdminUserList() {
       </div>
 
       {/* Mobile Cards */}
-      <div className="md:hidden space-y-3">
-        {isLoading ? (
-          [...Array(3)].map((_, i) => (
-            <div key={i} className="h-28 bg-gray-100 rounded-2xl animate-pulse" />
-          ))
-        ) : filtered.map((user: any, idx: number) => (
-          <div key={user.id} className="bg-white rounded-2xl p-4 shadow-sm space-y-2">
-            <div className="flex justify-between text-xs text-gray-400">
-              <span>No. {(page - 1) * PAGE_SIZE + idx + 1}</span>
-              <span>{formatDate(user.createdAt)}</span>
-            </div>
-            <p className="font-bold text-gray-900">{user.name}</p>
-            <p className="text-sm text-gray-500">{user.email}</p>
-            <p className="text-sm text-gray-400">{user.phone ?? "-"}</p>
-          </div>
-        ))}
+      <div className="md:hidden space-y-4">
+  {isLoading ? (
+    [...Array(3)].map((_, i) => (
+      <div key={i} className="h-40 bg-gray-100 rounded-2xl animate-pulse" />
+    ))
+  ) : filtered.length === 0 ? (
+    <p className="text-center text-gray-400 py-6">No users found</p>
+  ) : (
+    filtered.map((user: any, idx: number) => (
+      <div
+        key={user.id}
+        className="bg-white rounded-2xl p-4 shadow-xs space-y-3"
+      >
+        {/* No */}
+        <div className="flex justify-between text-sm">
+          <span className="text-neutral-950 font-semibold">No</span>
+          <span className="font-bold text-gray-900">
+            {(page - 1) * PAGE_SIZE + idx + 1}
+          </span>
+        </div>
+
+        {/* Name */}
+        <div className="flex justify-between text-sm">
+          <span className="text-neutral-950 font-semibold">Name</span>
+          <span className="font-bold text-gray-900">
+            {user.name}
+          </span>
+        </div>
+
+        {/* Email */}
+        <div className="flex justify-between text-sm">
+          <span className="text-neutral-950 font-semibold">Email</span>
+          <span className="font-bold text-gray-900 break-all text-right">
+            {user.email}
+          </span>
+        </div>
+
+        {/* Phone */}
+        <div className="flex justify-between text-sm">
+          <span className="text-neutral-950 font-semibold">Nomor Handphone</span>
+          <span className="font-bold text-gray-900">
+            {user.phone ?? "-"}
+          </span>
+        </div>
+
+        {/* Created At */}
+        <div className="flex justify-between text-sm">
+          <span className="text-neutral-950 font-semibold">Created at</span>
+          <span className="font-bold text-gray-900 text-right">
+            {formatDate(user.createdAt)}
+          </span>
+        </div>
       </div>
+    ))
+  )}
+</div>
 
       {/* Pagination */}
       {totalPages > 1 && (
