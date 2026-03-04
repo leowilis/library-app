@@ -1,24 +1,23 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Search } from "lucide-react";
 import { api } from "@/lib/api";
 import { EndPoints, Query_Keys } from "@/constants";
 import { formatDate } from "@/lib/utils";
-import { toast } from "sonner";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 15;
 
-type LoanStatus = "BORROWED" | "LATE" | "RETURNED" | undefined;
+type LoanStatus = "active" | "returned" | "overdue" | undefined;
 
 const STATUS_FILTERS = [
   { label: "All", value: undefined },
-  { label: "Active", value: "BORROWED" as const },
-  { label: "Returned", value: "RETURNED" as const },
-  { label: "Overdue", value: "LATE" as const },
+  { label: "Active", value: "active" as const },
+  { label: "Returned", value: "returned" as const },
+  { label: "Overdue", value: "overdue" as const },
 ];
 
 const STATUS_COLOR: Record<string, string> = {
-  BORROWED: "#079455",
+  BORROWED: "#24A500",
   RETURNED: "#6b7280",
   LATE: "#d92d20",
 };
@@ -33,7 +32,6 @@ export default function AdminBorrowedList() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<LoanStatus>(undefined);
   const [page, setPage] = useState(1);
-  const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
     queryKey: [Query_Keys.AdminLoans, page, status],
@@ -49,17 +47,6 @@ export default function AdminBorrowedList() {
   const total = data?.pagination?.total ?? loans.length;
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
-  const { mutate: returnBook } = useMutation({
-    mutationFn: async (id: number) => {
-      await api.patch(EndPoints.LoansReturn(id));
-    },
-    onSuccess: () => {
-      toast.success("Book returned!");
-      queryClient.invalidateQueries({ queryKey: [Query_Keys.AdminLoans] });
-    },
-    onError: () => toast.error("Failed to return book"),
-  });
-
   const filtered = loans.filter((loan: any) =>
     loan.book?.title?.toLowerCase().includes(search.toLowerCase()) ||
     loan.user?.name?.toLowerCase().includes(search.toLowerCase())
@@ -71,12 +58,12 @@ export default function AdminBorrowedList() {
 
       {/* Search */}
       <div className="flex items-center gap-2 bg-white rounded-xl px-4 py-2.5 border border-gray-200 w-full md:w-80">
-        <Search size={16} className="text-gray-400" />
+        <Search size={15} className="text-neutral-600" />
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search by book or user"
-          className="flex-1 text-sm bg-transparent outline-none text-gray-700"
+          placeholder="Search"
+          className="flex-1 text-md bg-transparent outline-none text-neutral-600"
         />
       </div>
 
@@ -98,94 +85,82 @@ export default function AdminBorrowedList() {
         ))}
       </div>
 
-      {/* Desktop Table */}
-      <div className="hidden md:block bg-white rounded-2xl shadow-sm overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b border-gray-200">
-            <tr>
-              {["No", "User", "Book", "Borrowed At", "Due Date", "Status", "Action"].map((h) => (
-                <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {isLoading ? (
-              [...Array(5)].map((_, i) => (
-                <tr key={i}>
-                  {[...Array(7)].map((_, j) => (
-                    <td key={j} className="px-4 py-3">
-                      <div className="h-4 bg-gray-100 rounded animate-pulse" />
-                    </td>
-                  ))}
-                </tr>
-              ))
-            ) : filtered.length === 0 ? (
-              <tr>
-                <td colSpan={7} className="text-center py-10 text-gray-400">No loans found</td>
-              </tr>
-            ) : (
-              filtered.map((loan: any, idx: number) => (
-                <tr key={loan.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-3 text-gray-500">{(page - 1) * PAGE_SIZE + idx + 1}</td>
-                  <td className="px-4 py-3 font-medium text-gray-900">{loan.user?.name}</td>
-                  <td className="px-4 py-3 text-gray-600 max-w-40">
-                    <p className="line-clamp-2">{loan.book?.title}</p>
-                  </td>
-                  <td className="px-4 py-3 text-gray-400">{formatDate(loan.borrowedAt)}</td>
-                  <td className="px-4 py-3 text-gray-400">{formatDate(loan.dueAt)}</td>
-                  <td className="px-4 py-3">
-                    <span className="text-xs font-bold" style={{ color: STATUS_COLOR[loan.status] }}>
-                      {STATUS_LABEL[loan.status]}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    {loan.status !== "RETURNED" && (
-                      <button
-                        onClick={() => returnBook(loan.id)}
-                        className="px-3 py-1.5 rounded-full text-xs font-semibold border-2 transition-colors"
-                        style={{ borderColor: "#1c65da", color: "#1c65da" }}
-                      >
-                        Return
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Mobile Cards */}
-      <div className="md:hidden space-y-3">
+      {/* Cards */}
+      <div className="space-y-3">
         {isLoading ? (
           [...Array(3)].map((_, i) => (
-            <div key={i} className="h-28 bg-gray-100 rounded-2xl animate-pulse" />
+            <div key={i} className="h-32 bg-gray-100 rounded-2xl animate-pulse" />
           ))
-        ) : filtered.map((loan: any) => (
-          <div key={loan.id} className="bg-white rounded-2xl p-4 shadow-sm space-y-2">
-            <div className="flex justify-between">
-              <span className="text-xs font-bold" style={{ color: STATUS_COLOR[loan.status] }}>
-                {STATUS_LABEL[loan.status]}
-              </span>
-              <span className="text-xs text-gray-400">{formatDate(loan.dueAt)}</span>
+        ) : filtered.length === 0 ? (
+          <p className="text-center text-gray-400 py-10">No loans found</p>
+        ) : (
+          filtered.map((loan: any) => (
+            <div key={loan.id} className="bg-white rounded-2xl p-4 shadow-sm">
+              {/* Status + Due Date */}
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-4">
+                  <span className="text-md font-bold text-neutral-950">Status</span>
+                  <span
+                    className="text-sm font-bold bg-[#24a500]/10 rounded py-2 px-2"
+                    style={{
+                      color: STATUS_COLOR[loan.status],
+                      borderColor: STATUS_COLOR[loan.status]
+                    }}
+                  >
+                    {STATUS_LABEL[loan.status]}
+                  </span>
+                </div>
+                <div className="flex items-center gap-5">
+                  <span className="text-md font-bold text-neutral-950">Due Date</span>
+                  <span
+                    className="text-sm font-bold bg-[#EE1D52]/10 rounded py-2 px-2"
+                    style={{
+                      color: "#d92d20",
+                      borderColor: "#d92d20"
+                    }}
+                  >
+                    {formatDate(loan.dueAt)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Line */}
+              <div className="border-t border-neutral-300 mb-5 mt-5"/>
+
+              {/* Book info */}
+              <div className="flex flex-col gap-3">
+                {/* Cover */}
+                <div className="w-25 h-30 overflow-hidden flex-shrink-0 bg-gray-100">
+                  {loan.book?.coverImage ? (
+                    <img
+                      src={loan.book.coverImage}
+                      alt={loan.book?.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gray-200 rounded-xl" />
+                  )}
+                </div>
+
+                {/* Info */}
+                <div className="flex-1 min-w-0 space-y-3">
+                  <span className="inline-block text-xs font-bold px-2 py-1 rounded-md border border-neutral-300 text-neutral-950">
+                    {loan.book?.category?.name ?? "Category"}
+                  </span>
+                  <p className="text-md font-bold text-gray-950 line-clamp-1">{loan.book?.title}</p>
+                  <p className="text-xs text-neutral-700">{loan.book?.author?.name}</p>
+                  <p className="text-sm font-bold text-neutral-950">
+                    {formatDate(loan.borrowedAt)} · Duration {loan.durationDays} Days
+                  </p>
+                  {/* Divider + Borrower name */}
+                  <div className="border-t border-gray-200 pt-2">
+                    <p className="text-sm font-semibold text-gray-700">{loan.user?.name}</p>
+                  </div>
+                </div>
+              </div>
             </div>
-            <p className="font-bold text-gray-900 line-clamp-1">{loan.book?.title}</p>
-            <p className="text-sm text-gray-500">{loan.user?.name}</p>
-            <p className="text-xs text-gray-400">{formatDate(loan.borrowedAt)}</p>
-            {loan.status !== "RETURNED" && (
-              <button
-                onClick={() => returnBook(loan.id)}
-                className="w-full py-2 rounded-full text-xs font-semibold border-2"
-                style={{ borderColor: "#1c65da", color: "#1c65da" }}
-              >
-                Return
-              </button>
-            )}
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
       {/* Pagination */}
