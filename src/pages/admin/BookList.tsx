@@ -1,12 +1,66 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Search, Pencil, Trash2, Plus } from "lucide-react";
+import { Search, Plus, MoreVertical, Eye, Pencil, Trash2 } from "lucide-react";
 import { api } from "@/lib/api";
-import { EndPoints, Query_Keys, ROUTES } from "@/constants";
+import { EndPoints, Query_Keys } from "@/constants";
 import { toast } from "sonner";
+import { Star } from "lucide-react";
 
 const PAGE_SIZE = 10;
+
+// Dropdown Menu Component for Actions
+const ActionDropdown = ({ bookId, onPreview, onEdit, onDelete }: any) => {
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
+      >
+        <MoreVertical size={18} />
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 mt-1 w-40 bg-white rounded-lg shadow-lg border border-gray-200 z-10 py-1">
+          <button
+            onClick={() => { onPreview(); setIsOpen(false); }}
+            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+          >
+            <Eye size={16} /> Preview
+          </button>
+          <button
+            onClick={() => { onEdit(); setIsOpen(false); }}
+            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+          >
+            <Pencil size={16} /> Edit
+          </button>
+          <button
+            onClick={() => { onDelete(); setIsOpen(false); }}
+            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+          >
+            <Trash2 size={16} /> Delete
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default function AdminBookList() {
   const navigate = useNavigate();
@@ -58,13 +112,13 @@ export default function AdminBookList() {
       </div>
 
       {/* Search */}
-      <div className="flex items-center gap-2 bg-white rounded-xl px-4 py-2.5 border border-gray-200 w-full md:w-80">
-        <Search size={16} className="text-gray-400" />
+      <div className="flex items-center gap-2 bg-white rounded-full px-4 py-2.5 border border-gray-200 w-full md:w-80">
+        <Search size={16} className="text-neutral-600" />
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search book"
-          className="flex-1 text-sm bg-transparent outline-none text-gray-700"
+          className="flex-1 text-sm bg-transparent outline-none text-neutral-600"
         />
       </div>
 
@@ -113,20 +167,12 @@ export default function AdminBookList() {
                   <td className="px-4 py-3 text-gray-600">{book.category?.name}</td>
                   <td className="px-4 py-3 text-gray-600">{book.stock ?? 0}</td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => navigate(`/admin/books/${book.id}/edit`)}
-                        className="p-1.5 rounded-lg text-blue-500 hover:bg-blue-50 transition-colors"
-                      >
-                        <Pencil size={16} />
-                      </button>
-                      <button
-                        onClick={() => setDeleteId(book.id)}
-                        className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
+                    <ActionDropdown
+                      bookId={book.id}
+                      onPreview={() => navigate(`/books/${book.id}`)} 
+                      onEdit={() => navigate(`/admin/books/${book.id}/edit`)}
+                      onDelete={() => setDeleteId(book.id)}
+                    />
                   </td>
                 </tr>
               ))
@@ -142,33 +188,35 @@ export default function AdminBookList() {
             <div key={i} className="h-28 bg-gray-100 rounded-2xl animate-pulse" />
           ))
         ) : filtered.map((book: any, idx: number) => (
-          <div key={book.id} className="bg-white rounded-2xl p-4 shadow-sm">
+          <div key={book.id} className="bg-white rounded-xl p-4 shadow-sm">
             <div className="flex gap-3">
-              <div className="w-12 h-16 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
+              <div className="w-[92px] h-[138px] overflow-hidden">
                 {book.coverImage && (
-                  <img src={book.coverImage} alt={book.title} className="w-full h-full object-cover" />
+                  <img src={book.coverImage} alt={book.title} className="w-[92px] h-[140px] object-cover mt-2" />
                 )}
               </div>
-              <div className="flex-1 min-w-0">
-                <span className="text-xs border border-gray-300 rounded px-1.5 py-0.5 text-gray-500">
+              <div className="flex-1 p-2">
+                <span className="text-xs font-bold border border-gray-300 rounded px-2 py-0.5 text-neutral-950">
                   {book.category?.name}
                 </span>
-                <p className="font-bold text-gray-900 mt-1 line-clamp-2">{book.title}</p>
-                <p className="text-xs text-gray-500">{book.author?.name}</p>
+                <p className="font-bold text-gray-900 mt-2 line-clamp-2">{book.title}</p>
+                <p className="text-xs text-neutral-700 mt-3">{book.author?.name}</p>
+                
+                {/* Inline Rating */}
+                <div className="flex items-center gap-1.5 mt-5">
+                  <Star size={18} fill="#fdb022" color="#fdb022" />
+                  <span className="text-sm font-bold text-gray-800">
+                    {book.rating}
+                  </span>
+                </div>
               </div>
-              <div className="flex flex-col gap-1">
-                <button
-                  onClick={() => navigate(`/admin/books/${book.id}/edit`)}
-                  className="p-1.5 rounded-lg text-blue-500 hover:bg-blue-50"
-                >
-                  <Pencil size={16} />
-                </button>
-                <button
-                  onClick={() => setDeleteId(book.id)}
-                  className="p-1.5 rounded-lg text-red-500 hover:bg-red-50"
-                >
-                  <Trash2 size={16} />
-                </button>
+              <div className="flex items-start font-bold">
+                <ActionDropdown
+                  bookId={book.id}
+                  onPreview={() => navigate(`/books/${book.id}`)} 
+                  onEdit={() => navigate(`/admin/books/${book.id}/edit`)}
+                  onDelete={() => setDeleteId(book.id)}
+                />
               </div>
             </div>
           </div>
