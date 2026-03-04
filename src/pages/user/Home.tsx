@@ -6,7 +6,7 @@ import { usePopularAuthors } from "@/hooks/useAuthors";
 import { ROUTES } from "@/constants";
 import AuthorCard from "@/components/user/AuthorCard";
 import Background from "@/components/user/Background";
-import BookCard from "@/common/BookCard";
+import BookCard from "@/pages/user/BookCard";
 
 import fictionIcon from "@/assets/categoriesIcon/fiction.svg";
 import nonfictionIcon from "@/assets/categoriesIcon/nonfiction.svg";
@@ -37,7 +37,7 @@ export default function Home() {
     by: "rating",
     categoryId: activeCategory,
     page,
-    limit: 8,
+    limit: 10, // Changed from 8 to 10 to fit the 5-column layout (2 rows of 5)
   });
 
   const { data: popularAuthors } = usePopularAuthors(4);
@@ -92,8 +92,9 @@ export default function Home() {
         </h2>
 
         {isFetching ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {[...Array(8)].map((_, i) => (
+          // Skeleton Loader: Updated to 5 columns
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6">
+            {[...Array(10)].map((_, i) => (
               <div
                 key={i}
                 className="h-56 md:h-80 rounded-2xl bg-gray-100 animate-pulse"
@@ -101,7 +102,8 @@ export default function Home() {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+          // Book Grid: Updated to 5 columns
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6">
             {recommended?.map((book: any) => (
               <BookCard
                 key={book.id}
@@ -112,7 +114,7 @@ export default function Home() {
           </div>
         )}
 
-        {recommended && recommended.length >= 8 && (
+        {recommended && recommended.length >= 10 && (
           <div className="flex justify-center mt-4 md:mt-8">
             <button
               onClick={() => setPage((prev) => prev + 1)}
@@ -125,7 +127,7 @@ export default function Home() {
       </section>
 
       {/* Popular Authors */}
-      <div className="px-4 md:py-12 md:px-10 md:justify-center md:items-center ">
+      <div className="px-4 md:py-10 md:px-10 md:justify-center md:items-center ">
         <h2 className="text-3xl font-bold text-gray-900 mb-7 md:text-4xl md:mb-8">
           Popular Authors
         </h2>

@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useBooks } from "@/hooks/useBooks";
 import { useCategories } from "@/hooks/useCategories";
 import { ROUTES } from "@/constants";
-import BookCard from "@/common/BookCard";
+import BookCard from "@/pages/user/BookCard";
 import { X } from "lucide-react";
 import FilterIcon from "@/assets/icon/Filter.svg";
 import StarIcon from "@/assets/icon/Star.svg";

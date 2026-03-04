@@ -22,7 +22,10 @@ export default function ReviewModal({ bookId, onClose }: ReviewModalProps) {
     createReview(
       { bookId, star: rating, comment },
       {
-        onSuccess: () => { toast.success('Review submitted!'); onClose() },
+        onSuccess: () => { 
+          toast.success('Review submitted!')
+          onClose() 
+        },
         onError: () => toast.error('Failed to submit review'),
       }
     )
@@ -32,44 +35,51 @@ export default function ReviewModal({ bookId, onClose }: ReviewModalProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
       <div className="relative bg-white w-full max-w-md rounded-3xl p-6 space-y-5">
+        {/* Header */}
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-bold text-gray-900">Give Review</h3>
-          <button onClick={onClose} className="text-gray-400"><X size={20} /></button>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <X size={24} className='text-black'/>
+          </button>
         </div>
 
-        <div className="space-y-2 text-center">
-          <p className="text-sm font-semibold text-gray-700">Give Rating</p>
-          <div className="flex justify-center gap-2">
+        {/* Star Rating */}
+        <div className="space-y-3 text-center">
+          <p className="text-sm font-bold text-gray-700">Give Rating</p>
+          <div className="flex justify-center gap-4">
             {[1, 2, 3, 4, 5].map((i) => (
               <button
                 key={i}
                 onMouseEnter={() => setHovered(i)}
                 onMouseLeave={() => setHovered(0)}
                 onClick={() => setRating(i)}
+                className="transition-transform hover:scale-110"
               >
                 <Star
-                  size={36}
-                  fill={(hovered || rating) >= i ? 'var(--accent-yellow)' : '#e5e7eb'}
-                  color={(hovered || rating) >= i ? 'var(--accent-yellow)' : '#e5e7eb'}
+                  size={40}
+                  fill={(hovered || rating) >= i ? '#fdb022' : '#e5e7eb'}
+                  stroke={(hovered || rating) >= i ? '#fdb022' : '#e5e7eb'}
+                  strokeWidth={2}
                 />
               </button>
             ))}
           </div>
         </div>
 
+        {/* Comment Textarea */}
         <textarea
           value={comment}
           onChange={(e) => setComment(e.target.value)}
           placeholder="Please share your thoughts about this book"
-          rows={5}
+          rows={15}
           className="w-full border border-gray-200 rounded-2xl px-4 py-3 text-sm text-gray-700 focus:outline-none focus:border-blue-400 resize-none"
         />
 
+        {/* Send Button */}
         <Button
           onClick={handleSend}
           disabled={isPending}
-          className="w-full rounded-full py-6 font-semibold text-white"
-          style={{ backgroundColor: 'var(--primary-300)' }}
+          className="w-full rounded-full py-6 font-semibold text-white bg-blue-600 hover:bg-blue-700"
         >
           {isPending ? 'Sending...' : 'Send'}
         </Button>

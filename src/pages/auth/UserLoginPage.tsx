@@ -1,12 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useLogin } from "@/hooks/useAuth";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-// Logo & Icons
 import Logo from "@/assets/logo/logo.svg";
 import EyeOpen from "@/assets/icon/eye.svg";
 import EyeOff from "@/assets/icon/eyeclose.svg";
@@ -19,40 +17,25 @@ export default function UserLogin() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    login(
-      { email, password },
-      {
-        onSuccess: () => toast.success("Welcome back!"),
-        onError: () =>
-          toast.error(
-            "Login failed! wrong email or password. Please try again.",
-          ),
-      },
-    );
+    login({ email, password });
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center px-6">
       <div className="w-full max-w-sm">
-        {/* Logo */}
         <div className="flex items-center gap-3 mb-5">
           <img src={Logo} width={33} height={33} alt="logo" />
           <h1 className="text-2xl font-bold">Booky</h1>
         </div>
 
-        {/* Title */}
         <h1 className="text-2xl font-bold mb-2">Login</h1>
         <p className="text-md text-neutral-700">
           Sign in to manage your library account.
         </p>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-6 mt-7">
-          {/* Email */}
           <div className="flex flex-col gap-2">
-            <Label htmlFor="email" className="text-sm font-bold">
-              Email
-            </Label>
+            <Label htmlFor="email" className="text-sm font-bold">Email</Label>
             <Input
               id="email"
               type="email"
@@ -63,11 +46,8 @@ export default function UserLogin() {
             />
           </div>
 
-          {/* Password */}
           <div className="flex flex-col gap-2">
-            <Label htmlFor="password" className="text-sm font-bold">
-              Password
-            </Label>
+            <Label htmlFor="password" className="text-sm font-bold">Password</Label>
             <div className="relative">
               <Input
                 id="password"
@@ -75,14 +55,13 @@ export default function UserLogin() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full border border-gray-300 rounded-xl px-3 py-6 text-sm outline-none focus:border-blue-500"
+                required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 bg-transparent border-none cursor-pointer"
               >
-
-                {/* Show Password */}
                 <img
                   src={showPassword ? EyeOff : EyeOpen}
                   width={20}
@@ -93,7 +72,6 @@ export default function UserLogin() {
             </div>
           </div>
 
-          {/* Button */}
           <Button
             type="submit"
             disabled={isPending}
@@ -109,12 +87,9 @@ export default function UserLogin() {
           </Button>
         </form>
 
-        {/* Register link */}
         <p className="text-center text-sm text-neutral-950 mt-4">
           Don't have an account?{" "}
-          <Link to="/register" className="text-blue-600 font-medium">
-            Register
-          </Link>
+          <Link to="/register" className="text-blue-600 font-medium">Register</Link>
         </p>
       </div>
     </div>

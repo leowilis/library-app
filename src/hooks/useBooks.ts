@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { EndPoints, Query_Keys } from '@/constants'
 import type { Book, CreateBookPayload, UpdateBookPayload } from '@/types/book'
-import api from '@/lib/api'
+import { api } from '@/lib/api'
 
 export const useBooks = (params?: {
   q?: string
@@ -40,10 +40,18 @@ export const useRecommendedBooks = (params?: {
   return useQuery({
     queryKey: [Query_Keys.BooksRecommend, params],
     queryFn: async () => {
-      const data = await api.get(EndPoints.BooksRecommend, { params })
-      return data
+      const res = await api.get(EndPoints.BooksRecommend, { params })
+
+      console.log("RECOMMEND RESPONSE:", res.data)
+
+      return res.data
     },
-    select: (data: any) => data.data.books as Book[]
+    select: (data: any) => {
+      if (Array.isArray(data)) return data
+      if (Array.isArray(data?.books)) return data.books
+      if (Array.isArray(data?.data?.books)) return data.data.books
+      return []
+    },
   })
 }
 

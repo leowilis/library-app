@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { EndPoints, Query_Keys } from '@/constants'
-import api from '@/lib/api'
+import { api } from '@/lib/api'
 
 export const useAuthors = (q?: string) => {
   return useQuery({
@@ -14,10 +14,13 @@ export const useAuthors = (q?: string) => {
 
 export const usePopularAuthors = (limit?: number) => {
   return useQuery({
-    queryKey: [Query_Keys.AuthorsPopular],
+    queryKey: [Query_Keys.AuthorsPopular, limit],
     queryFn: async () => {
-      const data = await api.get(EndPoints.AuthorsPopular, { params: { limit } })
-      return data.data.authors
+      const res = await api.get(EndPoints.AuthorsPopular, { params: { limit } })
+
+      return Array.isArray(res.data?.authors)
+        ? res.data.authors
+        : []
     },
   })
 }

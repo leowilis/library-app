@@ -1,48 +1,71 @@
-import { createSlice} from '@reduxjs/toolkit'
-import type { PayloadAction } from '@reduxjs/toolkit'
+import type { Book } from "@/types/book";
+import { createSlice } from "@reduxjs/toolkit";
+import type { PayloadAction } from "@reduxjs/toolkit";
 
-interface CartItem {
-  id: number
-  bookId: number
-  book: {
-    id: number
-    title: string
-    coverImage: string | null
-    author: {
-      id: number
-      name: string
-    }
-    category: {
-      id: number
-      name: string
-    }
+type CartItem = {
+  book: Book;
+};
+
+type CartState = {
+  items: CartItem[];
+};
+
+/* ================= LOAD FROM LOCAL STORAGE ================= */
+
+function loadCart(): CartItem[] {
+  try {
+    const saved = localStorage.getItem("cart");
+    return saved ? JSON.parse(saved) : [];
+  } catch {
+    return [];
   }
 }
 
-interface CartState {
-  items: CartItem[]
-  itemCount: number
+function saveCart(items: CartItem[]) {
+  try {
+    localStorage.setItem("cart", JSON.stringify(items));
+  } catch {
+    // ignore storage errors
+  }
 }
+
+/* ================= INITIAL STATE ================= */
 
 const initialState: CartState = {
-  items: [],
-  itemCount: 0,
-}
+  items: loadCart(),
+};
+
+/* ================= SLICE ================= */
 
 const cartSlice = createSlice({
-  name: 'cart',
+  name: "cart",
   initialState,
   reducers: {
-    setCart: (state, action: PayloadAction<{ items: CartItem[]; itemCount: number }>) => {
-      state.items = action.payload.items
-      state.itemCount = action.payload.itemCount
+    addToCart(state, action: PayloadAction<Book>) {
+      const exists = state.items.find(
+        (item) => item.book.id === action.payload.id,
+      );
+
+      if (!exists) {
+        state.items.push({ book: action.payload });
+        saveCart(state.items);
+      }
     },
-    clearCart: (state) => {
-      state.items = []
-      state.itemCount = 0
+
+    removeFromCart(state, action: PayloadAction<number>) {
+      state.items = state.items.filter(
+        (item) => item.book.id !== action.payload,
+      );
+      saveCart(state.items);
+    },
+
+    clearCart(state) {
+      state.items = [];
+      saveCart(state.items);
     },
   },
-})
+});
 
-export const { setCart, clearCart } = cartSlice.actions
-export default cartSlice.reducer
+export const { addToCart, removeFromCart, clearCart } = cartSlice.actions;
+
+export default cartSlice.reducer;

@@ -2,6 +2,7 @@ import type { Author } from './author'
 import type { Category } from './category'
 
 export interface Book {
+  stock: any
   id: number
   title: string
   description: string | null

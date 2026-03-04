@@ -1,16 +1,23 @@
-import type { Book } from "./book"
-import type { User } from "./user"
+
 
 
 export interface Review {
-  id: number
-  bookId: number
-  userId: number
-  star: number
-  comment: string | null
-  createdAt: string
-  book?: Book
-  user?: User
+  id: number;
+  bookId: number;
+  star: number;
+  comment: string;
+  createdAt: string;
+  book: {
+    id: number;
+    title: string;
+    coverImage: string;
+    author: {
+      name: string;
+    };
+    category: {
+      name: string;
+    };
+  };
 }
 
 export interface CreateReviewPayload {
@@ -18,3 +25,4 @@ export interface CreateReviewPayload {
   star: number
   comment?: string
 }
+

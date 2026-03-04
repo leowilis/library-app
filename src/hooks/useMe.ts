@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { EndPoints, Query_Keys } from "@/constants";
 import type { UpdateProfilePayload } from "@/types/user";
-import api from "@/lib/api";
+import { api } from "@/lib/api";
 
 export const useMe = () => {
   return useQuery({

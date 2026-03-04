@@ -14,6 +14,8 @@ export default function Navbar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { token, user } = useSelector((state: RootState) => state.auth);
+  const cartItems = useSelector((state: RootState) => state.cart.items);
+  const cartCount = cartItems.length;
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -59,7 +61,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="w-full px-4 py-4 relative bg-white shadow-sm md:mb-10 md:px-30" ref={menuRef}>
+    <nav className="w-full px-4 py-4 relative md:mb-10 md:px-30" ref={menuRef}>
       <div className="flex justify-between items-center">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 md:gap-4">
@@ -67,7 +69,7 @@ export default function Navbar() {
           <span className="hidden md:block text-xl font-semibold md:text-2xl md:font-extrabold">Booky</span>
         </Link>
 
-        {/* Search Bar - Always visible on desktop when logged in, toggleable on mobile */}
+        {/* Search Bar */}
         {token ? (
           // When logged in, always show search bar on desktop
           <div className="hidden md:flex flex-1 max-w-xl mx-8 bg-white border border-neutral-300 rounded-full px-4 py-2">
@@ -112,9 +114,23 @@ export default function Navbar() {
         {token ? (
           // User profile section when logged in
           <div className="flex items-center gap-5">
-            {/* Cart icon - visible on desktop when logged in */}
             <button onClick={() => navigate(ROUTES.Cart)} className="relative">
-              <img src={Bag} width={28} height={28} alt="checkout" />
+              {cartCount > 0 ? (
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 2L3 6V20C3 20.5304 3.21071 21.0391 3.58579 21.4142C3.96086 21.7893 4.46957 22 5 22H19C19.5304 22 20.0391 21.7893 20.4142 21.4142C20.7893 21.0391 21 20.5304 21 20V6L18 2H6Z" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+                  <path d="M3 6H21" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M16 10C16 11.0609 15.5786 12.0783 14.8284 12.8284C14.0783 13.5786 13.0609 14 12 14C10.9391 14 9.92172 13.5786 9.17157 12.8284C8.42143 12.0783 8 11.0609 8 10" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              ) : (
+                <img src={Bag} width={28} height={28} alt="checkout" />
+              )}
+              
+              {/* Badge counter */}
+              {cartCount > 0 && (
+                <div className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full min-w-[20px] h-5 flex items-center justify-center text-[11px] font-bold px-1">
+                  {cartCount}
+                </div>
+              )}
             </button>
             
             {/* User avatar and dropdown */}
@@ -175,7 +191,7 @@ export default function Navbar() {
 
       {/* Dropdown - Only for mobile when not logged in */}
       {menuOpen && !token && (
-        <div className="absolute top-18 left-4 right-4 rounded-2xl bg-white shadow-md z-50 px-4 py-2 md:hidden">
+        <div className="absolute top-18 left-4 right-4 rounded-2xl shadow-md z-50 px-4 py-2 md:hidden">
           <div className="flex gap-3 py-2">
             <button
               onClick={() => handleNavigate(ROUTES.Login)}
@@ -195,7 +211,7 @@ export default function Navbar() {
 
       {/* Dropdown - For logged in users (both mobile and desktop) */}
       {menuOpen && token && (
-        <div className="absolute top-16 right-19 w-48 rounded-2xl bg-white shadow-md z-50 px-4 py-2">
+        <div className="relative top-1 min-w-full rounded-2xl shadow-md px-4 py-2 md:w-48">
           <div className="flex flex-col">
             {[
               { label: "Profile", route: ROUTES.Profile },
