@@ -5,6 +5,7 @@ import type { RootState } from "@/store/index";
 import { clearCart } from "@/store/cartSlice";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
+import { CheckCircle } from "lucide-react";
 
 const DURATION_OPTIONS = [
   { label: "3 Days", value: 3 },
@@ -23,7 +24,11 @@ function formatDateInput(date: Date): string {
 }
 
 function formatDateDisplay(date: Date): string {
-  return date.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  return date.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 }
 
 export default function CheckoutPage() {
@@ -33,11 +38,15 @@ export default function CheckoutPage() {
   const { user } = useSelector((state: RootState) => state.auth);
 
   const books: any[] = location.state?.books ?? [];
-  const [borrowDate, setBorrowDate] = useState<string>(formatDateInput(new Date()));
+  const [borrowDate, setBorrowDate] = useState<string>(
+    formatDateInput(new Date()),
+  );
   const [duration, setDuration] = useState<number>(3);
   const [agreeReturn, setAgreeReturn] = useState(false);
   const [agreePolicy, setAgreePolicy] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [returnDateDisplay, setReturnDateDisplay] = useState<string>("");
 
   const returnDate = addDays(new Date(borrowDate), duration);
 
@@ -54,11 +63,13 @@ export default function CheckoutPage() {
     setIsSubmitting(true);
     try {
       await Promise.all(
-        books.map((book: any) => api.post("/api/loans", { bookId: book.id, days: duration }))
+        books.map((book: any) =>
+          api.post("/api/loans", { bookId: book.id, days: duration }),
+        ),
       );
       dispatch(clearCart());
-      toast.success("Books borrowed successfully!");
-      navigate("/profile");
+      setReturnDateDisplay(formatDateDisplay(returnDate));
+      setIsSuccess(true);
     } catch (err: any) {
       toast.error(err?.response?.data?.message ?? "Failed to borrow books");
     } finally {
@@ -66,9 +77,44 @@ export default function CheckoutPage() {
     }
   };
 
+  // Success Screen
+  if (isSuccess) {
+    return (
+      <div className="min-h-[80vh] flex flex-col items-center justify-center text-center px-6 space-y-6">
+        <div className="w-30 h-30 rounded-full bg-blue-600 flex items-center justify-center">
+          <CheckCircle size={70} className="text-white" strokeWidth={2.5} />
+        </div>
+        <div className="space-y-3">
+          <h2 className="text-2xl font-bold text-neutral-950">
+            Borrowing Successful!
+          </h2>
+          <p className="text-lg text-neutral-950">
+            Your book has been successfully borrowed.
+          </p>
+          <p className="text-lg text-neutral-950">
+            Please return by{" "}
+            <span className="font-semibold text-red-500">
+              {returnDateDisplay}
+            </span>
+          </p>
+        </div>
+        <button
+          onClick={() => navigate("/profile")}
+          className="mt-2 px-25 py-4 rounded-full font-semibold text-white text-sm"
+          style={{ backgroundColor: "#1c65da" }}
+        >
+          See Borrowed List
+        </button>
+      </div>
+    );
+  }
+
+  // BORROW FORM ON CHECKOUT
   const BorrowForm = (
     <div className="bg-white rounded-2xl p-5 shadow-sm space-y-4">
-      <h2 className="text-base font-bold text-gray-900">Complete Your Borrow Request</h2>
+      <h2 className="text-xl font-bold text-gray-900">
+        Complete Your Borrow Request
+      </h2>
 
       <div className="space-y-1">
         <label className="text-sm font-bold text-gray-700">Borrow Date</label>
@@ -81,19 +127,33 @@ export default function CheckoutPage() {
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-semibold text-gray-700">Borrow Duration</label>
-        <div className="space-y-2">
+        <label className="text-sm font-bold text-neutral-950">
+          Borrow Duration
+        </label>
+        <div className="space-y-3">
           {DURATION_OPTIONS.map(({ label, value }) => (
-            <label key={value} className="flex items-center gap-3 cursor-pointer" onClick={() => setDuration(value)}>
+            <label
+              key={value}
+              className="flex items-center gap-3 cursor-pointer"
+              onClick={() => setDuration(value)}
+            >
               <div
                 className="w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0"
-                style={{ borderColor: duration === value ? "#1c65da" : "#D5D7DA" }}
+                style={{
+                  borderColor: duration === value ? "#1c65da" : "#D5D7DA",
+                }}
               >
                 {duration === value && (
-                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "#1c65da" }} />
+                  <div
+                    className="w-2.5 h-2.5 rounded-full"
+                    style={{ backgroundColor: "#1c65da" }}
+                  />
                 )}
               </div>
-              <span className="text-sm font-medium" style={{ color: duration === value ? "#1c65da" : "#374151" }}>
+              <span
+                className="text-sm font-medium"
+                style={{ color: duration === value ? "#1c65da" : "#374151" }}
+              >
                 {label}
               </span>
             </label>
@@ -101,15 +161,17 @@ export default function CheckoutPage() {
         </div>
       </div>
 
-      <div className="bg-blue-50 rounded-xl p-3 space-y-1">
-        <p className="text-sm font-semibold text-gray-700">Return Date</p>
-        <p className="text-xs text-gray-500">Please return the book no later than</p>
+      <div className="bg-blue-50 rounded-xl p-3 space-y-3">
+        <p className="text-sm font-semibold text-neutral-950">Return Date</p>
+        <p className="text-xs text-neutral-950">
+          Please return the book no later than
+        </p>
         <p className="text-sm font-bold" style={{ color: "#d92d20" }}>
           {formatDateDisplay(returnDate)}
         </p>
       </div>
 
-      <div className="space-y-3 pt-1">
+      <div className="space-y-6 pt-3">
         <label className="flex items-start gap-3 cursor-pointer">
           <input
             type="checkbox"
@@ -117,7 +179,9 @@ export default function CheckoutPage() {
             onChange={(e) => setAgreeReturn(e.target.checked)}
             className="mt-0.5 w-4 h-4 rounded accent-blue-600"
           />
-          <span className="text-sm text-gray-600">I agree to return the book(s) before the due date.</span>
+          <span className="text-sm text-neutral-950">
+            I agree to return the book(s) before the due date.
+          </span>
         </label>
         <label className="flex items-start gap-3 cursor-pointer">
           <input
@@ -126,7 +190,9 @@ export default function CheckoutPage() {
             onChange={(e) => setAgreePolicy(e.target.checked)}
             className="mt-0.5 w-4 h-4 rounded accent-blue-600"
           />
-          <span className="text-sm text-gray-600">I accept the library borrowing policy.</span>
+          <span className="text-sm text-neutral-950">
+            I accept the library borrowing policy.
+          </span>
         </label>
       </div>
 
@@ -141,6 +207,7 @@ export default function CheckoutPage() {
     </div>
   );
 
+  // Main Checkout Page
   return (
     <div className="pb-10">
       <div className="py-4">
@@ -148,48 +215,65 @@ export default function CheckoutPage() {
       </div>
 
       <div className="md:flex md:gap-8 md:items-start">
-
         {/* LEFT: User Info + Book List */}
         <div className="flex-1 space-y-6">
-
           {/* User Information */}
           <div className="md:bg-white md:rounded-2xl md:p-5 md:shadow-sm">
-            <h2 className="text-base font-bold text-gray-900 mb-3">User Information</h2>
-            <div className="space-y-2">
+            <h2 className="text-xl font-bold text-gray-900 mb-3">
+              User Information
+            </h2>
+            <div className="space-y-5">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Name</span>
-                <span className="font-medium text-gray-900">{(user as any)?.name ?? "-"}</span>
+                <span className="text-neutral-950">Name</span>
+                <span className="font-medium text-gray-900">
+                  {(user as any)?.name ?? "-"}
+                </span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Email</span>
-                <span className="font-medium text-gray-900">{(user as any)?.email ?? "-"}</span>
+                <span className="text-neutral-950">Email</span>
+                <span className="font-medium text-gray-900">
+                  {(user as any)?.email ?? "-"}
+                </span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Nomor Handphone</span>
-                <span className="font-medium text-gray-900">{(user as any)?.phone ?? "-"}</span>
+                <span className="text-neutral-950">Nomor Handphone</span>
+                <span className="font-medium text-gray-900">
+                  {(user as any)?.phone ?? "-"}
+                </span>
               </div>
             </div>
           </div>
 
+          {/* Line */}
+          <div className="border-b border-neutral-300" />
+
           {/* Book List */}
           <div className="md:bg-white md:rounded-2xl md:p-5 md:shadow-sm">
-            <h2 className="text-base font-bold text-gray-900 mb-3">Book List</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-5">Book List</h2>
             <div className="space-y-4">
               {books.map((book: any) => (
                 <div key={book.id} className="flex gap-3">
-                  <div className="w-16 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
+                  <div className="w-20 h-30 overflow-hidden flex-shrink-0 bg-gray-100">
                     {book.coverImage ? (
-                      <img src={book.coverImage} alt={book.title} className="w-full h-full object-cover" />
+                      <img
+                        src={book.coverImage}
+                        alt={book.title}
+                        className="w-full h-full object-cover"
+                      />
                     ) : (
-                      <div className="w-full h-full bg-gray-200 rounded-xl" />
+                      <div className="w-full h-full bg-gray-200" />
                     )}
                   </div>
-                  <div className="flex-1 min-w-0 space-y-1">
-                    <span className="inline-block text-xs font-semibold px-2 py-0.5 border border-gray-300 rounded text-gray-500">
+                  <div className="flex-1 min-w-0 space-y-5">
+                    <span className="inline-block text-xs font-semibold px-2 py-0.5 border border-neutral-300 rounded text-neutral-950">
                       {book.category?.name ?? "Category"}
                     </span>
-                    <p className="text-sm font-bold text-gray-900 line-clamp-2">{book.title}</p>
-                    <p className="text-xs text-gray-500">{book.author?.name ?? "Author"}</p>
+                    <p className="text-sm font-bold text-gray-900 line-clamp-2">
+                      {book.title}
+                    </p>
+                    <p className="text-xs text-neutral-700">
+                      {book.author?.name ?? "Author"}
+                    </p>
                   </div>
                 </div>
               ))}

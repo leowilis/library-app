@@ -82,7 +82,7 @@ export const ROUTES = {
   Search: "/search",
   BookDetail: (id: number) => `/books/${id}`,
   Category: (id: number) => `/category/${id}`,
-  BooksByAuthors: (id: number) => `/authors/${id}`,
+  BooksByAuthors: (id: number) => `/authors/${id}/books`,
   Cart: "/cart",
   CheckOut: "/checkout",
   Profile: "/profile",
@@ -93,6 +93,8 @@ export const ROUTES = {
   AdminDashboard: "/admin/dashboard",
   AdminBookEdit: (id: number) => `/admin/books/${id}/edit`,
   AdminBookPreview: (id: number) => `/admin/books/${id}/preview`,
+
+  
 
   // Borrow
   BorrowSuccess: "/borrow-success",

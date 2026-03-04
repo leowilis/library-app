@@ -28,6 +28,9 @@ export const useCreateReview = () => {
       queryClient.invalidateQueries({
         queryKey: [Query_Keys.ReviewsBook, variables.bookId],
       });
+      queryClient.invalidateQueries({
+        queryKey: [Query_Keys.MeReviews],
+      });
     },
   });
 };

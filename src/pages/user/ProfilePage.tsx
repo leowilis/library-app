@@ -24,13 +24,13 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<Tab>(getInitialTab);
 
   return (
-    <div className="px-2 pt-4 pb-10 space-y-7">
-      <div className="flex bg-neutral-100 rounded-2xl p-2">
+    <div className="px-2 pt-4 pb-10 space-y-7 md:m-10">
+      <div className="flex bg-neutral-100 rounded-2xl p-2 md:w-fit">
         {TABS.map(({ key, label }) => (
           <button
             key={key}
             onClick={() => setActiveTab(key)}
-            className="flex-1 py-3 rounded-xl text-sm font-bold transition-all"
+            className="flex-1 py-3 rounded-xl text-sm font-bold transition-all md:flex-none md:px-20 md:py-2 md:text-sm"
             style={{
               backgroundColor: activeTab === key ? "white" : "transparent",
               color: activeTab === key ? "var(--primary-300)" : "#6b7280",

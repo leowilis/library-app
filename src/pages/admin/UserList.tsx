@@ -29,7 +29,7 @@ export default function AdminUserList() {
   );
 
   return (
-    <div className="space-y-4">
+    <section className="space-y-4">
       <h1 className="text-2xl font-bold text-gray-900">User</h1>
 
       {/* Search */}
@@ -181,6 +181,6 @@ export default function AdminUserList() {
           </div>
         </div>
       )}
-    </div>
+    </section>
   );
 }

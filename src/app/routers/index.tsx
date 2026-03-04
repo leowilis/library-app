@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router-dom'
 import { ROUTES } from '@/constants'
 import RegisterPage from '@/pages/auth/RegisterPage'
-import UserLogin from '@/pages/auth/UserLoginPage'
+import UserLogin from '@/pages/auth/LoginPage'
 import UserRouter from '@/app/routers/UserRouter'
 import AdminRouter from './AdminRouter'
 
