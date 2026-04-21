@@ -1,28 +1,23 @@
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { ROUTES } from "@/constants"
+import { useBorrowBook } from "@/hooks/useBorrowBook"
 
 interface BorrowModalProps {
   bookId: number
   bookTitle: string
-  book: any
+  currentStock: number
   onClose: () => void
 }
 
 const DAY_OPTIONS = [3, 7, 14, 30]
 
-export default function BorrowModal({ bookId, bookTitle, book, onClose }: BorrowModalProps) {
+export default function BorrowModal({ bookId, bookTitle, currentStock, onClose }: BorrowModalProps) {
   const [days, setDays] = useState(7)
-  const navigate = useNavigate()
+  const { mutate: borrowBook, isPending } = useBorrowBook()
+
+  const isOutOfStock = currentStock <= 0
 
   const handleBorrow = () => {
-    onClose()
-    navigate(ROUTES.CheckOut, {
-      state: {
-        books: [{ ...book, id: bookId, title: bookTitle }],
-        defaultDays: { [bookId]: days },
-      },
-    })
+    borrowBook({ bookId, days }, { onSuccess: onClose })
   }
 
   return (
@@ -31,17 +26,28 @@ export default function BorrowModal({ bookId, bookTitle, book, onClose }: Borrow
       <div className="relative bg-white w-full md:w-[420px] rounded-t-3xl md:rounded-3xl p-6 space-y-5">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-bold text-gray-900">Borrow Book</h3>
-          <button onClick={onClose} className="text-gray-400 text-2xl leading-none">x</button>
+          <button onClick={onClose} className="text-gray-400 text-2xl leading-none">×</button>
         </div>
+
         <p className="text-sm text-gray-500 line-clamp-2">{bookTitle}</p>
-        <div className="space-y-2">
+
+        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
+          isOutOfStock ? "bg-red-100 text-red-600"
+          : currentStock <= 3 ? "bg-green-700 text-white"
+          : "bg-green-100 text-green-700"
+        }`}>
+          {isOutOfStock ? "Out of stock" : `${currentStock} available`}
+        </span>
+
+        <div className="space-y-2 pt-3">
           <p className="text-sm font-semibold text-gray-700">Borrow Duration</p>
           <div className="grid grid-cols-4 gap-2">
             {DAY_OPTIONS.map((d) => (
               <button
                 key={d}
                 onClick={() => setDays(d)}
-                className="py-2 rounded-xl text-sm font-semibold border-2 transition-all"
+                disabled={isOutOfStock}
+                className="py-2 rounded-xl text-sm font-semibold border-2 transition-all disabled:opacity-40"
                 style={{
                   backgroundColor: days === d ? "#E0ECFF" : "white",
                   borderColor: days === d ? "#1c65da" : "#e5e7eb",
@@ -53,6 +59,7 @@ export default function BorrowModal({ bookId, bookTitle, book, onClose }: Borrow
             ))}
           </div>
         </div>
+
         <div className="space-y-2">
           <p className="text-sm font-semibold text-gray-700">Or enter custom days</p>
           <input
@@ -60,16 +67,19 @@ export default function BorrowModal({ bookId, bookTitle, book, onClose }: Borrow
             min={1}
             max={90}
             value={days}
+            disabled={isOutOfStock}
             onChange={(e) => setDays(Number(e.target.value))}
-            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-blue-400"
+            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-blue-400 disabled:opacity-40 disabled:bg-gray-50"
           />
         </div>
+
         <button
           onClick={handleBorrow}
-          className="w-full py-3.5 rounded-full font-semibold text-white text-sm"
+          disabled={isOutOfStock || isPending}
+          className="w-full py-3.5 rounded-full font-semibold text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           style={{ backgroundColor: "#1c65da" }}
         >
-          Borrow for {days} days
+          {isPending ? "Borrow..." : isOutOfStock ? "Out of stock" : `Borrow for ${days} days`}
         </button>
       </div>
     </div>
