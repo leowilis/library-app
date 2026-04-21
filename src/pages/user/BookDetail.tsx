@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useBookDetail, useRecommendedBooks } from '@/hooks/useBooks';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import type { RootState } from '@/store/index';
-import { addToCart } from '@/store/cartSlice';
 import { ROUTES } from '@/constants';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -14,13 +13,12 @@ import StarRating from '@/components/ui/starRating';
 import BorrowModal from './BorrowModal';
 import ReviewModal from './ReviewModal';
 import BookCard from './BookCard';
+import { useIsBookBorrowed } from '@/hooks/useMe';
 
 export default function BookDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const { token } = useSelector((state: RootState) => state.auth);
-  const cartItems = useSelector((state: RootState) => state.cart.items);
   const [showReview, setShowReview] = useState(false);
   const [showBorrow, setShowBorrow] = useState(false);
   const [reviewPage, setReviewPage] = useState(1);
@@ -37,25 +35,12 @@ export default function BookDetail() {
     limit: 6,
   });
 
-  const isInCart = book
-    ? cartItems.some((item) => item.book.id === book.id)
-    : false;
+  const isAlreadyBorrowed = useIsBookBorrowed(Number(id));
   const isOutOfStock = book ? book.availableCopies <= 0 : false;
-
-  const handleAddToCart = () => {
-    if (isOutOfStock) return toast.error('This book is out of stock');
-    if (!token) {
-      toast.error('Please login first');
-      return navigate(ROUTES.Login);
-    }
-    if (!book) return;
-    if (isInCart) return toast.info('Book already in cart');
-    dispatch(addToCart(book));
-    toast.success('Book added to cart!');
-  };
 
   const handleBorrow = () => {
     if (isOutOfStock) return toast.error('This book is out of stock');
+    if (isAlreadyBorrowed) return toast.error('You already borrowed this book');
     if (!token) {
       toast.error('Please login first');
       return navigate(ROUTES.Login);
@@ -72,6 +57,12 @@ export default function BookDetail() {
       </div>
     );
   }
+
+  const borrowButtonLabel = isOutOfStock
+    ? 'Not Available'
+    : isAlreadyBorrowed
+      ? 'Already Borrowed'
+      : 'Borrow Book';
 
   if (!book)
     return <p className='text-center py-10 text-gray-400'>Book not found</p>;
@@ -102,7 +93,6 @@ export default function BookDetail() {
 
       {/* Top Section */}
       <div className='md:flex md:gap-8 md:items-start'>
-        {/* Cover */}
         <div className='md:w-64 md:flex-shrink-0'>
           <div className='w-full rounded-2xl overflow-hidden'>
             <img
@@ -113,17 +103,23 @@ export default function BookDetail() {
           </div>
         </div>
 
-        {/* Info */}
         <div className='mt-4 md:mt-0 space-y-3 flex-1'>
           <div className='flex items-center justify-between'>
             <p className='text-xs font-semibold text-neutral-950 border border-neutral-300 rounded-sm w-32 py-1 px-2 text-center'>
               {book.category?.name}
             </p>
-            {isOutOfStock && (
-              <span className='text-xs font-bold text-red-500 bg-red-50 px-2 py-1 rounded'>
-                Out of stock
-              </span>
-            )}
+            <div className='flex items-center gap-2'>
+              {isAlreadyBorrowed && (
+                <span className='text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded'>
+                  Currently Borrowed
+                </span>
+              )}
+              {isOutOfStock && !isAlreadyBorrowed && (
+                <span className='text-xs font-bold text-red-500 bg-red-50 px-2 py-1 rounded'>
+                  Out of stock
+                </span>
+              )}
+            </div>
           </div>
 
           <h1 className='text-2xl font-bold text-gray-900'>{book.title}</h1>
@@ -152,7 +148,6 @@ export default function BookDetail() {
             </div>
           </div>
 
-          {/* Description */}
           <div>
             <h2 className='text-base font-bold text-gray-900 mb-2'>
               Description
@@ -162,26 +157,14 @@ export default function BookDetail() {
             </p>
           </div>
 
-          {/* Desktop Buttons */}
-          <div className='hidden md:flex gap-3 pt-4'>
+          {/* Desktop Button */}
+          <div className='hidden md:flex pt-4'>
             <Button
-              variant='outline'
-              className='rounded-full px-8 py-5 font-semibold border-2 transition-all duration-200 hover:-translate-y-1 hover:shadow-md hover:border-blue-400 hover:text-blue-600'
-              onClick={handleAddToCart}
-              disabled={isOutOfStock || isInCart}
-            >
-              {isOutOfStock
-                ? 'Out of Stock'
-                : isInCart
-                  ? 'In Cart'
-                  : 'Add to Cart'}
-            </Button>
-            <Button
-              className='rounded-full px-8 py-5 font-semibold text-white bg-[#1C65DA] transition-all duration-200 hover:-translate-y-1 hover:shadow-md hover:bg-[#1550b8]'
+              className='rounded-full px-8 py-5 font-semibold text-white bg-[#1C65DA] transition-all duration-200 hover:-translate-y-1 hover:shadow-md hover:bg-[#1550b8] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0'
               onClick={handleBorrow}
-              disabled={isOutOfStock}
+              disabled={isOutOfStock || isAlreadyBorrowed}
             >
-              {isOutOfStock ? 'Not Available' : 'Borrow Book'}
+              {borrowButtonLabel}
             </Button>
           </div>
         </div>
@@ -261,22 +244,14 @@ export default function BookDetail() {
         </div>
       )}
 
-      {/* Mobile Buttons */}
-      <div className='fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-4 py-4 flex gap-3 md:hidden'>
+      {/* Mobile Button */}
+      <div className='fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-4 py-4 flex md:hidden'>
         <Button
-          variant='outline'
-          className='flex-1 rounded-full py-6 font-semibold transition-all duration-200 border-[#D5D7DA] hover:border-blue-600 hover:text-blue-600 active:scale-95'
-          onClick={handleAddToCart}
-          disabled={isOutOfStock || isInCart}
-        >
-          {isOutOfStock ? 'Out of Stock' : isInCart ? 'In Cart' : 'Add to Cart'}
-        </Button>
-        <Button
-          className='flex-1 rounded-full py-6 font-semibold text-white bg-[#1C65DA] transition-all duration-200 hover:bg-[#1550b8] active:scale-95'
+          className='flex-1 rounded-full py-6 font-semibold text-white bg-[#1C65DA] transition-all duration-200 hover:bg-[#1550b8] active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed'
           onClick={handleBorrow}
-          disabled={isOutOfStock}
+          disabled={isOutOfStock || isAlreadyBorrowed}
         >
-          {isOutOfStock ? 'Not Available' : 'Borrow Book'}
+          {borrowButtonLabel}
         </Button>
       </div>
 
