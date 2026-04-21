@@ -1,96 +1,96 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { EndPoints, Query_Keys } from '@/constants'
-import type { CreateBookPayload, UpdateBookPayload } from '@/types/book'
-import { api } from '@/lib/api'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { EndPoints, Query_Keys } from '@/constants';
+import type { CreateBookPayload, UpdateBookPayload } from '@/types/book';
+import { api } from '@/lib/api';
 
 export const useBooks = (params?: {
-  q?: string
-  categoryId?: number
-  authorId?: number
-  minRating?: number
-  page?: number
-  limit?: number
+  q?: string;
+  categoryId?: number;
+  authorId?: number;
+  minRating?: number;
+  page?: number;
+  limit?: number;
 }) => {
   return useQuery({
     queryKey: [Query_Keys.Books, params],
     queryFn: async () => {
-      const data = await api.get(EndPoints.Book, { params })
-      return data
+      const res = await api.get(EndPoints.Book, { params });
+      return res.data;
     },
-  })
-}
+  });
+};
 
 export const useBookDetail = (id: number) => {
   return useQuery({
     queryKey: [Query_Keys.BooksDetail, id],
     queryFn: async () => {
-      const data = await api.get(EndPoints.BooksDetail(id))
-      return data
+      const res = await api.get(EndPoints.BooksDetail(id));
+      return res.data;
     },
     enabled: !!id,
-  })
-}
+  });
+};
 
 export const useRecommendedBooks = (params?: {
-  by?: 'rating' | 'popular'
-  categoryId?: number
-  page?: number
-  limit?: number
+  by?: 'rating' | 'popular';
+  categoryId?: number;
+  page?: number;
+  limit?: number;
 }) => {
   return useQuery({
     queryKey: [Query_Keys.BooksRecommend, params],
     queryFn: async () => {
-      const res = await api.get(EndPoints.BooksRecommend, { params })
+      const res = await api.get(EndPoints.BooksRecommend, { params });
 
-      console.log("RECOMMEND RESPONSE:", res.data)
+      console.log('RECOMMEND RESPONSE:', res.data);
 
-      return res.data
+      return res.data;
     },
     select: (data: any) => {
-      if (Array.isArray(data)) return data
-      if (Array.isArray(data?.books)) return data.books
-      if (Array.isArray(data?.data?.books)) return data.data.books
-      return []
+      if (Array.isArray(data)) return data;
+      if (Array.isArray(data?.books)) return data.books;
+      if (Array.isArray(data?.data?.books)) return data.data.books;
+      return [];
     },
-  })
-}
+  });
+};
 
 export const useCreateBook = () => {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (payload: CreateBookPayload) => {
-      const data = await api.post(EndPoints.Book, payload)
-      return data
+      const data = await api.post(EndPoints.Book, payload);
+      return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [Query_Keys.Books] })
+      queryClient.invalidateQueries({ queryKey: [Query_Keys.Books] });
     },
-  })
-}
+  });
+};
 
 export const useUpdateBook = (id: number) => {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (payload: UpdateBookPayload) => {
-      const data = await api.put(EndPoints.BooksDetail(id), payload)
-      return data
+      const data = await api.put(EndPoints.BooksDetail(id), payload);
+      return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [Query_Keys.Books] })
-      queryClient.invalidateQueries({ queryKey: [Query_Keys.BooksDetail, id] })
+      queryClient.invalidateQueries({ queryKey: [Query_Keys.Books] });
+      queryClient.invalidateQueries({ queryKey: [Query_Keys.BooksDetail, id] });
     },
-  })
-}
+  });
+};
 
 export const useDeleteBook = () => {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: number) => {
-      const data = await api.delete(EndPoints.BooksDetail(id))
-      return data
+      const data = await api.delete(EndPoints.BooksDetail(id));
+      return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [Query_Keys.Books] })
+      queryClient.invalidateQueries({ queryKey: [Query_Keys.Books] });
     },
-  })
-}
+  });
+};
