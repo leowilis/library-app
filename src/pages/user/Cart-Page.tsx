@@ -41,7 +41,7 @@ export default function CartPage() {
           category: i.book.category,
           author: i.book.author,
           rating: i.book.rating,
-          stock: i.book.stock,
+          availableCopies: i.book.availableCopies,
         })),
       },
     });
