@@ -53,3 +53,11 @@ export const useMyReviews = (params?: {
     },
   });
 };
+
+export const useIsBookBorrowed = (bookId: number) => {
+  const { data } = useMyLoansProfile({ status: 'BORROWED' });
+  const loans = data?.data?.loans ?? data?.loans ?? [];
+  return loans.some(
+    (loan: any) => loan.book?.id === bookId && loan.status === 'BORROWED',
+  );
+};
