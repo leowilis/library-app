@@ -41,9 +41,6 @@ export const useRecommendedBooks = (params?: {
     queryKey: [Query_Keys.BooksRecommend, params],
     queryFn: async () => {
       const res = await api.get(EndPoints.BooksRecommend, { params });
-
-      console.log('RECOMMEND RESPONSE:', res.data);
-
       return res.data;
     },
     select: (data: any) => {
