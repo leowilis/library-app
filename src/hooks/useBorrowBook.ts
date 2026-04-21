@@ -31,7 +31,7 @@ export const useBorrowBook = () => {
     onError: (_err, payload, context) => {
       queryClient.setQueryData([Query_Keys.Books], context?.previousBooks)
       queryClient.setQueryData([Query_Keys.BooksDetail, payload.bookId], context?.previousDetail)
-      toast.error("Gagal meminjam buku. Silakan coba lagi.")
+      toast.error("Failed to borrow the book. Please try again.")
     },
 
     onSuccess: () => {
@@ -39,7 +39,7 @@ export const useBorrowBook = () => {
       queryClient.invalidateQueries({ queryKey: [Query_Keys.BooksDetail] })
       queryClient.invalidateQueries({ queryKey: [Query_Keys.MeLoans] })
       queryClient.invalidateQueries({ queryKey: [Query_Keys.LoansMy] })
-      toast.success("Buku berhasil dipinjam!")
+      toast.success("Book borrowed successfully!")
     },
   })
 }
