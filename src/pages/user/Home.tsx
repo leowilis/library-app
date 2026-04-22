@@ -47,31 +47,40 @@ export default function Home() {
       {/* Categories */}
       <section className='px-4 md:px-8'>
         <div className='grid grid-cols-3 md:grid-cols-6 gap-3 md:gap-4 py-3'>
-          {categories
-            ?.filter(
-              (cat: { id: number; name: string }) => CATEGORY_ICONS[cat.name],
-            )
-            .map((cat: { id: number; name: string }) => (
-              <button
-                key={cat.id}
-                onClick={() => navigate(ROUTES.Category(cat.id))}
-                className='flex flex-col items-start gap-5 p-3 md:p-4 rounded-2xl bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md'
-              >
+          {!categories
+            ? // Skeleton Loading
+              [...Array(6)].map((_, i) => (
                 <div
-                  className='w-full h-15 md:h-20 rounded-xl flex items-center justify-center'
-                  style={{ backgroundColor: '#E0ECFF' }}
-                >
-                  <img
-                    src={CATEGORY_ICONS[cat.name]}
-                    alt={cat.name}
-                    className='w-11 h-11 md:w-14 md:h-14 object-contain'
-                  />
-                </div>
-                <span className='text-xs md:text-sm font-semibold text-gray-950 text-left'>
-                  {cat.name}
-                </span>
-              </button>
-            ))}
+                  key={i}
+                  className='h-28 rounded-2xl bg-gray-100 animate-pulse'
+                />
+              ))
+            : categories
+                ?.filter(
+                  (cat: { id: number; name: string }) =>
+                    CATEGORY_ICONS[cat.name],
+                )
+                .map((cat: { id: number; name: string }) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => navigate(ROUTES.Category(cat.id))}
+                    className='flex flex-col items-start gap-5 p-3 md:p-4 rounded-2xl bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md'
+                  >
+                    <div
+                      className='w-full h-15 md:h-20 rounded-xl flex items-center justify-center'
+                      style={{ backgroundColor: '#E0ECFF' }}
+                    >
+                      <img
+                        src={CATEGORY_ICONS[cat.name]}
+                        alt={cat.name}
+                        className='w-11 h-11 md:w-14 md:h-14 object-contain'
+                      />
+                    </div>
+                    <span className='text-xs md:text-sm font-semibold text-gray-950 text-left'>
+                      {cat.name}
+                    </span>
+                  </button>
+                ))}
         </div>
       </section>
 
@@ -117,6 +126,7 @@ export default function Home() {
         )}
       </section>
 
+      {/* Popular Authors */}
       <div className='px-4 md:py-10 md:px-10'>
         <h2 className='text-3xl font-bold text-gray-900 mb-7 md:text-4xl md:mb-8'>
           Popular Authors
