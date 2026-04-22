@@ -11,7 +11,7 @@ export default function StarRating({ rating, size = 16, showValue = false }: Sta
     return (
       <div className="flex items-center gap-1">
         <Star size={size} fill="#fdb022" color="#fdb022" />
-        <span className="text-sm font-semibold text-gray-700">{rating}</span>
+        <span className="text-sm font-extrabold text-gray-700">{rating}</span>
       </div>
     )
   }
