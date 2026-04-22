@@ -6,9 +6,6 @@ import SearchPage from '@/pages/user/SearchPage'
 import BookDetail from '@/pages/user/BookDetail'
 import Category from '@/pages/user/Category'
 import BooksByAuthorPage from '@/pages/Author/AuthorBook'
-import CartPage from '@/pages/user/Cart-Page'
-import CheckoutPage from '@/pages/user/Checkout'
-import ReviewsPage from '@/pages/user/Review'
 
 export default function UserRoutes() {
   return (
@@ -20,9 +17,6 @@ export default function UserRoutes() {
         <Route path="/books/:id" element={<BookDetail />} />
         <Route path="/category/:id" element={<Category />} />
         <Route path="/authors/:id/books" element={<BooksByAuthorPage />} />
-        <Route path="/cart" element={<CartPage />} /> 
-        <Route path="/checkout" element={<CheckoutPage />} />
-        <Route path="/profile/reviews" element={<ReviewsPage />} /> 
       </Routes>
     </UserLayout>
   )
