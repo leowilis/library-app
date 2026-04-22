@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { EndPoints, Query_Keys } from '@/constants';
 import type { UpdateProfilePayload } from '@/types/user';
 import { api } from '@/lib/api';
+import type { Loan } from '@/types/loan';
 
 export const useMe = () => {
   return useQuery({
@@ -54,10 +55,11 @@ export const useMyReviews = (params?: {
   });
 };
 
+
 export const useIsBookBorrowed = (bookId: number) => {
-  const { data } = useMyLoansProfile({ status: 'BORROWED' });
-  const loans = data?.data?.loans ?? data?.loans ?? [];
+  const { data } = useMyLoansProfile({ status: 'BORROWED' })
+  const loans: Loan[] = data?.data?.loans ?? data?.loans ?? []
   return loans.some(
-    (loan: any) => loan.book?.id === bookId && loan.status === 'BORROWED',
-  );
-};
+    (loan) => loan.book?.id === bookId && loan.status === 'BORROWED'
+  )
+}
