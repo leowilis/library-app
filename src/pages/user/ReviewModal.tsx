@@ -8,9 +8,10 @@ import StarPicker from '@/components/ui/starPicker';
 interface ReviewModalProps {
   bookId: number;
   onClose: () => void;
+  onSuccess?: () => void
 }
 
-export default function ReviewModal({ bookId, onClose }: ReviewModalProps) {
+export default function ReviewModal({ bookId, onClose, onSuccess }: ReviewModalProps) {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const { mutate: createReview, isPending } = useCreateReview();
@@ -24,7 +25,7 @@ export default function ReviewModal({ bookId, onClose }: ReviewModalProps) {
       {
         onSuccess: () => {
           toast.success('Review submitted!');
-          onClose();
+          onSuccess ? onSuccess() : onClose()
         },
         onError: () => toast.error('Failed to submit review'),
       },
