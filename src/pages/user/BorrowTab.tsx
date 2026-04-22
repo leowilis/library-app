@@ -8,6 +8,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Query_Keys } from '@/constants';
 import { api } from '@/lib/api';
 import type { Loan } from '@/types/loan';
+import { useNavigate } from 'react-router-dom';
 
 type LoanStatus = 'BORROWED' | 'LATE' | 'RETURNED' | undefined;
 
@@ -35,9 +36,15 @@ function LoanBookInfo({ loan }: { loan: Loan }) {
     <div className='flex gap-3 flex-1 min-w-0'>
       <div className='w-20 h-24 overflow-hidden flex-shrink-0 bg-gray-100 rounded-lg'>
         {loan.book?.coverImage ? (
-          <img src={loan.book.coverImage} alt={loan.book.title} className='w-full h-full object-cover' />
+          <img
+            src={loan.book.coverImage}
+            alt={loan.book.title}
+            className='w-full h-full object-cover'
+          />
         ) : (
-          <div className='w-full h-full flex items-center justify-center bg-blue-50 text-2xl'>📚</div>
+          <div className='w-full h-full flex items-center justify-center bg-blue-50 text-2xl'>
+            📚
+          </div>
         )}
       </div>
       <div className='flex-1 min-w-0 space-y-1.5'>
@@ -55,13 +62,18 @@ function LoanBookInfo({ loan }: { loan: Loan }) {
 }
 
 interface ReturnConfirmModalProps {
-  loan: Loan
-  isLoading: boolean
-  onConfirm: () => void
-  onCancel: () => void
+  loan: Loan;
+  isLoading: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
 }
 
-function ReturnConfirmModal({ loan, isLoading, onConfirm, onCancel }: ReturnConfirmModalProps) {
+function ReturnConfirmModal({
+  loan,
+  isLoading,
+  onConfirm,
+  onCancel,
+}: ReturnConfirmModalProps) {
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center px-4'>
       <div className='absolute inset-0 bg-black/40' onClick={onCancel} />
@@ -105,7 +117,7 @@ function ReturnConfirmModal({ loan, isLoading, onConfirm, onCancel }: ReturnConf
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default function BorrowedTab() {
@@ -114,9 +126,13 @@ export default function BorrowedTab() {
   const [reviewBookId, setReviewBookId] = useState<number | null>(null);
   const [returningId, setReturningId] = useState<number | null>(null);
   const [confirmLoan, setConfirmLoan] = useState<Loan | null>(null);
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const { data: loansData, isLoading } = useMyLoansProfile({ status, limit: 20 });
+  const { data: loansData, isLoading } = useMyLoansProfile({
+    status,
+    limit: 20,
+  });
   const loans: Loan[] =
     (loansData as any)?.data?.data?.loans ??
     (loansData as any)?.data?.loans ??
@@ -127,23 +143,25 @@ export default function BorrowedTab() {
   );
 
   const handleReturn = async () => {
-    if (!confirmLoan) return
-    setReturningId(confirmLoan.id)
+    if (!confirmLoan) return;
+    setReturningId(confirmLoan.id);
     try {
-      await api.patch(`/api/loans/${confirmLoan.id}/return`)
-      toast.success('Book returned successfully!')
-      queryClient.invalidateQueries({ queryKey: [Query_Keys.MeLoans] })
-      setConfirmLoan(null)
+      await api.patch(`/api/loans/${confirmLoan.id}/return`);
+      toast.success('Book returned successfully!');
+      queryClient.invalidateQueries({ queryKey: [Query_Keys.MeLoans] });
+      setConfirmLoan(null);
     } catch (err: any) {
-      toast.error(err?.response?.data?.message ?? 'Failed to return book')
+      toast.error(err?.response?.data?.message ?? 'Failed to return book');
     } finally {
-      setReturningId(null)
+      setReturningId(null);
     }
-  }
+  };
 
   return (
     <div className='space-y-4 md:space-y-6'>
-      <h1 className='text-2xl font-bold text-gray-900 md:text-3xl'>Borrowed List</h1>
+      <h1 className='text-2xl font-bold text-gray-900 md:text-3xl'>
+        Borrowed List
+      </h1>
 
       <div className='flex items-center gap-2 bg-white rounded-full px-4 py-3 border border-gray-200 md:max-w-2xl'>
         <Search size={16} className='text-neutral-600' />
@@ -175,7 +193,10 @@ export default function BorrowedTab() {
       {isLoading && (
         <div className='space-y-4'>
           {[1, 2, 3].map((i) => (
-            <div key={i} className='bg-white rounded-2xl p-4 shadow-sm animate-pulse'>
+            <div
+              key={i}
+              className='bg-white rounded-2xl p-4 shadow-sm animate-pulse'
+            >
               <div className='h-4 w-1/3 bg-gray-100 rounded mb-3' />
               <div className='h-20 bg-gray-100 rounded' />
             </div>
@@ -193,10 +214,15 @@ export default function BorrowedTab() {
       {!isLoading && (
         <div className='space-y-5 md:max-w-6xl'>
           {filtered.map((loan) => (
-            <div key={loan.id} className='bg-white rounded-2xl p-4 shadow-sm space-y-4 md:p-6'>
+            <div
+              key={loan.id}
+              className='bg-white rounded-2xl p-4 shadow-sm space-y-4 md:p-6'
+            >
               <div className='flex items-center justify-between'>
                 <div className='flex items-center gap-2'>
-                  <span className='text-sm font-bold text-neutral-950'>Status</span>
+                  <span className='text-sm font-bold text-neutral-950'>
+                    Status
+                  </span>
                   <span
                     className='text-xs font-bold py-1 px-2 rounded-lg'
                     style={{
@@ -208,7 +234,9 @@ export default function BorrowedTab() {
                   </span>
                 </div>
                 <div className='flex items-center gap-2'>
-                  <span className='text-sm font-bold text-neutral-950'>Due Date</span>
+                  <span className='text-sm font-bold text-neutral-950'>
+                    Due Date
+                  </span>
                   <span className='text-xs font-bold py-1 px-2 rounded-lg bg-red-50 text-red-600'>
                     {formatDate(loan.dueAt)}
                   </span>
@@ -254,7 +282,14 @@ export default function BorrowedTab() {
       )}
 
       {reviewBookId && (
-        <ReviewModal bookId={reviewBookId} onClose={() => setReviewBookId(null)} />
+        <ReviewModal
+          bookId={reviewBookId}
+          onClose={() => setReviewBookId(null)}
+          onSuccess={() => {
+            setReviewBookId(null);
+            navigate('/profile?tab=reviews');
+          }}
+        />
       )}
     </div>
   );
