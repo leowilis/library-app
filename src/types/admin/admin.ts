@@ -1,0 +1,121 @@
+export interface AdminOverview {
+  totalBooks: number;
+  totalUsers: number;
+  activeLoans: number;
+  overdueLoans: number;
+}
+
+// Book
+
+/**
+ * Author embedded inside a Book object.
+ */
+export interface BookAuthor {
+  id: number;
+  name: string;
+}
+
+/**
+ * Category embedded inside a Book object.
+ */
+export interface BookCategory {
+  id: number;
+  name: string;
+}
+
+/**
+ * Book record as returned by the admin books endpoint.
+ */
+export interface AdminBook {
+  id: number;
+  title: string;
+  coverImage: string | null;
+  stock: number;
+  rating: number;
+  author: BookAuthor;
+  category: BookCategory;
+}
+
+/**
+ * Paginated response from `GET /api/admin/books`.
+ */
+export interface AdminBooksResponse {
+  books: AdminBook[];
+  pagination: Pagination;
+}
+
+// User
+
+/**
+ * User record as returned by the admin users endpoint.
+ */
+export interface AdminUser {
+  id: number;
+  name: string;
+  email: string;
+  phone: string | null;
+  createdAt: string;
+}
+
+/**
+ * Paginated response from `GET /api/admin/users`.
+ */
+export interface AdminUsersResponse {
+  users: AdminUser[];
+  pagination: Pagination;
+}
+
+// Loan
+/**
+ * Possible statuses for a library loan.
+ * - `BORROWED` — currently borrowed, not yet due.
+ * - `RETURNED` — book has been returned.
+ * - `LATE`     — past due date, not yet returned.
+ */
+export type LoanStatus = 'BORROWED' | 'RETURNED' | 'LATE';
+
+/**
+ * Filter values accepted by the loans list endpoint.
+ */
+export type LoanStatusFilter = 'active' | 'returned' | 'overdue' | undefined;
+
+/**
+ * Loan record as returned by the admin loans endpoint.
+ */
+export interface AdminLoan {
+  id: number;
+  status: LoanStatus;
+  borrowedAt: string;
+  dueAt: string;
+  durationDays: number;
+  book: {
+    title: string;
+    coverImage: string | null;
+    author: BookAuthor;
+    category: BookCategory;
+  };
+  user: {
+    id: number;
+    name: string;
+  };
+}
+
+/**
+ * Paginated response from `GET /api/admin/loans`.
+ */
+export interface AdminLoansResponse {
+  loans: AdminLoan[];
+  pagination: Pagination;
+}
+
+// Shared
+
+/**
+ * Standard pagination metadata returned by all paginated endpoints.
+ */
+export interface Pagination {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
