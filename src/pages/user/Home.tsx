@@ -14,7 +14,13 @@ import selfimprovementIcon from '@/assets/categoriesIcon/selfimprovement.svg';
 import financeIcon from '@/assets/categoriesIcon/finance.svg';
 import scienceIcon from '@/assets/categoriesIcon/science.svg';
 import educationIcon from '@/assets/categoriesIcon/education.svg';
+import {
+  SkeletonAuthorCard,
+  SkeletonBookCard,
+  SkeletonCategoryCard,
+} from '@/components/ui/skeleton';
 
+// Icon mapping for each category name
 const CATEGORY_ICONS: Record<string, string> = {
   Fiction: fictionIcon,
   'Non-Fiction': nonfictionIcon,
@@ -24,13 +30,18 @@ const CATEGORY_ICONS: Record<string, string> = {
   Education: educationIcon,
 };
 
+/**
+ * Home page — displays category grid, recommended books, and popular authors.
+ * Includes loading skeletons and empty states for all sections.
+ */
 export default function Home() {
   const navigate = useNavigate();
+  // Active category filter — undefined shows all recommendations
   const [activeCategory] = useState<number | undefined>(undefined);
   const [page, setPage] = useState(1);
 
+  // Data fetching
   const { data: categories } = useCategories();
-
   const { data: recommended, isFetching } = useRecommendedBooks({
     by: 'rating',
     categoryId: activeCategory,
@@ -48,13 +59,8 @@ export default function Home() {
       <section className='px-4 md:px-8'>
         <div className='grid grid-cols-3 md:grid-cols-6 gap-3 md:gap-4 py-3'>
           {!categories
-            ? // Skeleton Loading
-              [...Array(6)].map((_, i) => (
-                <div
-                  key={i}
-                  className='h-28 rounded-2xl bg-gray-100 animate-pulse'
-                />
-              ))
+            ? // Loading skeleton for categories
+              [...Array(6)].map((_, i) => <SkeletonCategoryCard key={i} />)
             : categories
                 ?.filter(
                   (cat: { id: number; name: string }) =>
@@ -93,13 +99,11 @@ export default function Home() {
             : 'Recommendation'}
         </h2>
 
+        {/* Loading skeleton or book grid */}
         {isFetching ? (
           <div className='grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6'>
             {[...Array(10)].map((_, i) => (
-              <div
-                key={i}
-                className='h-56 md:h-80 rounded-2xl bg-gray-100 animate-pulse'
-              />
+              <SkeletonBookCard key={i} />
             ))}
           </div>
         ) : (
@@ -114,6 +118,7 @@ export default function Home() {
           </div>
         )}
 
+        {/* Load more button — shown when there are more books */}
         {recommended && recommended.length >= 10 && (
           <div className='flex justify-center mt-4 md:mt-8'>
             <button
@@ -132,15 +137,14 @@ export default function Home() {
           Popular Authors
         </h2>
         {!popularAuthors ? (
+          // Loading skeleton for authors
           <div className='grid grid-cols-1 md:grid-cols-4 gap-6'>
             {[...Array(4)].map((_, i) => (
-              <div
-                key={i}
-                className='h-40 rounded-2xl bg-gray-100 animate-pulse'
-              />
+              <SkeletonAuthorCard key={i} />
             ))}
           </div>
         ) : popularAuthors.length === 0 ? (
+          // Empty state
           <p className='text-sm text-gray-400'>No authors found</p>
         ) : (
           <div className='grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-4'>
