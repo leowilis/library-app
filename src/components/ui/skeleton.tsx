@@ -45,3 +45,7 @@ export function SkeletonProfileCard() {
     </div>
   );
 }
+
+export function SkeletonCategoryCard() {
+  return <div className='h-28 rounded-2xl bg-gray-100 animate-pulse' />;
+}
