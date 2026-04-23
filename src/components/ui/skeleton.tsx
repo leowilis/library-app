@@ -49,3 +49,7 @@ export function SkeletonProfileCard() {
 export function SkeletonCategoryCard() {
   return <div className='h-28 rounded-2xl bg-gray-100 animate-pulse' />;
 }
+
+export function SkeletonAuthorCard() {
+  return <div className='h-40 rounded-2xl bg-gray-100 animate-pulse' />
+}
