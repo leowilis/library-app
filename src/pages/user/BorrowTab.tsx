@@ -9,6 +9,7 @@ import { Query_Keys } from '@/constants';
 import { api } from '@/lib/api';
 import type { Loan } from '@/types/loan';
 import { useNavigate } from 'react-router-dom';
+import { SkeletonCard } from '@/components/ui/skeleton';
 
 // Status filter options for the loan list
 type LoanStatus = 'BORROWED' | 'LATE' | 'RETURNED' | undefined;
@@ -196,19 +197,7 @@ export default function BorrowedTab() {
       </div>
 
       {/* Loading skeleton */}
-      {isLoading && (
-        <div className='space-y-4'>
-          {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className='bg-white rounded-2xl p-10 shadow-sm animate-pulse'
-            >
-              <div className='h-4 w-1/3 bg-gray-100 rounded mb-3' />
-              <div className='h-20 bg-gray-100 rounded' />
-            </div>
-          ))}
-        </div>
-      )}
+      {isLoading && [1,2,3].map((i) => <SkeletonCard key={i} />)}
 
       {/* Empty state */}
       {!isLoading && filtered.length === 0 && (
