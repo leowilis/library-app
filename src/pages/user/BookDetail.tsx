@@ -15,14 +15,22 @@ import ReviewModal from './ReviewModal';
 import BookCard from './BookCard';
 import { useIsBookBorrowed } from '@/hooks/useMe';
 
+/**
+ * BookDetail page — displays full book information including cover, stats,
+ * description, reviews, and related books.
+ * Handles borrow flow, out-of-stock state, and already-borrowed state.
+ */
 export default function BookDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { token } = useSelector((state: RootState) => state.auth);
+  // Modal visibility state
   const [showReview, setShowReview] = useState(false);
   const [showBorrow, setShowBorrow] = useState(false);
+  // Pagination state for reviews
   const [reviewPage, setReviewPage] = useState(1);
 
+  // Data fetching
   const { data: bookData, isLoading } = useBookDetail(Number(id));
   const book =
     (bookData as any)?.data?.data?.book ??
@@ -35,9 +43,11 @@ export default function BookDetail() {
     limit: 6,
   });
 
+  // Borrow status checks
   const isAlreadyBorrowed = useIsBookBorrowed(Number(id));
   const isOutOfStock = book ? book.availableCopies <= 0 : false;
 
+  // Handles borrow button click with auth and stock validation
   const handleBorrow = () => {
     if (isOutOfStock) return toast.error('This book is out of stock');
     if (isAlreadyBorrowed) return toast.error('You already borrowed this book');
@@ -48,6 +58,7 @@ export default function BookDetail() {
     setShowBorrow(true);
   };
 
+  // Loading skeleton
   if (isLoading) {
     return (
       <div className='space-y-4 px-4 py-4'>
@@ -58,6 +69,7 @@ export default function BookDetail() {
     );
   }
 
+  // Dynamic borrow button label based on book state
   const borrowButtonLabel = isOutOfStock
     ? 'Not Available'
     : isAlreadyBorrowed
@@ -72,8 +84,8 @@ export default function BookDetail() {
 
   return (
     <div className='pb-32 md:pb-10'>
-      {/* Breadcrumb */}
-      <div className='flex items-center gap-1 py-3 text-xs text-blue-500'>
+      {/* Breadcrumb navigation */}
+      <div className='flex items-center gap-1 py-3 text-xs text-blue-500 md:pb-8'>
         <button
           onClick={() => navigate(ROUTES.Home)}
           className='hover:text-blue-700'
@@ -91,23 +103,26 @@ export default function BookDetail() {
         <span className='text-neutral-950 line-clamp-1'>{book.title}</span>
       </div>
 
-      {/* Top Section */}
-      <div className='md:flex md:gap-8 md:items-start'>
-        <div className='md:w-64 md:flex-shrink-0'>
-          <div className='w-full rounded-2xl overflow-hidden'>
+      {/* Top Section: cover + book info */}
+      <div className='md:flex md:gap-10 md:items-start'>
+        {/* Book Cover */}
+        <div className='md:w-80 md:flex-shrink-0'>
+          <div className='w-full overflow-hidden'>
             <img
               src={book.coverImage ?? ''}
               alt={book.title}
-              className='w-full object-contain max-h-[400px] md:h-full'
+              className='w-full object-contain max-h-[400px] md:max-h-[480px]'
             />
           </div>
         </div>
 
+        {/* Book info */}
         <div className='mt-4 md:mt-0 space-y-3 flex-1'>
           <div className='flex items-center justify-between'>
             <p className='text-xs font-semibold text-neutral-950 border border-neutral-300 rounded-sm w-32 py-1 px-2 text-center'>
               {book.category?.name}
             </p>
+            {/* Borrow status badges */}
             <div className='flex items-center gap-2'>
               {isAlreadyBorrowed && (
                 <span className='text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded'>
@@ -123,41 +138,46 @@ export default function BookDetail() {
           </div>
 
           <h1 className='text-2xl font-bold text-gray-900'>{book.title}</h1>
-          <p className='text-sm text-gray-500'>{book.author?.name}</p>
+          <p className='text-sm text-neutral-700'>{book.author?.name}</p>
           <StarRating rating={book.rating} showValue />
 
-          {/* Stats */}
-          <div className='flex justify-between py-3 border-b border-neutral-300 my-4'>
-            <div className='flex flex-col items-center flex-1 border-r border-neutral-300'>
+          {/* Book Stats: Pages, Rating, Reviews */}
+          <div className='flex justify-between py-3 border-b border-neutral-300 my-5 md:justify-start md:gap-0 md:max-w-xl'>
+            <div className='flex flex-col items-center flex-1 border-r border-neutral-300 md:flex-none md:items-start md:pr-10'>
               <span className='text-base font-bold text-neutral-950'>
                 {book.totalPages ?? '-'}
               </span>
-              <span className='text-xs text-neutral-950'>Page</span>
+              <span className='text-xs font-medium text-neutral-950'>Page</span>
             </div>
-            <div className='flex flex-col items-center flex-1 border-r border-gray-200'>
+            <div className='flex flex-col items-center flex-1 border-r border-gray-200 md:flex-none md:items-start md:px-10'>
               <span className='text-base font-bold text-neutral-950'>
                 {book.rating ?? 0}
               </span>
-              <span className='text-xs text-neutral-950'>Rating</span>
+              <span className='text-xs font-medium text-neutral-950'>
+                Rating
+              </span>
             </div>
-            <div className='flex flex-col items-center flex-1'>
+            <div className='flex flex-col items-center flex-1 md:flex-none md:items-start md:pl-10'>
               <span className='text-base font-bold text-neutral-950'>
                 {book.reviewCount ?? 0}
               </span>
-              <span className='text-xs text-neutral-950'>Reviews</span>
+              <span className='text-xs font-medium text-neutral-950'>
+                Reviews
+              </span>
             </div>
           </div>
 
+          {/* Book description */}
           <div>
             <h2 className='text-base font-bold text-gray-900 mb-2'>
               Description
             </h2>
-            <p className='text-md text-neutral-950 leading-relaxed'>
+            <p className='text-md text-neutral-950 leading-relaxed md:text-sm'>
               {book.description}
             </p>
           </div>
 
-          {/* Desktop Button */}
+          {/* Desktop Borrow Button */}
           <div className='hidden md:flex pt-4'>
             <Button
               className='rounded-full px-8 py-5 font-semibold text-white bg-[#1C65DA] transition-all duration-200 hover:-translate-y-1 hover:shadow-md hover:bg-[#1550b8] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0'
@@ -170,17 +190,19 @@ export default function BookDetail() {
         </div>
       </div>
 
-      <br />
-      <div className='flex flex-col items-center flex-1 border border-neutral-300' />
+      {/* Line */}
+      <div className='mt-15 border-t border-neutral-300 pt-8 space-y-5' />
 
       {/* Reviews */}
       <div className='mt-8 space-y-5'>
         <div>
-          <h2 className='text-2xl font-bold text-gray-900 mb-2'>Review</h2>
-          <StarRating rating={book.rating} showValue />
-          <span className='text-xs text-neutral-950 ml-1'>
-            ({book.reviewCount} Ulasan)
-          </span>
+          <h2 className='text-2xl font-extrabold text-gray-900 mb-2'>Review</h2>
+          <div className='flex items-center gap-1'>
+            <StarRating rating={book.rating} showValue />
+            <span className='text-xs font-extrabold text-neutral-950'>
+              ({book.reviewCount} Ulasan)
+            </span>
+          </div>
         </div>
 
         <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
@@ -213,6 +235,7 @@ export default function BookDetail() {
           )}
         </div>
 
+        {/* Load more reviews */}
         {visibleReviews.length < reviews.length && (
           <div className='flex justify-center'>
             <button
@@ -225,10 +248,15 @@ export default function BookDetail() {
         )}
       </div>
 
+      {/* Line */}
+      <div className='mt-15 border-t border-neutral-300 pt-8 space-y-5' />
+
       {/* Related Books */}
       {relatedBooks && relatedBooks.length > 0 && (
         <div className='mt-8 space-y-4'>
-          <h2 className='text-base font-bold text-gray-900'>Related Books</h2>
+          <h2 className='text-base font-extrabold text-gray-900 md:text-2xl'>
+            Related Books
+          </h2>
           <div className='grid grid-cols-2 md:grid-cols-5 gap-4'>
             {relatedBooks
               .filter((b: any) => b.id !== book.id)
@@ -244,7 +272,7 @@ export default function BookDetail() {
         </div>
       )}
 
-      {/* Mobile Button */}
+      {/* Mobile borrow button — fixed at bottom */}
       <div className='fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-4 py-4 flex md:hidden'>
         <Button
           className='flex-1 rounded-full py-6 font-semibold text-white bg-[#1C65DA] transition-all duration-200 hover:bg-[#1550b8] active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed'
@@ -255,9 +283,12 @@ export default function BookDetail() {
         </Button>
       </div>
 
+      {/* Review modal */}
       {showReview && (
         <ReviewModal bookId={book.id} onClose={() => setShowReview(false)} />
       )}
+
+      {/* Borrow modal */}
       {showBorrow && (
         <BorrowModal
           bookId={book.id}
