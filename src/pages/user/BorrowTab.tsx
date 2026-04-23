@@ -10,6 +10,7 @@ import { api } from '@/lib/api';
 import type { Loan } from '@/types/loan';
 import { useNavigate } from 'react-router-dom';
 
+// Status filter options for the loan list
 type LoanStatus = 'BORROWED' | 'LATE' | 'RETURNED' | undefined;
 
 const STATUS_FILTERS = [
@@ -19,22 +20,25 @@ const STATUS_FILTERS = [
   { label: 'Overdue', value: 'LATE' as const },
 ];
 
+// Color mapping for each loan status badge
 const STATUS_COLOR: Record<string, string> = {
   BORROWED: '#079455',
   RETURNED: '#6b7280',
   LATE: '#d92d20',
 };
 
+// Display label mapping for each loan status
 const STATUS_LABEL: Record<string, string> = {
   BORROWED: 'Active',
   RETURNED: 'Returned',
   LATE: 'Overdue',
 };
 
+// Displays book cover, title, author, and borrow date for a loan item
 function LoanBookInfo({ loan }: { loan: Loan }) {
   return (
     <div className='flex gap-3 flex-1 min-w-0'>
-      <div className='w-20 h-24 overflow-hidden flex-shrink-0 bg-gray-100 rounded-lg'>
+      <div className='w-20 h-30 overflow-hidden flex-shrink-0 bg-gray-100'>
         {loan.book?.coverImage ? (
           <img
             src={loan.book.coverImage}
@@ -47,13 +51,12 @@ function LoanBookInfo({ loan }: { loan: Loan }) {
           </div>
         )}
       </div>
-      <div className='flex-1 min-w-0 space-y-1.5'>
-        <span className='inline-block text-xs font-semibold px-2 py-0.5 rounded-full border border-gray-300 text-gray-500'>
+      <div className='flex-1 min-w-0 space-y-4 m-2 md:space-y-5 '>
+        <span className='inline-block text-xs font-semibold px-2 py-0.5 rounded-sm border border-gray-300 text-gray-500'>
           {loan.book?.category?.name ?? 'Category'}
         </span>
         <p className='text-sm font-bold text-gray-900'>{loan.book?.title}</p>
-        <p className='text-xs text-gray-500'>{loan.book?.author?.name}</p>
-        <p className='text-xs text-gray-400'>
+        <p className='text-xs text-neutral-950 font-bold'>
           {formatDate(loan.borrowedAt)} · Duration {loan.durationDays} Days
         </p>
       </div>
@@ -61,31 +64,27 @@ function LoanBookInfo({ loan }: { loan: Loan }) {
   );
 }
 
-interface ReturnConfirmModalProps {
-  loan: Loan;
-  isLoading: boolean;
-  onConfirm: () => void;
-  onCancel: () => void;
-}
-
+// Confirmation modal shown before returning a book
 function ReturnConfirmModal({
   loan,
   isLoading,
   onConfirm,
   onCancel,
-}: ReturnConfirmModalProps) {
+}: {
+  loan: Loan;
+  isLoading: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center px-4'>
       <div className='absolute inset-0 bg-black/40' onClick={onCancel} />
       <div className='relative bg-white w-full max-w-sm rounded-3xl p-6 space-y-5'>
-        {/* Icon */}
         <div className='flex justify-center'>
           <div className='w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center'>
             <AlertTriangle size={28} className='text-[#1c65da]' />
           </div>
         </div>
-
-        {/* Text */}
         <div className='text-center space-y-2'>
           <h3 className='text-lg font-bold text-gray-900'>Return Book?</h3>
           <p className='text-sm text-gray-500'>
@@ -95,8 +94,6 @@ function ReturnConfirmModal({
             "{loan.book?.title}"
           </p>
         </div>
-
-        {/* Buttons */}
         <div className='flex gap-3 pt-1'>
           <button
             onClick={onCancel}
@@ -120,15 +117,19 @@ function ReturnConfirmModal({
   );
 }
 
+// Borrowed books tab — shows list of user loans with filter, search, return, and review actions
 export default function BorrowedTab() {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  // UI state
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<LoanStatus>(undefined);
   const [reviewBookId, setReviewBookId] = useState<number | null>(null);
   const [returningId, setReturningId] = useState<number | null>(null);
   const [confirmLoan, setConfirmLoan] = useState<Loan | null>(null);
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
+  // Data fetching
   const { data: loansData, isLoading } = useMyLoansProfile({
     status,
     limit: 20,
@@ -138,10 +139,12 @@ export default function BorrowedTab() {
     (loansData as any)?.data?.loans ??
     [];
 
+  // Filter loans by search query
   const filtered = loans.filter((loan) =>
     loan.book?.title?.toLowerCase().includes(search.toLowerCase()),
   );
 
+  // Handles book return API call with loading and error state
   const handleReturn = async () => {
     if (!confirmLoan) return;
     setReturningId(confirmLoan.id);
@@ -163,7 +166,8 @@ export default function BorrowedTab() {
         Borrowed List
       </h1>
 
-      <div className='flex items-center gap-2 bg-white rounded-full px-4 py-3 border border-gray-200 md:max-w-2xl'>
+      {/* Search input */}
+      <div className='flex items-center gap-2 bg-white rounded-full px-4 py-3 border border-neutral-300 md:max-w-2xl'>
         <Search size={16} className='text-neutral-600' />
         <input
           value={search}
@@ -173,7 +177,8 @@ export default function BorrowedTab() {
         />
       </div>
 
-      <div className='flex gap-2 overflow-x-auto pb-3'>
+      {/* Status filter tabs */}
+      <div className='flex gap-2 overflow-x-auto pb-3 md:gap-3'>
         {STATUS_FILTERS.map(({ label, value }) => (
           <button
             key={label}
@@ -190,12 +195,13 @@ export default function BorrowedTab() {
         ))}
       </div>
 
+      {/* Loading skeleton */}
       {isLoading && (
         <div className='space-y-4'>
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className='bg-white rounded-2xl p-4 shadow-sm animate-pulse'
+              className='bg-white rounded-2xl p-10 shadow-sm animate-pulse'
             >
               <div className='h-4 w-1/3 bg-gray-100 rounded mb-3' />
               <div className='h-20 bg-gray-100 rounded' />
@@ -204,6 +210,7 @@ export default function BorrowedTab() {
         </div>
       )}
 
+      {/* Empty state */}
       {!isLoading && filtered.length === 0 && (
         <div className='flex flex-col items-center py-16 gap-3 text-gray-400'>
           <span className='text-4xl'>📚</span>
@@ -211,13 +218,15 @@ export default function BorrowedTab() {
         </div>
       )}
 
-      {!isLoading && (
-        <div className='space-y-5 md:max-w-6xl'>
+      {/* Loan list */}
+      {!isLoading && filtered.length > 0 && (
+        <div className='space-y-5 md:max-w-5xl'>
           {filtered.map((loan) => (
             <div
               key={loan.id}
-              className='bg-white rounded-2xl p-4 shadow-sm space-y-4 md:p-6'
+              className='bg-white rounded-2xl p-4 shadow-sm space-y-4 md:p-4.5 md:space-y-6'
             >
+              {/* Status and due date row */}
               <div className='flex items-center justify-between'>
                 <div className='flex items-center gap-2'>
                   <span className='text-sm font-bold text-neutral-950'>
@@ -243,8 +252,10 @@ export default function BorrowedTab() {
                 </div>
               </div>
 
-              <div className='border-b border-neutral-300' />
+              {/* Line */}
+              <hr className='border-neutral-300' />
 
+              {/* Book info and action buttons */}
               <div className='flex items-center justify-between gap-4'>
                 <LoanBookInfo loan={loan} />
                 {loan.status === 'BORROWED' && (
@@ -272,6 +283,7 @@ export default function BorrowedTab() {
         </div>
       )}
 
+      {/* Return confirmation modal */}
       {confirmLoan && (
         <ReturnConfirmModal
           loan={confirmLoan}
@@ -281,6 +293,7 @@ export default function BorrowedTab() {
         />
       )}
 
+      {/* Review modal — redirects to reviews tab on success */}
       {reviewBookId && (
         <ReviewModal
           bookId={reviewBookId}
