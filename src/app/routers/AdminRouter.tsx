@@ -4,7 +4,7 @@ import AdminUserList from "@/pages/admin/UserList";
 import AdminBookList from "@/pages/admin/BookList";
 import AdminBookForm from "@/pages/admin/BookForm";
 import AdminBorrowedList from "@/pages/admin/BorrowedList";
-import AdminBookPreview from "@/pages/admin/BookPreview"; // 1. Import the new component
+import AdminBookPreview from "@/pages/admin/BookPreview"; 
 
 export default function AdminRouter() {
   return (
