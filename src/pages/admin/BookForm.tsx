@@ -1,49 +1,94 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ChevronLeft, Upload, Trash2 } from "lucide-react";
-import { api } from "@/lib/api";
-import { EndPoints, Query_Keys } from "@/constants";
-import { toast } from "sonner";
-import { useCategories } from "@/hooks/useCategories";
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { ChevronLeft, Trash2, ImageIcon } from 'lucide-react';
+import { api } from '@/lib/api';
+import { EndPoints, Query_Keys } from '@/constants';
+import { toast } from 'sonner';
+import { useCategories } from '@/hooks/useCategories';
+import { useBookDetail } from '@/hooks/useBooks';
+import type { Category } from '@/types/category';
 
+// Types
+interface BookFormState {
+  title: string;
+  authorName: string;
+  categoryId: string;
+  description: string;
+  totalPages: string;
+  coverImage: string;
+}
+
+// Constants
+const INITIAL_FORM: BookFormState = {
+  title: '',
+  authorName: '',
+  categoryId: '',
+  description: '',
+  totalPages: '',
+  coverImage: '',
+};
+
+// FormField
+
+/**
+ * Reusable labeled input wrapper.
+ */
+function FormField({
+  label,
+  required,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className='space-y-2'>
+      <label className='text-sm font-bold text-neutral-950'>
+        {label}
+        {required && <span className='text-red-500 ml-1'>*</span>}
+      </label>
+      {children}
+    </div>
+  );
+}
+
+// inputClass
+const inputClass =
+  'w-full rounded-xl border border-gray-200 px-4 py-3 text-sm font-medium text-gray-800 focus:outline-none focus:border-blue-500 transition-colors placeholder:text-gray-400';
+
+/**
+ * Admin Book Form page.
+ *
+ * - In **add** mode (`/admin/books/add`): renders an empty form.
+ * - In **edit** mode (`/admin/books/:id/edit`): prefills form from `useBookDetail`.
+ * Submits via PUT (edit) or POST (add) and invalidates the admin books cache on success.
+ */
 export default function AdminBookForm() {
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
+  const [form, setForm] = useState<BookFormState>(INITIAL_FORM);
+
   const { data: categories } = useCategories();
+  const { data: book } = useBookDetail(Number(id));
 
-  const [form, setForm] = useState({
-    title: "",
-    authorName: "",
-    categoryId: "",
-    description: "",
-    totalPages: "",
-    coverImage: "",
-  });
-
-  const { data: bookData } = useQuery({
-    queryKey: [Query_Keys.BooksDetail, id],
-    queryFn: async () => {
-      const res = await api.get(EndPoints.BooksDetail(Number(id)));
-      return res.data?.data?.book ?? res.data?.data ?? res.data;
-    },
-    enabled: isEdit,
-  });
-
+  // Prefill form when editing
   useEffect(() => {
-    if (bookData) {
+    if (isEdit && book) {
       setForm({
-        title: bookData.title ?? "",
-        authorName: bookData.author?.name ?? "",
-        categoryId: bookData.categoryId?.toString() ?? "",
-        description: bookData.description ?? "",
-        totalPages: bookData.totalPages?.toString() ?? "",
-        coverImage: bookData.coverImage ?? "",
+        title: book.title ?? '',
+        authorName: book.author?.name ?? '',
+        categoryId: book.categoryId?.toString() ?? '',
+        description: book.description ?? '',
+        totalPages: book.totalPages?.toString() ?? '',
+        coverImage: book.coverImage ?? '',
       });
     }
-  }, [bookData]);
+  }, [isEdit, book]);
 
   const { mutate: submit, isPending } = useMutation({
     mutationFn: async () => {
@@ -55,7 +100,6 @@ export default function AdminBookForm() {
         totalPages: Number(form.totalPages),
         coverImage: form.coverImage,
       };
-
       if (isEdit) {
         await api.put(EndPoints.BooksDetail(Number(id)), payload);
       } else {
@@ -63,12 +107,17 @@ export default function AdminBookForm() {
       }
     },
     onSuccess: () => {
-      toast.success(isEdit ? "Book updated!" : "Book added!");
+      toast.success(isEdit ? 'Book updated!' : 'Book added!');
       queryClient.invalidateQueries({ queryKey: [Query_Keys.AdminBooks] });
-      navigate("/admin/books");
+      if (isEdit) {
+        queryClient.invalidateQueries({
+          queryKey: [Query_Keys.BooksDetail, Number(id)],
+        });
+      }
+      navigate('/admin/books');
     },
     onError: () =>
-      toast.error(isEdit ? "Failed to update book" : "Failed to add book"),
+      toast.error(isEdit ? 'Failed to update book' : 'Failed to add book'),
   });
 
   const handleChange = (
@@ -82,190 +131,165 @@ export default function AdminBookForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.title || !form.categoryId) {
-      toast.error("Please fill required fields");
+      toast.error('Please fill required fields');
       return;
     }
     submit();
   };
 
   return (
-    <section className=" space-y-6 pb-3">
-      {/* HEADER */}
-      <div className="flex items-center">
+    <section className='max-w-2xl space-y-6 pb-10'>
+      {/* Header */}
+      <div className='flex items-center gap-3'>
         <button
-          onClick={() => navigate("/admin/books")}
-          className="p-2 rounded-xl hover:bg-gray-100"
+          onClick={() => navigate('/admin/books')}
+          className='p-2 rounded-xl hover:bg-gray-100 transition-colors'
         >
-          <ChevronLeft size={30} className="text-neutral-700" />
+          <ChevronLeft size={22} className='text-neutral-700' />
         </button>
-        {!isEdit && (
-          <button
-            onClick={() => navigate("/admin/books")}
-            className="p-2 rounded-full hover:bg-gray-100"
-          >
-            <ChevronLeft size={20} className="text-gray-600" />
-          </button>
-        )}
-        <h1 className="text-2xl font-bold text-gray-900">
-          {isEdit ? "Edit Book" : "Add Book"}
+        <h1 className='text-2xl font-bold text-gray-900'>
+          {isEdit ? 'Edit Book' : 'Add Book'}
         </h1>
       </div>
 
+      {/* Form */}
       <form
         onSubmit={handleSubmit}
-        className="rounded-3xl shadow-sm p-6 space-y-6"
+        className='bg-white rounded-3xl border border-gray-100 shadow-sm p-6 md:p-8 space-y-6'
       >
-        {/* TITLE */}
-        <div className="space-y-1">
-          <label className="text-sm font-bold text-neutral-950">Title</label>
+        {/* Title */}
+        <FormField label='Title' required>
           <input
-            name="title"
+            name='title'
             value={form.title}
             onChange={handleChange}
+            placeholder='Enter book title'
             required
-            className="w-full rounded-xl font-semibold border border-gray-200 mt-2 px-4 py-3 text-sm focus:outline-none focus:border-blue-500"
+            className={inputClass}
           />
-        </div>
+        </FormField>
 
-        {/* AUTHOR */}
-        <div className="space-y-1">
-          <label className="text-sm font-bold text-neutral-950">Author</label>
+        {/* Author */}
+        <FormField label='Author' required>
           <input
-            name="authorName"
+            name='authorName'
             value={form.authorName}
             onChange={handleChange}
+            placeholder='Enter author name'
             required
-            className="w-full rounded-xl font-semibold border border-gray-200 mt-2 px-4 py-3 text-sm focus:outline-none focus:border-blue-500"
+            className={inputClass}
           />
-        </div>
+        </FormField>
 
-        {/* CATEGORY */}
-        <div className="space-y-1">
-          <label className="text-sm font-semibold text-gray-700">
-            Category
-          </label>
-
-          <div className="relative">
+        {/* Category */}
+        <FormField label='Category' required>
+          <div className='relative'>
             <select
-              name="categoryId"
+              name='categoryId'
               value={form.categoryId}
               onChange={handleChange}
               required
-              className="w-full appearance-none rounded-xl border border-gray-200 
-                 px-4 py-3 pr-10 text-sm
-                 focus:outline-none focus:border-blue-500"
+              className={`${inputClass} appearance-none pr-10`}
             >
-              <option value="">Select category</option>
-              {(categories ?? []).map((cat: any) => (
+              <option value=''>Select category</option>
+              {(categories ?? []).map((cat: Category) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.name}
                 </option>
               ))}
             </select>
-
-            {/* Custom Arrow */}
             <svg
-              className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
+              className='pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400'
+              fill='none'
+              stroke='currentColor'
+              strokeWidth='2'
+              viewBox='0 0 24 24'
             >
               <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M19 9l-7 7-7-7"
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                d='M19 9l-7 7-7-7'
               />
             </svg>
           </div>
-        </div>
+        </FormField>
 
-        {/* NUMBER OF PAGES */}
-        <div className="space-y-1">
-          <label className="text-sm font-bold text-neutral-950">
-            Number of Pages
-          </label>
+        {/* Number of Pages */}
+        <FormField label='Number of Pages'>
           <input
-            name="totalPages"
-            type="number"
+            name='totalPages'
+            type='number'
+            min={1}
             value={form.totalPages}
             onChange={handleChange}
-            className="w-full rounded-xl font-semibold border border-gray-200 mt-2 px-4 py-3 text-sm focus:outline-none focus:border-blue-500"
+            placeholder='e.g. 320'
+            className={inputClass}
           />
-        </div>
+        </FormField>
 
-        {/* DESCRIPTION */}
-        <div className="space-y-1">
-          <label className="text-sm font-bold text-neutral-950">
-            Description
-          </label>
+        {/* Description */}
+        <FormField label='Description'>
           <textarea
-            name="description"
+            name='description'
             value={form.description}
             onChange={handleChange}
             rows={5}
-            className="w-full rounded-xl font-semibold border border-gray-200 mt-2 px-4 py-3 text-sm resize-none focus:outline-none focus:border-blue-500"
+            placeholder='Enter book description'
+            className={`${inputClass} resize-none`}
           />
-        </div>
+        </FormField>
 
-        {/* COVER IMAGE */}
-        <div className="space-y-2">
-          <label className="text-sm font-bold text-neutral-950">
-            Cover Image
-          </label>
-
-          <div className="border-2 border-dashed border-gray-200 mt-2 rounded-2xl p-6 text-center space-y-4">
+        {/* Cover Image */}
+        <FormField label='Cover Image'>
+          <div className='border-2 border-dashed border-gray-200 rounded-2xl p-6 space-y-4'>
             {form.coverImage ? (
-              <>
+              <div className='flex flex-col items-center gap-4'>
                 <img
                   src={form.coverImage}
-                  alt="cover"
-                  className="w-28 h-40 object-cover mx-auto shadow-sm"
+                  alt='cover preview'
+                  className='w-28 h-40 object-cover rounded-xl shadow-sm'
                 />
-
-                <div className="flex justify-center gap-4">
-                  <button
-                    type="button"
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl border border-neutral-300 text-sm hover:bg-gray-50"
-                  >
-                    <Upload size={16} />
-                    Change Image
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setForm((prev) => ({ ...prev, coverImage: "" }))
-                    }
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl border border-neutral-300 text-red-500 text-sm hover:bg-red-50"
-                  >
-                    <Trash2 size={16} />
-                    Delete Image
-                  </button>
-                </div>
-              </>
+                <button
+                  type='button'
+                  onClick={() =>
+                    setForm((prev) => ({ ...prev, coverImage: '' }))
+                  }
+                  className='flex items-center gap-2 px-4 py-2 rounded-xl border border-neutral-300 text-red-500 text-sm hover:bg-red-50 transition-colors'
+                >
+                  <Trash2 size={15} />
+                  Remove Image
+                </button>
+              </div>
             ) : (
-              <input
-                name="coverImage"
-                placeholder="Enter image URL"
-                value={form.coverImage}
-                onChange={handleChange}
-                className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-blue-500"
-              />
+              <div className='space-y-3'>
+                <div className='flex justify-center'>
+                  <div className='w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center'>
+                    <ImageIcon size={22} className='text-gray-400' />
+                  </div>
+                </div>
+                <input
+                  name='coverImage'
+                  placeholder='Paste image URL here'
+                  value={form.coverImage}
+                  onChange={handleChange}
+                  className={inputClass}
+                />
+                <p className='text-xs text-center text-gray-400'>
+                  PNG or JPG (max. 5MB)
+                </p>
+              </div>
             )}
-
-            <p className="text-md text-neutral-950">PNG or JPG (max. 5mb)</p>
           </div>
-        </div>
+        </FormField>
 
-        {/* SAVE BUTTON */}
+        {/* Submit */}
         <button
-          type="submit"
+          type='submit'
           disabled={isPending}
-          className="w-full py-3 rounded-full text-white font-semibold text-sm disabled:opacity-60"
-          style={{ backgroundColor: "#2563eb" }}
+          className='w-full py-3.5 rounded-full text-white font-semibold text-sm disabled:opacity-60 transition-colors hover:bg-blue-700'
+          style={{ backgroundColor: '#1c65da' }}
         >
-          {isPending ? "Saving..." : "Save"}
+          {isPending ? 'Saving...' : isEdit ? 'Update Book' : 'Add Book'}
         </button>
       </form>
     </section>
