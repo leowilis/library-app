@@ -30,7 +30,7 @@ export interface AdminBook {
   id: number;
   title: string;
   coverImage: string | null;
-  stock: number;
+  availableCopies: number;
   rating: number;
   author: BookAuthor;
   category: BookCategory;
@@ -94,12 +94,8 @@ export interface AdminLoan {
     author: BookAuthor;
     category: BookCategory;
   };
-  borrower: {
-    id: number;
-    name: string;
-    email: string;
-    phone: string | null;
-  };
+  borrower?: { id: number; name: string; email: string; phone: string | null };
+  user?: { id: number; name: string; email: string };
 }
 
 /**
