@@ -31,12 +31,8 @@ export default function BookDetail() {
   const [reviewPage, setReviewPage] = useState(1);
 
   // Data fetching
-  const { data: bookData, isLoading } = useBookDetail(Number(id));
-  const book =
-    (bookData as any)?.data?.data?.book ??
-    (bookData as any)?.data?.data ??
-    (bookData as any)?.data;
-
+  const { data: book, isLoading } = useBookDetail(Number(id));
+ 
   const { data: relatedBooks } = useRecommendedBooks({
     by: 'rating',
     categoryId: book?.categoryId,
