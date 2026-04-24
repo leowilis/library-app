@@ -5,13 +5,28 @@ import { Button } from '@/components/ui/button';
 import { useCreateReview } from '@/hooks/useReviews';
 import StarPicker from '@/components/ui/starPicker';
 
+// Types
+
 interface ReviewModalProps {
   bookId: number;
   onClose: () => void;
-  onSuccess?: () => void
+  // Called after the review is successfully submitted
+  onSuccess?: () => void;
 }
 
-export default function ReviewModal({ bookId, onClose, onSuccess }: ReviewModalProps) {
+// ReviewModal
+
+/**
+ * Review submission modal.
+ *
+ * Validates rating and comment before submitting via `useCreateReview`.
+ * Calls `onSuccess` only inside `onSuccess` callback — not before the request completes.
+ */
+export default function ReviewModal({
+  bookId,
+  onClose,
+  onSuccess,
+}: ReviewModalProps) {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const { mutate: createReview, isPending } = useCreateReview();
@@ -25,9 +40,12 @@ export default function ReviewModal({ bookId, onClose, onSuccess }: ReviewModalP
       {
         onSuccess: () => {
           toast.success('Review submitted!');
-          onSuccess ? onSuccess() : onClose()
+          onSuccess?.();
+          onClose();
         },
-        onError: () => toast.error('Failed to submit review'),
+        onError: () => {
+          toast.error('Failed to submit review');
+        },
       },
     );
   };
