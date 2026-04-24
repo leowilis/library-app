@@ -10,7 +10,7 @@ import {
   Star,
   AlertCircle,
 } from 'lucide-react';
-import { useAdminBooks, useDeleteBook } from '@/hooks/admin/useAdminbooks';
+import { useAdminBooks, useDeleteBook } from '@/hooks/admin/useAdminBookHooks';
 import type {
   AdminBook,
   ActionDropdownProps,
