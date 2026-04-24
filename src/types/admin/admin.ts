@@ -148,3 +148,23 @@ export interface Pagination {
   limit: number;
   totalPages: number;
 }
+
+/**
+ * Props for the three-dot action menu on each book row.
+ * Receives navigation callbacks for preview, edit, and delete actions.
+ */
+export interface ActionDropdownProps {
+  onPreview: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+}
+
+/**
+ * Props for the delete confirmation modal.
+ * Controls loading state and confirm/cancel callbacks.
+ */
+export interface DeleteModalProps {
+  isDeleting: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
