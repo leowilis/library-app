@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Search,
   Plus,
@@ -9,17 +8,15 @@ import {
   Pencil,
   Trash2,
   Star,
+  AlertCircle,
 } from 'lucide-react';
-import { api } from '@/lib/api';
-import { EndPoints, Query_Keys } from '@/constants';
-import { toast } from 'sonner';
+import { useAdminBooks, useDeleteBook } from '@/hooks/admin/useAdminbooks';
 import type {
   AdminBook,
   ActionDropdownProps,
   DeleteModalProps,
 } from '@/types/admin/admin';
 
-const PAGE_SIZE = 10;
 const TABLE_HEADERS = [
   'Cover',
   'Title',
@@ -76,7 +73,6 @@ function ActionDropdown({ onPreview, onEdit, onDelete }: ActionDropdownProps) {
       >
         <MoreVertical size={18} />
       </button>
-
       {isOpen && (
         <div className='absolute right-0 mt-1 w-40 bg-white rounded-lg shadow-lg border border-gray-200 z-10 py-1'>
           {actions.map(({ label, icon, onClick, className }) => (
@@ -138,47 +134,47 @@ function DeleteModal({ isDeleting, onConfirm, onCancel }: DeleteModalProps) {
 /**
  * Admin Book List page.
  *
- * Fetches paginated books from `GET /api/admin/books` and renders:
- * - A table with cover, title, author, category, stock, and actions on desktop.
+ * Fetches paginated books via `useAdminBooks` and renders:
+ * - A card-style table on desktop with optimistic delete.
  * - Stacked cards with rating on mobile.
- * Supports client-side search by title and delete with confirmation modal.
+ * Supports client-side search by title.
  */
 export default function AdminBookList() {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
-  const { data, isLoading } = useQuery({
-    queryKey: [Query_Keys.AdminBooks, page],
-    queryFn: async () => {
-      const res = await api.get(EndPoints.AdminBooks, {
-        params: { page, limit: PAGE_SIZE },
-      });
-      return res.data?.data ?? res.data;
-    },
-  });
+  const { data, isLoading, isError } = useAdminBooks(page);
+  const { mutate: deleteBook, isPending: isDeleting } = useDeleteBook(
+    page,
+    () => setDeleteId(null),
+  );
 
-  const books: AdminBook[] = data?.books ?? data ?? [];
+  const books: AdminBook[] = data?.books ?? [];
   const total: number = data?.pagination?.total ?? books.length;
-  const totalPages = Math.ceil(total / PAGE_SIZE);
-
-  const { mutate: deleteBook, isPending: isDeleting } = useMutation({
-    mutationFn: async (id: number) => {
-      await api.delete(EndPoints.BooksDetail(id));
-    },
-    onSuccess: () => {
-      toast.success('Book deleted!');
-      setDeleteId(null);
-      queryClient.invalidateQueries({ queryKey: [Query_Keys.AdminBooks] });
-    },
-    onError: () => toast.error('Failed to delete book'),
-  });
+  const totalPages = Math.ceil(total / 10);
 
   const filtered = books.filter((b) =>
     b.title?.toLowerCase().includes(search.toLowerCase()),
   );
+
+  // ── Error State ──
+  if (isError) {
+    return (
+      <section className='space-y-4 md:px-4 md:m-4'>
+        <h1 className='text-2xl font-bold text-gray-900 md:text-3xl'>
+          Book List
+        </h1>
+        <div className='flex flex-col items-center justify-center py-20 gap-3 text-red-500'>
+          <AlertCircle size={40} />
+          <p className='text-sm font-semibold'>
+            Failed to load books. Please try again.
+          </p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className='space-y-4 md:px-4 md:m-4'>
@@ -198,7 +194,7 @@ export default function AdminBookList() {
       </div>
 
       {/* Search */}
-      <div className='flex items-center gap-2 bg-white rounded-full px-4 py-2.5 border border-gray-200 w-full md:max-w-[750px] md:rounded-full md:mb-10'>
+      <div className='flex items-center gap-2 bg-white rounded-full px-4 py-2.5 border border-gray-200 w-full md:max-w-[750px] md:mb-10'>
         <Search size={20} className='text-neutral-600' />
         <input
           value={search}
@@ -208,7 +204,7 @@ export default function AdminBookList() {
         />
       </div>
 
-      {/* Desktop Table */}
+      {/* ── Desktop Table ── */}
       <div className='hidden md:block bg-gray-50 rounded-2xl overflow-hidden'>
         <table className='w-full text-sm border-separate border-spacing-y-2 px-2'>
           <thead>
@@ -227,7 +223,7 @@ export default function AdminBookList() {
             {isLoading ? (
               [...Array(5)].map((_, i) => (
                 <tr key={i}>
-                  {[...Array(7)].map((_, j) => (
+                  {[...Array(6)].map((_, j) => (
                     <td key={j} className='px-4 py-3 bg-white'>
                       <div className='h-4 bg-gray-100 rounded animate-pulse' />
                     </td>
@@ -237,14 +233,14 @@ export default function AdminBookList() {
             ) : filtered.length === 0 ? (
               <tr>
                 <td
-                  colSpan={7}
+                  colSpan={6}
                   className='text-center py-10 text-gray-400 bg-white rounded-2xl'
                 >
                   No books found
                 </td>
               </tr>
             ) : (
-              filtered.map((book, idx) => (
+              filtered.map((book) => (
                 <tr
                   key={book.id}
                   className='bg-white hover:bg-gray-50 transition-colors'
@@ -340,8 +336,8 @@ export default function AdminBookList() {
       {totalPages > 1 && (
         <div className='flex items-center justify-between pt-2'>
           <p className='text-xs text-gray-400'>
-            Showing {(page - 1) * PAGE_SIZE + 1}–
-            {Math.min(page * PAGE_SIZE, total)} of {total} entries
+            Showing {(page - 1) * 10 + 1}–{Math.min(page * 10, total)} of{' '}
+            {total} entries
           </p>
           <div className='flex items-center gap-1'>
             <button
