@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { api } from '@/lib/api';
 import { EndPoints, Query_Keys } from '@/constants';
 import type { CreateLoanPayload } from '@/types/loan';
+import type { Book } from '@/types/book';
 
 export const useBorrowBook = () => {
   const queryClient = useQueryClient();
@@ -25,13 +26,13 @@ export const useBorrowBook = () => {
 
       queryClient.setQueryData(
         [Query_Keys.BooksDetail, payload.bookId],
-        (old: any) => {
+        (old: { data: Book } | undefined) => {
           if (!old) return old;
           return {
             ...old,
             data: {
               ...old.data,
-              availableCopies: old.data.availableCopies - 1,
+              availableCopies: (old.data?.availableCopies ?? 1) - 1,
             },
           };
         },
