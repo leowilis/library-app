@@ -68,21 +68,18 @@ function ProfileDropdown({
       {isOpen && (
         <div className='absolute -right-4 mt-3 w-50 bg-white rounded-2xl shadow-lg border border-gray-100 py-1 z-50'>
           {/* Dropdown list */}
-          {TABS.map((item) => {
-            const active = currentPath.startsWith(item.path);
-            return (
-              <button
-                key={item.path}
-                onClick={() => {
-                  onNavigate(item.path);
-                  setIsOpen(false);
-                }}
-                className='w-full text-left px-4 py-2.5 text-sm transition-all rounded-xl relative after:absolute after:bottom-1 after:left-4 after:right-4 after:h-[2px] after:bg-blue-500 after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:origin-left'
-              >
-                {item.label}
-              </button>
-            );
-          })}
+          {TABS.map((item) => (
+            <button
+              key={item.path}
+              onClick={() => {
+                onNavigate(item.path);
+                setIsOpen(false);
+              }}
+              className='w-full text-left px-4 py-2.5 text-sm transition-all rounded-xl relative after:absolute after:bottom-1 after:left-4 after:right-4 after:h-[2px] after:bg-blue-500 after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:origin-left'
+            >
+              {item.label}
+            </button>
+          ))}
           {/* Logout */}
           <div className='border-t border-gray-100 mt-1 pt-1'>
             <button
