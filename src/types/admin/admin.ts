@@ -110,6 +110,20 @@ export interface AdminLoansResponse {
   pagination: Pagination;
 }
 
+/**
+ * Admin overview for dashboard
+ */
+export interface AdminOverview {
+  totals: {
+    users: number;
+    books: number;
+  };
+  loans: {
+    active: number;
+    overdue: number;
+  };
+}
+
 // Components
 
 /**
