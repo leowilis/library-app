@@ -94,9 +94,11 @@ export interface AdminLoan {
     author: BookAuthor;
     category: BookCategory;
   };
-  user: {
+  borrower: {
     id: number;
     name: string;
+    email: string;
+    phone: string | null;
   };
 }
 
