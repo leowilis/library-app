@@ -1,3 +1,4 @@
+import { useRef, useState, useEffect } from 'react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { useLogout } from '@/hooks/useAuth';
 import { useSelector } from 'react-redux';
@@ -5,12 +6,110 @@ import type { RootState } from '@/store/index';
 import Logo from '@/assets/logo/logo.svg';
 import AvatarIcon from '@/assets/avatar/avatar.svg';
 
+// Tabs List
+
 const TABS = [
+  { label: 'Dashboard', path: '/admin/dashboard' },
   { label: 'Borrowed List', path: '/admin/borrowed' },
   { label: 'User', path: '/admin/users' },
   { label: 'Book List', path: '/admin/books' },
 ];
 
+// Profile Dropdown
+
+interface ProfileDropdownProps {
+  avatar: string;
+  name: string;
+  currentPath: string;
+  onNavigate: (path: string) => void;
+  onLogout: () => void;
+}
+
+/**
+ * Avatar button that opens a dropdown with nav links and a logout option.
+ * Closes automatically on outside click or item selection.
+ */
+function ProfileDropdown({
+  avatar,
+  name,
+  currentPath,
+  onNavigate,
+  onLogout,
+}: ProfileDropdownProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
+    <div className='relative' ref={ref}>
+      {/* Trigger */}
+      <button
+        onClick={() => setIsOpen((prev) => !prev)}
+        className='flex items-center gap-3 cursor-pointer'
+      >
+        <img
+          src={avatar}
+          alt='avatar'
+          className='w-9 h-9 rounded-full object-cover'
+        />
+        <span className='text-sm font-semibold text-gray-900'>{name}</span>
+      </button>
+
+      {/* Dropdown */}
+      {isOpen && (
+        <div className='absolute -right-4 mt-3 w-50 bg-white rounded-2xl shadow-lg border border-gray-100 py-1 z-50'>
+          {/* Dropdown list */}
+          {TABS.map((item) => {
+            const active = currentPath.startsWith(item.path);
+            return (
+              <button
+                key={item.path}
+                onClick={() => {
+                  onNavigate(item.path);
+                  setIsOpen(false);
+                }}
+                className='w-full text-left px-4 py-2.5 text-sm transition-all rounded-xl relative after:absolute after:bottom-1 after:left-4 after:right-4 after:h-[2px] after:bg-blue-500 after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:origin-left'
+              >
+                {item.label}
+              </button>
+            );
+          })}
+          {/* Logout */}
+          <div className='border-t border-gray-100 mt-1 pt-1'>
+            <button
+              onClick={() => {
+                onLogout();
+                setIsOpen(false);
+              }}
+              className='w-full text-left px-4 py-2.5 text-sm rounded-xl text-red-500 hover:bg-red-50 transition-colors'
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// AdminLayout
+
+/**
+ * Root layout for all admin pages.
+ *
+ * - Navbar: logo (links to dashboard) + profile dropdown (nav + logout).
+ * - Tab bar: hidden on book form (/add, /edit) and book preview pages.
+ * - Renders child routes via `<Outlet />`.
+ */
 export default function AdminLayout() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -20,54 +119,35 @@ export default function AdminLayout() {
   const isFormPage =
     location.pathname.includes('/edit') || location.pathname.includes('/add');
 
-  const isPreviewPage = location.pathname.match(/\/admin\/books\/\d+$/);
+  const isPreviewPage = !!location.pathname.match(/\/admin\/books\/\d+$/);
 
   return (
     <div className='min-h-screen bg-gray-50'>
       {/* Navbar */}
       <nav className='w-full bg-white shadow-sm px-6 py-4 flex items-center justify-between'>
-        {/* LEFT SIDE: LOGO (Always Visible) */}
+        {/* Logo */}
         <div
           className='flex items-center gap-2 cursor-pointer'
-          onClick={() => navigate('/admin/borrowed')}
+          onClick={() => navigate('/admin/dashboard')}
         >
           <img src={Logo} alt='logo' className='w-8 h-8' />
           <span className='text-xl font-bold text-gray-900'>Booky</span>
         </div>
 
-        {/* RIGHT SIDE: Profile */}
-        <div className='flex items-center gap-3'>
-          {isPreviewPage ? (
-            <img
-              src={(user as any)?.profilePhoto ?? AvatarIcon}
-              alt='avatar'
-              className='w-9 h-9 rounded-full object-cover cursor-pointer'
-            />
-          ) : (
-            <>
-              <img
-                src={(user as any)?.profilePhoto ?? AvatarIcon}
-                alt='avatar'
-                className='w-9 h-9 rounded-full object-cover'
-              />
-              <span className='text-sm font-semibold text-gray-900'>
-                {(user as any)?.name ?? 'Admin'}
-              </span>
-              <button
-                onClick={logout}
-                className='text-xs text-gray-500 hover:text-red-500 transition-colors ml-2'
-              >
-                Logout
-              </button>
-            </>
-          )}
-        </div>
+        {/* Profile Dropdown */}
+        <ProfileDropdown
+          avatar={(user as any)?.profilePhoto ?? AvatarIcon}
+          name={(user as any)?.name ?? 'Admin'}
+          currentPath={location.pathname}
+          onNavigate={navigate}
+          onLogout={logout}
+        />
       </nav>
 
       {/* Tabs - Hidden on Edit/Add AND Preview Pages */}
       {!isFormPage && !isPreviewPage && (
-        <div className='px-4 md:px-8 pt-4'>
-          <div className='flex bg-neutral-100 rounded-2xl p-2'>
+        <div className='px-4 pt-4 md:px-15 md:pt-12 md:m-4'>
+          <div className='flex bg-neutral-100 rounded-2xl p-2 md:max-w-3xl'>
             {TABS.map((tab) => {
               const active = location.pathname.startsWith(tab.path);
               return (
@@ -91,7 +171,7 @@ export default function AdminLayout() {
       )}
 
       {/* Content */}
-      <main className='px-4 md:px-8 py-6 max-w-7xl mx-auto'>
+      <main className='px-4 py-6 max-w-7xl mx-auto md:mx-12'>
         <Outlet />
       </main>
     </div>
