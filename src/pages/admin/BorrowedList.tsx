@@ -162,7 +162,7 @@ export default function AdminBorrowedList() {
                       className='w-full h-full object-cover'
                     />
                   ) : (
-                    <div className='w-full h-full bg-gray-200 rounded-xl' />
+                    <div className='w-full h-full bg-gray-200' />
                   )}
                 </div>
 
