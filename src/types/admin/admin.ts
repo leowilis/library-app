@@ -108,6 +108,19 @@ export interface AdminLoansResponse {
   pagination: Pagination;
 }
 
+// Components
+
+/**
+ * Props for the `StatCard` component used in the Admin Dashboard.
+ */
+export interface StatCardProps {
+  label: string;
+  value: number | undefined;
+  icon: React.ReactNode;
+  isLoading: boolean;
+  accent: string;
+}
+
 // Shared
 
 /**
