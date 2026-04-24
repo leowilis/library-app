@@ -1,60 +1,89 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Search } from 'lucide-react';
-import { api } from '@/lib/api';
-import { EndPoints, Query_Keys } from '@/constants';
+import { Search, AlertCircle } from 'lucide-react';
+import { useAdminLoans } from '@/hooks/admin/useAdminLoans';
 import { formatDate } from '@/lib/utils';
+import type { AdminLoan, LoanStatusFilter } from '@/types/admin/admin';
 
-const PAGE_SIZE = 15;
-
-type LoanStatus = 'active' | 'returned' | 'overdue' | undefined;
-
-const STATUS_FILTERS = [
+// Filters Stats
+const STATUS_FILTERS: { label: string; value: LoanStatusFilter }[] = [
   { label: 'All', value: undefined },
-  { label: 'Active', value: 'active' as const },
-  { label: 'Returned', value: 'returned' as const },
-  { label: 'Overdue', value: 'overdue' as const },
+  { label: 'Active', value: 'active' },
+  { label: 'Returned', value: 'returned' },
+  { label: 'Overdue', value: 'overdue' },
 ];
 
+// Color Stats
 const STATUS_COLOR: Record<string, string> = {
   BORROWED: '#24A500',
   RETURNED: '#6b7280',
   LATE: '#d92d20',
 };
 
+// Label Stats
 const STATUS_LABEL: Record<string, string> = {
   BORROWED: 'Active',
   RETURNED: 'Returned',
   LATE: 'Overdue',
 };
 
+// Helpers
+
+// Returns the display color for a loan's status badge
+function getStatusColor(loan: AdminLoan, isOverdue: boolean): string {
+  return isOverdue ? '#d92d20' : STATUS_COLOR[loan.status];
+}
+
+// Returns the display label for a loan's status badge
+function getStatusLabel(loan: AdminLoan, isOverdue: boolean): string {
+  return isOverdue ? 'Overdue' : STATUS_LABEL[loan.status];
+}
+
+// Returns the borrower's name regardless of which field the API uses
+function getBorrowerName(loan: AdminLoan): string {
+  return loan.borrower?.name ?? loan.user?.name ?? '-';
+}
+
+/**
+ * Admin Borrowed List page.
+ *
+ * Fetches paginated loans via `useAdminLoans`.
+ * Overdue filter uses a dedicated endpoint (`/api/admin/loans/overdue`).
+ * Supports client-side search by book title or borrower name.
+ */
 export default function AdminBorrowedList() {
   const [search, setSearch] = useState('');
-  const [status, setStatus] = useState<LoanStatus>(undefined);
+  const [status, setStatus] = useState<LoanStatusFilter>(undefined);
   const [page, setPage] = useState(1);
 
-  const { data, isLoading } = useQuery({
-    queryKey: [Query_Keys.AdminLoans, page, status],
-    queryFn: async () => {
-      const isOverdue = status === 'overdue';
-      const res = await api.get(
-        isOverdue ? EndPoints.AdminLoansOverdue : EndPoints.AdminLoans,
-        { params: { page, limit: PAGE_SIZE, ...(!isOverdue && { status }) } },
-      );
-      return res.data?.data ?? res.data;
-    },
-  });
+  const { data, isLoading, isError } = useAdminLoans(page, status);
 
-  const loans = data?.loans ?? data?.overdue ?? data ?? [];
-  const total = data?.pagination?.total ?? loans.length;
-  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const loans: AdminLoan[] = data?.loans ?? (data as any)?.overdue ?? [];
+  const total: number = data?.pagination?.total ?? loans.length;
+  const totalPages = Math.ceil(total / 15);
+  const isOverdue = status === 'overdue';
 
   const filtered = loans.filter(
-    (loan: any) =>
+    (loan) =>
       loan.book?.title?.toLowerCase().includes(search.toLowerCase()) ||
-      loan.borrower?.name?.toLowerCase().includes(search.toLowerCase()) ||
-      loan.user?.name?.toLowerCase().includes(search.toLowerCase()),
+      getBorrowerName(loan).toLowerCase().includes(search.toLowerCase()),
   );
+
+  // ── Error State ──
+  if (isError) {
+    return (
+      <section className='space-y-4 md:px-2 md:m-4'>
+        <h1 className='text-2xl font-bold text-gray-900 md:text-3xl'>
+          Borrowed List
+        </h1>
+        <div className='flex flex-col items-center justify-center py-20 gap-3 text-red-500'>
+          <AlertCircle size={40} />
+          <p className='text-sm font-semibold'>
+            Failed to load loans. Please try again.
+          </p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className='space-y-4 md:px-2 md:m-4'>
@@ -63,7 +92,7 @@ export default function AdminBorrowedList() {
       </h1>
 
       {/* Search */}
-      <div className='flex items-center gap-2 bg-white rounded-full px-4 py-2.5 border border-neutral-300 w-full md:max-w-[750px] md:rounded-full'>
+      <div className='flex items-center gap-2 bg-white rounded-full px-4 py-2.5 border border-neutral-300 w-full md:max-w-[750px]'>
         <Search size={20} className='text-neutral-600' />
         <input
           value={search}
@@ -73,7 +102,7 @@ export default function AdminBorrowedList() {
         />
       </div>
 
-      {/* Status filters */}
+      {/* Status Filters */}
       <div className='flex gap-2 overflow-x-auto pb-1 md:gap-4 md:pb-3'>
         {STATUS_FILTERS.map(({ label, value }) => (
           <button
@@ -106,7 +135,7 @@ export default function AdminBorrowedList() {
         ) : filtered.length === 0 ? (
           <p className='text-center text-gray-400 py-10'>No loans found</p>
         ) : (
-          filtered.map((loan: any) => (
+          filtered.map((loan) => (
             <div key={loan.id} className='bg-white rounded-2xl p-4 shadow-sm'>
               {/* Status + Due Date */}
               <div className='flex items-center justify-between mb-3'>
@@ -117,19 +146,11 @@ export default function AdminBorrowedList() {
                   <span
                     className='text-sm font-bold rounded py-2 px-2'
                     style={{
-                      color:
-                        status === 'overdue'
-                          ? '#d92d20'
-                          : STATUS_COLOR[loan.status],
-                      backgroundColor:
-                        status === 'overdue'
-                          ? '#d92d201A'
-                          : STATUS_COLOR[loan.status] + '1A',
+                      color: getStatusColor(loan, isOverdue),
+                      backgroundColor: getStatusColor(loan, isOverdue) + '1A',
                     }}
                   >
-                    {status === 'overdue'
-                      ? 'Overdue'
-                      : STATUS_LABEL[loan.status]}
+                    {getStatusLabel(loan, isOverdue)}
                   </span>
                 </div>
                 <div className='flex items-center gap-5'>
@@ -138,27 +159,22 @@ export default function AdminBorrowedList() {
                   </span>
                   <span
                     className='text-sm font-bold bg-[#EE1D52]/10 rounded py-2 px-2'
-                    style={{
-                      color: '#d92d20',
-                      borderColor: '#d92d20',
-                    }}
+                    style={{ color: '#d92d20' }}
                   >
                     {formatDate(loan.dueAt)}
                   </span>
                 </div>
               </div>
 
-              {/* Line */}
               <div className='border-t border-neutral-300 mb-5 mt-5' />
 
-              {/* Book info */}
+              {/* Book Info */}
               <div className='flex flex-col gap-3'>
-                {/* Cover */}
                 <div className='w-25 h-30 overflow-hidden flex-shrink-0 bg-gray-100'>
                   {loan.book?.coverImage ? (
                     <img
                       src={loan.book.coverImage}
-                      alt={loan.book?.title}
+                      alt={loan.book.title}
                       className='w-full h-full object-cover'
                     />
                   ) : (
@@ -166,7 +182,6 @@ export default function AdminBorrowedList() {
                   )}
                 </div>
 
-                {/* Info */}
                 <div className='flex-1 min-w-0 space-y-3'>
                   <span className='inline-block text-xs font-bold px-2 py-1 rounded-md border border-neutral-300 text-neutral-950'>
                     {loan.book?.category?.name ?? 'Category'}
@@ -181,13 +196,12 @@ export default function AdminBorrowedList() {
                     {formatDate(loan.borrowedAt)} · Duration {loan.durationDays}{' '}
                     Days
                   </p>
-                  {/* Divider + Borrower name */}
                   <div className='border-t border-gray-200 pt-4 space-y-2.5'>
                     <p className='text-xs font-semibold text-neutral-950'>
                       borrower's name
                     </p>
                     <p className='text-sm font-bold text-neutral-950'>
-                      {loan.borrower?.name ?? loan.user?.name}
+                      {getBorrowerName(loan)}
                     </p>
                   </div>
                 </div>
@@ -201,8 +215,8 @@ export default function AdminBorrowedList() {
       {totalPages > 1 && (
         <div className='flex items-center justify-between pt-2'>
           <p className='text-xs text-gray-400'>
-            Showing {(page - 1) * PAGE_SIZE + 1}–
-            {Math.min(page * PAGE_SIZE, total)} of {total} entries
+            Showing {(page - 1) * 15 + 1}–{Math.min(page * 15, total)} of{' '}
+            {total} entries
           </p>
           <div className='flex items-center gap-1'>
             <button
