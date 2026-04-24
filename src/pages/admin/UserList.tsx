@@ -1,38 +1,37 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
-import { api } from '@/lib/api';
-import { EndPoints, Query_Keys } from '@/constants';
+import { Search, ChevronLeft, ChevronRight, AlertCircle } from 'lucide-react';
+import { useAdminUsers } from '@/hooks/admin/useAdminUsers';
 import { formatDate } from '@/lib/utils';
 import type { AdminUser } from '@/types/admin/admin';
 
+// Total page on table
 const PAGE_SIZE = 10;
+// Table Headers
 const TABLE_HEADERS = ['No', 'Name', 'Nomor Handphone', 'Email', 'Created At'];
 
 // Builds the visible page numbers with ellipsis for large page counts
 function buildPageNumbers(current: number, total: number): (number | '...')[] {
   if (total <= 5) return Array.from({ length: total }, (_, i) => i + 1);
-
   if (current <= 3) return [1, 2, 3, '...', total];
   if (current >= total - 2) return [1, '...', total - 2, total - 1, total];
   return [1, '...', current - 1, current, current + 1, '...', total];
 }
 
+/**
+ * Admin User List page.
+ *
+ * Fetches paginated users via `useAdminUsers` and renders:
+ * - A bordered table with pagination footer on desktop.
+ * - Stacked detail cards on mobile.
+ * Supports client-side search by name or email.
+ */
 export default function AdminUserList() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
 
-  const { data, isLoading } = useQuery({
-    queryKey: [Query_Keys.AdminUsers, page],
-    queryFn: async () => {
-      const res = await api.get(EndPoints.AdminUsers, {
-        params: { page, limit: PAGE_SIZE },
-      });
-      return res.data?.data ?? res.data;
-    },
-  });
+  const { data, isLoading, isError } = useAdminUsers(page);
 
-  const users: AdminUser[] = data?.users ?? data ?? [];
+  const users: AdminUser[] = data?.users ?? [];
   const total: number = data?.pagination?.total ?? users.length;
   const totalPages = Math.ceil(total / PAGE_SIZE);
   const pageNumbers = buildPageNumbers(page, totalPages);
@@ -42,6 +41,21 @@ export default function AdminUserList() {
       u.name?.toLowerCase().includes(search.toLowerCase()) ||
       u.email?.toLowerCase().includes(search.toLowerCase()),
   );
+
+  // ── Error State ──
+  if (isError) {
+    return (
+      <section className='space-y-4 md:px-6 md:m-4'>
+        <h1 className='text-2xl font-bold text-gray-900 md:text-3xl'>User</h1>
+        <div className='flex flex-col items-center justify-center py-20 gap-3 text-red-500'>
+          <AlertCircle size={40} />
+          <p className='text-sm font-semibold'>
+            Failed to load users. Please try again.
+          </p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className='space-y-4 md:px-6 md:m-4'>
@@ -61,12 +75,12 @@ export default function AdminUserList() {
       {/* Desktop Table */}
       <div className='hidden md:block border-2 border-gray-200 rounded-2xl overflow-hidden max-w-5xl'>
         <table className='w-full text-sm'>
-          <thead className='bg-white border-b border-gray-200'>
+          <thead className='bg-neutral-50 border-b border-gray-200'>
             <tr>
               {TABLE_HEADERS.map((h) => (
                 <th
                   key={h}
-                  className='text-left px-4 py-5 text-xs font-semibold text-neutral-950 uppercase tracking-wide md:bg-neutral-50 rounded'
+                  className='text-left px-4 py-5 text-xs font-semibold text-neutral-950 uppercase tracking-wide'
                 >
                   {h}
                 </th>
@@ -117,7 +131,7 @@ export default function AdminUserList() {
           </tbody>
         </table>
 
-        {/* Pagination */}
+        {/* Pagination inside border */}
         {totalPages > 1 && (
           <div className='flex items-center justify-between px-4 py-3 border-t border-gray-200 bg-white'>
             <p className='text-xs font-medium text-neutral-950'>
@@ -220,7 +234,7 @@ export default function AdminUserList() {
           ))
         )}
 
-        {/* Mobile pagination */}
+        {/* Mobile Pagination */}
         {totalPages > 1 && (
           <div className='flex items-center justify-between pt-2'>
             <p className='text-xs text-gray-400'>
