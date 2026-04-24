@@ -10,9 +10,10 @@
 3. [Live Preview](#3-live-preview)
 4. [Tech Stack](#4-tech-stack)
 5. [Features](#5-features)
-6. [Code Structure](#6-code-structure)
-7. [Getting Started](#7-getting-started)
-8. [Deployment](#8-deployment)
+6. [Architecture](#6-architecture)
+7. [Code Structure](#7-code-structure)
+8. [Getting Started](#8-getting-started)
+9. [Deployment](#9-deployment)
 
 ---
 
@@ -75,11 +76,63 @@ https://library-app-git-main-leowillis-projects.vercel.app/
 ✔ Book borrowing and return system  
 ✔ Review and rating system  
 ✔ User profile management  
-✔ Admin panel (Book & User management)  
+✔ Admin panel (Book, Loan & User management)  
+✔ Admin dashboard with library statistics  
 
 ---
 
-## 🗂 6. Code Structure
+## 🏗 6. Architecture
+
+### Custom Hooks — Separation of Concern
+All data fetching logic is extracted into dedicated custom hooks, keeping pages clean and focused on UI only.
+
+```
+hooks/
+├── admin/
+│   ├── useAdminBooks.ts     — fetch + optimistic delete
+│   ├── useAdminLoans.ts     — fetch with status filter
+│   ├── useAdminUsers.ts     — fetch paginated users
+│   └── useAdminOverview.ts  — dashboard statistics
+├── useBorrowBook.ts         — borrow with optimistic UI
+├── useReturnBook.ts         — return with optimistic UI
+├── useReviews.ts            — create + delete with optimistic UI
+└── useMe.ts                 — user profile & loan history
+```
+
+### Optimistic UI
+Mutations update the UI instantly before the server responds, with automatic rollback on failure. Implemented across:
+- **Book delete** (admin) — book disappears instantly, reappears if request fails
+- **Borrow book** — available copies decrease immediately
+- **Return book** — loan status updates to Returned instantly
+- **Create review** — review appears in list before server confirms
+- **Delete review** — review disappears instantly, reappears on failure
+
+### TanStack Query as Single Source of Truth
+- No duplicate local state for server data
+- All pages read from the same query cache
+- `invalidateQueries` ensures consistency across pages after mutations
+- `select` used in `useBookDetail` to normalize inconsistent API response shapes
+
+### Type Safety
+All API response shapes are typed in `src/types/`:
+```
+types/
+├── admin.ts    — AdminBook, AdminLoan, AdminUser, AdminOverview
+├── book.ts     — Book, BookReview, CreateBookPayload
+├── loan.ts     — Loan, CreateLoanPayload
+├── review.ts   — Review, CreateReviewPayload
+└── user.ts     — User, UpdateProfilePayload
+```
+
+### Error & Loading States
+All pages handle three UI states consistently:
+- **Loading** — animated skeleton placeholders
+- **Error** — error message with icon
+- **Empty** — empty state with illustration
+
+---
+
+## 🗂 7. Code Structure
 
 ```
 src/
@@ -90,6 +143,7 @@ src/
 │   └── layout/      — Layout components
 ├── constants/       — App constants & API endpoints
 ├── hooks/           — Custom React hooks
+│   └── admin/       — Admin-specific hooks
 ├── lib/             — Utility functions & API client
 ├── pages/           — Page components
 │   ├── admin/       — Admin pages
@@ -102,7 +156,7 @@ src/
 
 ---
 
-## 🏁 7. Getting Started
+## 🏁 8. Getting Started
 
 ### Install dependencies
 
@@ -124,7 +178,7 @@ http://localhost:5173
 
 ---
 
-## ☁️ 8. Deployment
+## ☁️ 9. Deployment
 
 This project is deployed on **Vercel**.
 
