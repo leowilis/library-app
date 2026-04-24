@@ -20,7 +20,6 @@ const TABS = [
 interface ProfileDropdownProps {
   avatar: string;
   name: string;
-  currentPath: string;
   onNavigate: (path: string) => void;
   onLogout: () => void;
 }
@@ -32,7 +31,6 @@ interface ProfileDropdownProps {
 function ProfileDropdown({
   avatar,
   name,
-  currentPath,
   onNavigate,
   onLogout,
 }: ProfileDropdownProps) {
@@ -135,7 +133,6 @@ export default function AdminLayout() {
         <ProfileDropdown
           avatar={(user as any)?.profilePhoto ?? AvatarIcon}
           name={(user as any)?.name ?? 'Admin'}
-          currentPath={location.pathname}
           onNavigate={navigate}
           onLogout={logout}
         />
