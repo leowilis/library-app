@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Trash2 } from 'lucide-react';
+import { Search, Trash2, AlertCircle } from 'lucide-react';
 import { useMyReviews } from '@/hooks/useMe';
 import { useDeleteReview } from '@/hooks/useReviews';
 import { ROUTES } from '@/constants';
@@ -9,21 +9,22 @@ import { toast } from 'sonner';
 import StarRating from '@/components/ui/starRating';
 import DeleteReviewModal from '@/components/user/DeleteReviewModal';
 import { SkeletonReviewCard } from '@/components/ui/skeleton';
+import type { Review } from '@/types/review';
 
-// Reviews tab — shows user's submitted reviews with delete functionality
+// ReviewsTab
+
 export default function ReviewsTab() {
   const navigate = useNavigate();
 
-  // UI state
   const [search, setSearch] = useState('');
   const [deleteReviewId, setDeleteReviewId] = useState<number | null>(null);
 
-  // Data fetching
-  const { data: reviewsData, isLoading } = useMyReviews({ q: search });
+  const { data: reviewsData, isLoading, isError } = useMyReviews({ q: search });
   const { mutate: deleteReview, isPending: isDeleting } = useDeleteReview();
-  const reviews = reviewsData?.data?.reviews ?? [];
 
-  // Handles review deletion and closes modal on success
+  const reviews: Review[] = reviewsData?.data?.reviews ?? [];
+
+  // Confirms and submits delete, closes modal on success
   const handleConfirmDelete = () => {
     if (!deleteReviewId) return;
     deleteReview(deleteReviewId, {
@@ -35,11 +36,23 @@ export default function ReviewsTab() {
     });
   };
 
+  // ── Error State ──
+  if (isError) {
+    return (
+      <div className='flex flex-col items-center justify-center py-20 gap-3 text-red-500'>
+        <AlertCircle size={40} />
+        <p className='text-sm font-semibold'>
+          Failed to load reviews. Please try again.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className='space-y-4'>
       <h1 className='text-3xl font-bold text-gray-900'>Reviews</h1>
 
-      {/* Search input */}
+      {/* Search */}
       <div className='flex items-center gap-2 bg-white rounded-full px-4 py-3 border border-neutral-300 md:max-w-2xl'>
         <Search size={20} className='text-neutral-600' />
         <input
@@ -50,10 +63,10 @@ export default function ReviewsTab() {
         />
       </div>
 
-      {/* Loading skeleton */}
+      {/* Loading */}
       {isLoading && [1, 2, 3].map((i) => <SkeletonReviewCard key={i} />)}
 
-      {/* Empty state */}
+      {/* Empty */}
       {!isLoading && reviews.length === 0 && (
         <div className='flex flex-col items-center py-16 gap-3 text-gray-400'>
           <StarRating rating={0} />
@@ -61,15 +74,15 @@ export default function ReviewsTab() {
         </div>
       )}
 
-      {/* Review list */}
+      {/* Review List */}
       {!isLoading && reviews.length > 0 && (
         <div className='space-y-6'>
-          {reviews.map((review: any) => (
+          {reviews.map((review) => (
             <div
               key={review.id}
               className='bg-white rounded-2xl p-4 shadow-sm space-y-4 md:p-4 md:space-y-5 md:max-w-5xl'
             >
-              {/* Date and delete button */}
+              {/* Date + Delete */}
               <div className='flex items-center justify-between'>
                 <p className='text-sm text-neutral-950 font-semibold'>
                   {formatDateTime(review.createdAt)}
@@ -82,13 +95,14 @@ export default function ReviewsTab() {
                 </button>
               </div>
 
-              {/* Line */}
               <hr className='border-gray-300' />
 
-              {/* Book info */}
+              {/* Book Info */}
               <div
                 className='flex gap-3 cursor-pointer'
-                onClick={() => navigate(ROUTES.BookDetail(review.book?.id))}
+                onClick={() =>
+                  navigate(ROUTES.BookDetail(review.book?.id ?? 0))
+                }
               >
                 <div className='w-20 h-28 overflow-hidden flex-shrink-0 bg-gray-100'>
                   {review.book?.coverImage ? (
@@ -116,11 +130,10 @@ export default function ReviewsTab() {
                 </div>
               </div>
 
-              {/* Line */}
               <hr className='border-gray-300' />
 
-              {/* Star rating and comment */}
-              <StarRating rating={review.star ?? review.rating} />
+              {/* Rating + Comment */}
+              <StarRating rating={review.star} />
               <p className='text-sm text-gray-950 leading-relaxed'>
                 {review.comment}
               </p>
@@ -129,7 +142,7 @@ export default function ReviewsTab() {
         </div>
       )}
 
-      {/* Delete confirmation modal */}
+      {/* Delete Modal */}
       {deleteReviewId && (
         <DeleteReviewModal
           isLoading={isDeleting}
