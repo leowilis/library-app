@@ -1,11 +1,20 @@
 import { useState, useEffect } from 'react'
 import bannerBg from '@/assets/background/background.svg'
 
+// Banner images to cycle through
 const banners = [bannerBg, bannerBg, bannerBg]
 
+/**
+ * Auto-rotating image banner with pagination dots.
+ *
+ * Cycles through `banners` every 3 seconds
+ * Dots are clickable for manual navigation
+ * Auto-rotation is skipped if only one banner exists
+ */
 export default function Background() {
   const [current, setCurrent] = useState(0)
 
+  // Start auto-rotation interval, cleared on unmount
   useEffect(() => {
     if (banners.length <= 1) return
     const timer = setInterval(() => {
@@ -25,7 +34,7 @@ export default function Background() {
         />
       </div>
 
-      {/* Pagination dots */}
+      {/* Pagination dots — active dot is wider and darker */}
       <div className="flex justify-center gap-1.5 mt-3">
         {banners.map((_, i) => (
           <button
