@@ -7,6 +7,10 @@ interface AuthorCardProps {
   onClick: () => void;
 }
 
+/**
+ * Clickable card displaying an author's avatar, name, and book count.
+ * Used in the Popular Authors section on the Home page.
+ */
 export default function AuthorCard({ author, onClick }: AuthorCardProps) {
   return (
     <button
