@@ -6,6 +6,13 @@ interface DeleteReviewModalProps {
   isLoading: boolean
 }
 
+/**
+ * Confirmation modal for deleting a review.
+ *
+ * Renders a backdrop overlay — clicking it triggers `onCancel`.
+ * Both action buttons are disabled while `isLoading` is true.
+ */
+
 export default function DeleteReviewModal({ onConfirm, onCancel, isLoading }: DeleteReviewModalProps) {
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center px-4'>
