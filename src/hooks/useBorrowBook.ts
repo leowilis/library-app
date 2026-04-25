@@ -5,6 +5,12 @@ import { EndPoints, Query_Keys } from '@/constants';
 import type { CreateLoanPayload } from '@/types/loan';
 import type { Book } from '@/types/book';
 
+/**
+ * Handles borrowing a book with optimistic UI
+ * On mutate: immediately decrements `availableCopies` in the book detail cache
+ * On error: rolls back both book list and book detail to their previous state
+ * On success: invalidates books, book detail, and loan queries to sync with server
+ */
 export const useBorrowBook = () => {
   const queryClient = useQueryClient();
 
@@ -24,6 +30,7 @@ export const useBorrowBook = () => {
         payload.bookId,
       ]);
 
+      // Optimistically decrement available copies
       queryClient.setQueryData(
         [Query_Keys.BooksDetail, payload.bookId],
         (old: { data: Book } | undefined) => {
@@ -41,6 +48,7 @@ export const useBorrowBook = () => {
       return { previousBooks, previousDetail };
     },
 
+    // Rollback on failure
     onError: (_err, payload, context) => {
       queryClient.setQueryData([Query_Keys.Books], context?.previousBooks);
       queryClient.setQueryData(
@@ -50,6 +58,7 @@ export const useBorrowBook = () => {
       toast.error('Failed to borrow the book. Please try again.');
     },
 
+    // Sync server state after success
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [Query_Keys.Books] });
       queryClient.invalidateQueries({ queryKey: [Query_Keys.BooksDetail] });
