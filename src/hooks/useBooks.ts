@@ -3,11 +3,13 @@ import { EndPoints, Query_Keys } from '@/constants';
 import type { Book, CreateBookPayload, UpdateBookPayload } from '@/types/book';
 import { api } from '@/lib/api';
 
+// Type of book list
 type BookListResponse = {
   books?: Book[];
   data?: { books?: Book[] };
 };
 
+// Fetches a paginated, filterable list of books
 export const useBooks = (params?: {
   q?: string;
   categoryId?: number;
@@ -25,17 +27,28 @@ export const useBooks = (params?: {
   });
 };
 
+/**
+ * Fetches a single book by ID
+ * Query is disabled until a valid `id` is provided
+ * Response is normalized via `select` to always return a `Book` object
+ */
 export const useBookDetail = (id: number) => {
-  return useQuery({
+  return useQuery<Book>({
     queryKey: [Query_Keys.BooksDetail, id],
     queryFn: async () => {
       const res = await api.get(EndPoints.BooksDetail(id));
       return res.data;
     },
     enabled: !!id,
+    select: (data: any) =>
+      data?.data?.book ?? data?.data ?? data,
   });
 };
 
+/**
+ * Fetches recommended books, sortable by rating or popularity
+ * Response is normalized via `select` to always return a `Book[]`
+ */
 export const useRecommendedBooks = (params?: {
   by?: 'rating' | 'popular';
   categoryId?: number;
@@ -57,6 +70,7 @@ export const useRecommendedBooks = (params?: {
   });
 };
 
+// Creates a new book. Invalidates the book list on success
 export const useCreateBook = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -70,6 +84,10 @@ export const useCreateBook = () => {
   });
 };
 
+/**
+ * Updates an existing book by ID
+ * Invalidates both the book list and the specific book detail on success
+ */
 export const useUpdateBook = (id: number) => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -84,6 +102,7 @@ export const useUpdateBook = (id: number) => {
   });
 };
 
+// Deletes a book by ID. Invalidates the book list on success
 export const useDeleteBook = () => {
   const queryClient = useQueryClient();
   return useMutation({
