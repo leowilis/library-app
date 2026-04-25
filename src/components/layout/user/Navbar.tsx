@@ -9,16 +9,29 @@ import Logo from "@/assets/logo/logo.svg"
 import Menubar from "@/assets/icon/Menu.svg"
 import AvatarIcon from "@/assets/avatar/avatar.svg"
 
+/**
+ * Top navigation bar for all user-facing pages.
+ *
+ * Handles:
+ * - Logo linking to home
+ * - Book search (desktop inline, mobile overlay)
+ * - User dropdown (profile, borrowed list, reviews, logout)
+ * - Guest dropdown (login, register)
+ *
+ * Auth state is read from Redux (`state.auth`).
+ * Search navigates to `ROUTES.Search?q=<query>` on Enter.
+ */
 export default function Navbar() {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const { token, user } = useSelector((state: RootState) => state.auth)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [searchOpen, setSearchOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false) // mobile search overlay
   const [query, setQuery] = useState("")
   const searchRef = useRef<HTMLInputElement>(null)
   const menuRef = useRef<HTMLDivElement>(null)
 
+  // Close dropdown when clicking outside the navbar
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
@@ -29,10 +42,12 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
+  // Auto-focus search input when mobile overlay opens
   useEffect(() => {
     if (searchOpen) searchRef.current?.focus()
   }, [searchOpen])
 
+  // Navigate to search page on Enter key
   const handleSearchSubmit = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && query.trim()) {
       navigate(`${ROUTES.Search}?q=${query.trim()}`)
@@ -61,7 +76,7 @@ export default function Navbar() {
           <span className="hidden md:block text-xl font-bold md:text-2xl">Booky</span>
         </Link>
 
-        {/* Desktop Search */}
+        {/* Desktop Search — only visible when logged in */}
         {token && (
           <div className="hidden md:flex items-center gap-2 border border-gray-200 rounded-full px-6 py-2 flex-1 max-w-2xl mx-6">
             <Search size={18} className="text-gray-400" />
@@ -101,7 +116,7 @@ export default function Navbar() {
               <Search size={24} className="text-gray-700" />
             </button>
 
-            {/* Avatar / Menu */}
+            {/* Logged in: avatar + chevron (desktop) / avatar only (mobile) */}
             {token ? (
               <>
                 <div className="hidden md:flex items-center gap-2">
@@ -122,6 +137,7 @@ export default function Navbar() {
                 </button>
               </>
             ) : (
+              /* Guest: hamburger menu */
               <button onClick={() => setMenuOpen((p) => !p)}>
                 <img src={Menubar} width={28} height={28} alt="menu" />
               </button>
@@ -130,7 +146,7 @@ export default function Navbar() {
         )}
       </div>
 
-      {/* Dropdown - Not logged in */}
+      {/* Guest dropdown — login / register */}
       {menuOpen && !token && (
         <div className="absolute top-18 left-4 right-4 rounded-2xl shadow-lg z-50 px-4 py-3 bg-white border border-gray-100">
           <div className="flex gap-3">
@@ -144,7 +160,7 @@ export default function Navbar() {
         </div>
       )}
 
-      {/* Dropdown - Logged in */}
+      {/* Authenticated dropdown — profile nav + logout */}
       {menuOpen && token && (
         <div className="absolute top-18 right-4 w-52 rounded-2xl shadow-lg z-50 px-4 py-2 bg-white border border-gray-100 md:top-16 md:right-28">
           <div className="flex flex-col">
