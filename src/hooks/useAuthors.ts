@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { EndPoints, Query_Keys } from "@/constants";
 import { api } from "@/lib/api";
 
+// Fetches a list of authors, optionally filtered by search query
 export const useAuthors = (q?: string) => {
   return useQuery({
     queryKey: [Query_Keys.Authors, q],
@@ -12,6 +13,7 @@ export const useAuthors = (q?: string) => {
   });
 };
 
+// Fetches the most popular authors ranked by book count
 export const usePopularAuthors = (limit?: number) => {
   return useQuery({
     queryKey: [Query_Keys.AuthorsPopular, limit],
@@ -26,6 +28,10 @@ export const usePopularAuthors = (limit?: number) => {
   });
 };
 
+/**
+ * Fetches paginated books written by a specific author
+ * Query is disabled until a valid `id` is provided
+ */
 export const useAuthorBooks = (
   id: number,
   params?: { page?: number; limit?: number },
