@@ -5,15 +5,13 @@ import AdminBookList from "@/pages/admin/BookList";
 import AdminBookForm from "@/pages/admin/BookForm";
 import AdminBorrowedList from "@/pages/admin/BorrowedList";
 import AdminBookPreview from "@/pages/admin/BookPreview"; 
+import AdminDashboard from "@/pages/admin/Dashboard";
 
 export default function AdminRouter() {
   return (
     <Routes>
       <Route element={<AdminLayout />}>
-        <Route
-          path="dashboard"
-          element={<Navigate to="/admin/borrowed" replace />}
-        />
+        <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="borrowed" element={<AdminBorrowedList />} />
         <Route path="users" element={<AdminUserList />} />
         <Route path="books" element={<AdminBookList />} />
