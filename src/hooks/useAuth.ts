@@ -6,6 +6,17 @@ import { EndPoints, ROUTES } from '@/constants'
 import { api } from '@/lib/api'
 import { toast } from 'sonner'
 
+/**
+ * Handles user login.
+ *
+ * On success: stores credentials in Redux and redirects to
+ * `/admin/users` for ADMIN role, or home for regular users.
+ * On error: shows a toast with a generic failure message.
+ *
+ * const { mutate: login, isPending } = useLogin()
+ * login({ email, password })
+ */
+
 export const useLogin = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -35,6 +46,16 @@ export const useLogin = () => {
     },
   })
 }
+
+/**
+ * Handles user registration.
+ *
+ * Returns the raw mutation — caller is responsible for
+ * handling success/error (toast, redirect, etc).
+ *
+ * const { mutate: register, isPending } = useRegister()
+ * register({ name, email, password })
+ */
 
 export const useRegister = () => {
   return useMutation({
