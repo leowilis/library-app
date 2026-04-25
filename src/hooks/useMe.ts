@@ -4,6 +4,7 @@ import type { UpdateProfilePayload } from '@/types/user';
 import { api } from '@/lib/api';
 import type { Loan } from '@/types/loan';
 
+// Fetches the current authenticated user's profile
 export const useMe = () => {
   return useQuery({
     queryKey: [Query_Keys.Me],
@@ -14,6 +15,7 @@ export const useMe = () => {
   });
 };
 
+// Updates the current user's profile. Invalidates the user cache on success
 export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -27,6 +29,7 @@ export const useUpdateProfile = () => {
   });
 };
 
+// Fetches the current user's loan history with optional status filter
 export const useMyLoansProfile = (params?: {
   status?: 'BORROWED' | 'LATE' | 'RETURNED';
   page?: number;
@@ -41,6 +44,7 @@ export const useMyLoansProfile = (params?: {
   });
 };
 
+// Fetches the current user's submitted reviews
 export const useMyReviews = (params?: {
   q?: string;
   page?: number;
@@ -55,11 +59,14 @@ export const useMyReviews = (params?: {
   });
 };
 
-
+/**
+ * Checks whether the current user has an active loan for a specific book
+ * Reuses `useMyLoansProfile` with status 'BORROWED' — no extra API call
+ */
 export const useIsBookBorrowed = (bookId: number) => {
-  const { data } = useMyLoansProfile({ status: 'BORROWED' })
-  const loans: Loan[] = data?.data?.loans ?? data?.loans ?? []
+  const { data } = useMyLoansProfile({ status: 'BORROWED' });
+  const loans: Loan[] = data?.data?.loans ?? data?.loans ?? [];
   return loans.some(
-    (loan) => loan.book?.id === bookId && loan.status === 'BORROWED'
-  )
-}
+    (loan) => loan.book?.id === bookId && loan.status === 'BORROWED',
+  );
+};
