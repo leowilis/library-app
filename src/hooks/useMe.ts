@@ -1,4 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSelector } from 'react-redux';
+import type { RootState } from '@/store'; 
 import { EndPoints, Query_Keys } from '@/constants';
 import type { UpdateProfilePayload } from '@/types/user';
 import { api } from '@/lib/api';
@@ -6,12 +8,14 @@ import type { Loan } from '@/types/loan';
 
 // Fetches the current authenticated user's profile
 export const useMe = () => {
+  const token = useSelector((state: RootState) => state.auth.token);
   return useQuery({
     queryKey: [Query_Keys.Me],
     queryFn: async () => {
       const res = await api.get(EndPoints.Me);
       return res.data;
     },
+    enabled: !!token,
   });
 };
 
@@ -35,12 +39,14 @@ export const useMyLoansProfile = (params?: {
   page?: number;
   limit?: number;
 }) => {
+  const token = useSelector((state: RootState) => state.auth.token);
   return useQuery({
     queryKey: [Query_Keys.MeLoans, params],
     queryFn: async () => {
       const res = await api.get(EndPoints.MeLoans, { params });
       return res.data;
     },
+    enabled: !!token, 
   });
 };
 
@@ -50,12 +56,14 @@ export const useMyReviews = (params?: {
   page?: number;
   limit?: number;
 }) => {
+  const token = useSelector((state: RootState) => state.auth.token);
   return useQuery({
     queryKey: [Query_Keys.MeReviews, params],
     queryFn: async () => {
       const res = await api.get(EndPoints.MeReviews, { params });
       return res.data;
     },
+    enabled: !!token,
   });
 };
 
