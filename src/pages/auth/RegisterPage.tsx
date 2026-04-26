@@ -11,6 +11,12 @@ import Logo from "@/assets/logo/logo.svg";
 import EyeOpen from "@/assets/icon/eye.svg";
 import EyeOff from "@/assets/icon/eyeclose.svg";
 
+/**
+ * Registration page for new users
+ * Validates that passwords match and phone is 8–20 characters before submitting
+ * On success: shows a toast and redirects to the login page
+ * On error: displays the server error message or a generic fallback
+ */
 export default function RegisterPage() {
   const navigate = useNavigate()
   const { mutate: register, isPending } = useRegister()
