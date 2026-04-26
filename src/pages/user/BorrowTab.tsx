@@ -92,7 +92,7 @@ function ReturnConfirmModal({
           <p className='text-sm text-gray-500'>
             Are you sure you want to return
           </p>
-          <p className='text-sm font-semibold text-gray-800 line-clamp-2'>
+          <p className='text-sm font-semibold text-gray-900 line-clamp-2'>
             "{loan.book?.title}"
           </p>
         </div>
@@ -187,7 +187,7 @@ export default function BorrowedTab() {
       </div>
 
       {/* Status Filters */}
-      <div className='flex gap-2 overflow-x-auto pb-3 md:gap-3'>
+      <div className='-mx-6 px-4 flex gap-2 overflow-x-auto pb-3 md:gap-3 md:mx-0 md:px-0'>
         {STATUS_FILTERS.map(({ label, value }) => (
           <button
             key={label}
@@ -225,8 +225,8 @@ export default function BorrowedTab() {
             >
               {/* Status + Due Date */}
               <div className='flex items-center justify-between'>
-                <div className='flex items-center gap-2'>
-                  <span className='text-sm font-bold text-neutral-950'>
+                <div className='flex items-center gap-1'>
+                  <span className='text-sm font-bold text-neutral-950 whitespace-nowrap'>
                     Status
                   </span>
                   <span
@@ -239,11 +239,11 @@ export default function BorrowedTab() {
                     {STATUS_LABEL[loan.status]}
                   </span>
                 </div>
-                <div className='flex items-center gap-2'>
-                  <span className='text-sm font-bold text-neutral-950'>
+                <div className='flex items-center gap-1'>
+                  <span className='text-sm font-bold text-neutral-950 whitespace-nowrap'>
                     Due Date
                   </span>
-                  <span className='text-xs font-bold py-1 px-2 rounded-lg bg-red-50 text-red-600'>
+                  <span className='text-xs font-bold py-1 px-2 rounded-lg bg-red-50 text-red-600 whitespace-nowrap'>
                     {formatDate(loan.dueAt)}
                   </span>
                 </div>
@@ -252,9 +252,9 @@ export default function BorrowedTab() {
               <hr className='border-neutral-300' />
 
               {/* Book Info + Actions */}
-              <div className='flex items-center justify-between gap-4'>
+              <div className='flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>
                 <LoanBookInfo loan={loan} />
-                <div className='flex flex-col md:flex-row gap-2 flex-shrink-0'>
+                <div className='flex justify-end md:justify-center gap-2 flex-shrink-0'>
                   {loan.status === 'BORROWED' && (
                     <button
                       onClick={() => setConfirmLoan(loan)}
