@@ -6,7 +6,7 @@ import axios from 'axios';
  * if one exists in localStorage
  */
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: import.meta.env.VITE_API_URL,
 });
 
 // Request interceptor — injects Authorization header if token exists
