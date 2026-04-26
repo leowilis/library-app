@@ -4,11 +4,17 @@ import { Button } from "@/components/ui/button";
 import { useLogin } from "@/hooks/useAuth";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
+// Logo + Icon
 import Logo from "@/assets/logo/logo.svg";
 import EyeOpen from "@/assets/icon/eye.svg";
 import EyeOff from "@/assets/icon/eyeclose.svg";
 
+/**
+ * Login page for user authentication
+ * Submits email and password via `useLogin` mutation
+ * On success: redirects to home (user) or `/admin/users` (admin) — handled in `useLogin`
+ * Includes a password visibility toggle
+ */
 export default function UserLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
