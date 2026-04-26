@@ -3,13 +3,24 @@ import { EndPoints, Query_Keys } from '@/constants';
 import type { Book, CreateBookPayload, UpdateBookPayload } from '@/types/book';
 import { api } from '@/lib/api';
 
-// Type of book list
-type BookListResponse = {
-  books?: Book[];
-  data?: { books?: Book[] };
-};
+// Types
 
-// Fetches a paginated, filterable list of books
+interface BooksResponse {
+  books: Book[];
+  pagination?: {
+    total: number;
+    page: number;
+    limit: number;
+    hasNextPage: boolean;
+  };
+}
+
+// useBooks
+
+/**
+ * Fetches a paginated, filterable list of books.
+ * Response is normalized via `select` to always return `BooksResponse`.
+ */
 export const useBooks = (params?: {
   q?: string;
   categoryId?: number;
@@ -18,19 +29,25 @@ export const useBooks = (params?: {
   page?: number;
   limit?: number;
 }) => {
-  return useQuery({
+  return useQuery<BooksResponse>({
     queryKey: [Query_Keys.Books, params],
     queryFn: async () => {
       const res = await api.get(EndPoints.Book, { params });
       return res.data;
     },
+    select: (data: any) => ({
+      books: data?.data?.data?.books ?? data?.data?.books ?? data?.books ?? [],
+      pagination: data?.data?.data?.pagination ?? data?.data?.pagination ?? data?.pagination,
+    }),
   });
 };
 
+// useBookDetail
+
 /**
- * Fetches a single book by ID
- * Query is disabled until a valid `id` is provided
- * Response is normalized via `select` to always return a `Book` object
+ * Fetches a single book by ID.
+ * Query is disabled until a valid `id` is provided.
+ * Response is normalized via `select` to always return a `Book` object.
  */
 export const useBookDetail = (id: number) => {
   return useQuery<Book>({
@@ -40,14 +57,15 @@ export const useBookDetail = (id: number) => {
       return res.data;
     },
     enabled: !!id,
-    select: (data: any) =>
-      data?.data?.book ?? data?.data ?? data,
+    select: (data: any) => data?.data?.book ?? data?.data ?? data,
   });
 };
 
+// useRecommendedBooks
+
 /**
- * Fetches recommended books, sortable by rating or popularity
- * Response is normalized via `select` to always return a `Book[]`
+ * Fetches recommended books, sortable by rating or popularity.
+ * Response is normalized via `select` to always return `Book[]`.
  */
 export const useRecommendedBooks = (params?: {
   by?: 'rating' | 'popular';
@@ -55,20 +73,22 @@ export const useRecommendedBooks = (params?: {
   page?: number;
   limit?: number;
 }) => {
-  return useQuery({
+  return useQuery<Book[]>({
     queryKey: [Query_Keys.BooksRecommend, params],
     queryFn: async () => {
       const res = await api.get(EndPoints.BooksRecommend, { params });
-      return res.data as BookListResponse;
+      return res.data;
     },
-    select: (data) => {
-      if (Array.isArray(data)) return data as Book[];
+    select: (data: any) => {
+      if (Array.isArray(data)) return data;
       if (Array.isArray(data?.books)) return data.books;
       if (Array.isArray(data?.data?.books)) return data.data.books;
-      return [] as Book[];
+      return [];
     },
   });
 };
+
+// useCreateBook
 
 // Creates a new book. Invalidates the book list on success
 export const useCreateBook = () => {
@@ -84,9 +104,11 @@ export const useCreateBook = () => {
   });
 };
 
+// useUpdateBook
+
 /**
- * Updates an existing book by ID
- * Invalidates both the book list and the specific book detail on success
+ * Updates an existing book by ID.
+ * Invalidates both the book list and the specific book detail on success.
  */
 export const useUpdateBook = (id: number) => {
   const queryClient = useQueryClient();
@@ -101,6 +123,8 @@ export const useUpdateBook = (id: number) => {
     },
   });
 };
+
+// useDeleteBook
 
 // Deletes a book by ID. Invalidates the book list on success
 export const useDeleteBook = () => {
