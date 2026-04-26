@@ -103,7 +103,7 @@ export default function AdminBorrowedList() {
       </div>
 
       {/* Status Filters */}
-      <div className='flex gap-2 overflow-x-auto pb-1 md:gap-4 md:pb-3'>
+      <div className='flex gap-1 overflow-x-auto pb-1 md:gap-4 md:pb-3 md:mx-0 md:px-0'>
         {STATUS_FILTERS.map(({ label, value }) => (
           <button
             key={label}
