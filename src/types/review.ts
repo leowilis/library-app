@@ -1,12 +1,14 @@
-
-
-
 export interface Review {
   id: number;
   bookId: number;
   star: number;
+  rating?: number;
   comment: string;
   createdAt: string;
+  user?: {
+    name: string;
+    profilePhoto?: string | null;
+  };
   book: {
     id: number;
     title: string;
@@ -21,8 +23,7 @@ export interface Review {
 }
 
 export interface CreateReviewPayload {
-  bookId: number
-  star: number
-  comment?: string
+  bookId: number;
+  star: number;
+  comment?: string;
 }
-
