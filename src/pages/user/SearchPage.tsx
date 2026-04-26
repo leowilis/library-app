@@ -105,9 +105,8 @@ export default function SearchPage() {
     limit: 8,
   });
 
-  const raw = (booksData as any)?.data;
-  const books = raw?.data?.books ?? raw?.books ?? [];
-  const pagination = raw?.data?.pagination ?? raw?.pagination;
+  const books = booksData?.books ?? [];
+  const pagination = booksData?.pagination;
 
   // Handle category selection — deselects if same category clicked
   const handleCategoryChange = (id: number) => {
