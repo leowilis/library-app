@@ -46,7 +46,7 @@ https://www.figma.com/design/YDdMopW8nI2pcxTxXD3Mck/Library-App?node-id=39412-65
 
 ## 👀 3. Live Preview
 
-https://library-app-git-main-leowillis-projects.vercel.app/
+(https://library-app-indol-nu.vercel.app)
 
 ---
 
