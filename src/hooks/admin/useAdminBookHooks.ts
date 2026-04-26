@@ -1,8 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { api } from "@/lib/api";
-import { EndPoints, Query_Keys } from "@/constants";
-import type { AdminBook, AdminBooksResponse } from "@/types/admin/admin";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { api } from '@/lib/api';
+import { EndPoints, Query_Keys } from '@/constants';
+import type { AdminBook, AdminBooksResponse } from '@/types/admin/admin';
 
 const PAGE_SIZE = 10;
 
@@ -38,7 +38,9 @@ export function useDeleteBook(page: number, onSuccess: () => void) {
       await api.delete(EndPoints.BooksDetail(id));
     },
     onMutate: async (id: number) => {
-      await queryClient.cancelQueries({ queryKey: [Query_Keys.AdminBooks, page] });
+      await queryClient.cancelQueries({
+        queryKey: [Query_Keys.AdminBooks, page],
+      });
 
       const previous = queryClient.getQueryData<AdminBooksResponse>([
         Query_Keys.AdminBooks,
@@ -53,22 +55,23 @@ export function useDeleteBook(page: number, onSuccess: () => void) {
             ...old,
             books: old.books.filter((b: AdminBook) => b.id !== id),
           };
-        }
+        },
       );
 
       return { previous };
     },
-    onError: (_err, _id, context: any) => {
+    onError: (_err: any, _id, context: any) => {
       if (context?.previous) {
         queryClient.setQueryData(
           [Query_Keys.AdminBooks, page],
-          context.previous
+          context.previous,
         );
       }
-      toast.error("Failed to delete book");
+      const message = _err?.response?.data?.message ?? 'Failed to delete book';
+      toast.error(message);
     },
     onSuccess: () => {
-      toast.success("Book deleted!");
+      toast.success('Book deleted!');
       queryClient.invalidateQueries({ queryKey: [Query_Keys.AdminBooks] });
       onSuccess();
     },
