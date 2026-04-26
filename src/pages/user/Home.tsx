@@ -7,6 +7,13 @@ import { ROUTES } from '@/constants';
 import AuthorCard from '@/components/user/AuthorCard';
 import Background from '@/components/user/Background';
 import BookCard from '@/pages/user/BookCard';
+import {
+  SkeletonAuthorCard,
+  SkeletonBookCard,
+  SkeletonCategoryCard,
+} from '@/components/ui/skeleton';
+import type { Book } from '@/types/book';
+import type { PopularAuthor } from '@/types/author';
 
 import fictionIcon from '@/assets/categoriesIcon/fiction.svg';
 import nonfictionIcon from '@/assets/categoriesIcon/nonfiction.svg';
@@ -14,11 +21,8 @@ import selfimprovementIcon from '@/assets/categoriesIcon/selfimprovement.svg';
 import financeIcon from '@/assets/categoriesIcon/finance.svg';
 import scienceIcon from '@/assets/categoriesIcon/science.svg';
 import educationIcon from '@/assets/categoriesIcon/education.svg';
-import {
-  SkeletonAuthorCard,
-  SkeletonBookCard,
-  SkeletonCategoryCard,
-} from '@/components/ui/skeleton';
+
+// Constants
 
 // Icon mapping for each category name
 const CATEGORY_ICONS: Record<string, string> = {
@@ -30,17 +34,24 @@ const CATEGORY_ICONS: Record<string, string> = {
   Education: educationIcon,
 };
 
+// Types
+
+interface Category {
+  id: number;
+  name: string;
+}
+
+// Home Page
+
 /**
  * Home page — displays category grid, recommended books, and popular authors.
  * Includes loading skeletons and empty states for all sections.
  */
 export default function Home() {
   const navigate = useNavigate();
-  // Active category filter — undefined shows all recommendations
   const [activeCategory] = useState<number | undefined>(undefined);
   const [page, setPage] = useState(1);
 
-  // Data fetching
   const { data: categories } = useCategories();
   const { data: recommended, isFetching } = useRecommendedBooks({
     by: 'rating',
@@ -48,8 +59,11 @@ export default function Home() {
     page,
     limit: 10,
   });
-
   const { data: popularAuthors } = usePopularAuthors(4);
+
+  const visibleCategories = (categories ?? []).filter(
+    (cat: Category) => CATEGORY_ICONS[cat.name],
+  );
 
   return (
     <main className='space-y-8 md:space-y-12'>
@@ -59,56 +73,44 @@ export default function Home() {
       <section className='px-4 md:px-8'>
         <div className='grid grid-cols-3 md:grid-cols-6 gap-3 md:gap-4 py-3'>
           {!categories
-            ? // Loading skeleton for categories
-              [...Array(6)].map((_, i) => <SkeletonCategoryCard key={i} />)
-            : categories
-                ?.filter(
-                  (cat: { id: number; name: string }) =>
-                    CATEGORY_ICONS[cat.name],
-                )
-                .map((cat: { id: number; name: string }) => (
-                  <button
-                    key={cat.id}
-                    onClick={() => navigate(ROUTES.Category(cat.id))}
-                    className='flex flex-col items-start gap-5 p-3 md:p-4 rounded-2xl bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md'
+            ? [...Array(6)].map((_, i) => <SkeletonCategoryCard key={i} />)
+            : visibleCategories.map((cat: Category) => (
+                <button
+                  key={cat.id}
+                  onClick={() => navigate(ROUTES.Category(cat.id))}
+                  className='flex flex-col items-start gap-5 p-3 md:p-4 rounded-2xl bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md'
+                >
+                  <div
+                    className='w-full h-15 md:h-20 rounded-xl flex items-center justify-center'
+                    style={{ backgroundColor: '#E0ECFF' }}
                   >
-                    <div
-                      className='w-full h-15 md:h-20 rounded-xl flex items-center justify-center'
-                      style={{ backgroundColor: '#E0ECFF' }}
-                    >
-                      <img
-                        src={CATEGORY_ICONS[cat.name]}
-                        alt={cat.name}
-                        className='w-11 h-11 md:w-14 md:h-14 object-contain'
-                      />
-                    </div>
-                    <span className='text-xs md:text-sm font-semibold text-gray-950 text-left'>
-                      {cat.name}
-                    </span>
-                  </button>
-                ))}
+                    <img
+                      src={CATEGORY_ICONS[cat.name]}
+                      alt={cat.name}
+                      className='w-11 h-11 md:w-14 md:h-14 object-contain'
+                    />
+                  </div>
+                  <span className='text-xs md:text-sm font-semibold text-gray-950 text-left'>
+                    {cat.name}
+                  </span>
+                </button>
+              ))}
         </div>
       </section>
 
       {/* Recommendations */}
       <section className='px-4 md:px-8'>
         <h2 className='text-3xl font-bold text-gray-900 mb-4 md:mb-6'>
-          {activeCategory
-            ? categories?.find((c: { id: number }) => c.id === activeCategory)
-                ?.name
-            : 'Recommendation'}
+          Recommendation
         </h2>
 
-        {/* Loading skeleton or book grid */}
         {isFetching ? (
           <div className='grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6'>
-            {[...Array(10)].map((_, i) => (
-              <SkeletonBookCard key={i} />
-            ))}
+            {[...Array(10)].map((_, i) => <SkeletonBookCard key={i} />)}
           </div>
         ) : (
           <div className='grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6'>
-            {recommended?.map((book: any) => (
+            {(recommended ?? []).map((book: Book) => (
               <BookCard
                 key={book.id}
                 book={book}
@@ -118,7 +120,6 @@ export default function Home() {
           </div>
         )}
 
-        {/* Load more button — shown when there are more books */}
         {recommended && recommended.length >= 10 && (
           <div className='flex justify-center mt-4 md:mt-8'>
             <button
@@ -137,18 +138,14 @@ export default function Home() {
           Popular Authors
         </h2>
         {!popularAuthors ? (
-          // Loading skeleton for authors
           <div className='grid grid-cols-1 md:grid-cols-4 gap-6'>
-            {[...Array(4)].map((_, i) => (
-              <SkeletonAuthorCard key={i} />
-            ))}
+            {[...Array(4)].map((_, i) => <SkeletonAuthorCard key={i} />)}
           </div>
         ) : popularAuthors.length === 0 ? (
-          // Empty state
           <p className='text-sm text-gray-400'>No authors found</p>
         ) : (
           <div className='grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-4'>
-            {popularAuthors.map((author: any) => (
+            {popularAuthors.map((author: PopularAuthor) => (
               <AuthorCard
                 key={author.id}
                 author={author}
