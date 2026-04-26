@@ -139,12 +139,12 @@ export default function AdminBorrowedList() {
             <div key={loan.id} className='bg-white rounded-2xl p-4 shadow-sm'>
               {/* Status + Due Date */}
               <div className='flex items-center justify-between mb-3'>
-                <div className='flex items-center gap-4'>
+                <div className='flex items-center gap-1 flex-shrink-0'>
                   <span className='text-md font-bold text-neutral-950'>
                     Status
                   </span>
                   <span
-                    className='text-sm font-bold rounded py-2 px-2'
+                    className='text-sm font-bold rounded py-2 px-1'
                     style={{
                       color: getStatusColor(loan, isOverdue),
                       backgroundColor: getStatusColor(loan, isOverdue) + '1A',
@@ -153,7 +153,7 @@ export default function AdminBorrowedList() {
                     {getStatusLabel(loan, isOverdue)}
                   </span>
                 </div>
-                <div className='flex items-center gap-5'>
+                <div className='flex items-center gap-1 flex-shrink-0'>
                   <span className='text-md font-bold text-neutral-950'>
                     Due Date
                   </span>
