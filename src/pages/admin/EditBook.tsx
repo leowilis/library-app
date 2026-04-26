@@ -1,9 +1,3 @@
-/**
- * @file BookForm.tsx
- * @description Admin form page for adding or editing a book.
- * Reuses the same form for both create and edit modes based on route param.
- */
-
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
