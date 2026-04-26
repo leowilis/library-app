@@ -1,4 +1,4 @@
-import { BookOpen, Users, BookMarked, AlertTriangle } from "lucide-react";
+import { BookOpen, Users, BookMarked, AlertTriangle, AlertCircle } from "lucide-react";
 import { useAdminOverview } from "@/hooks/admin/useAdminOverview";
 import type { AdminOverview, StatCardProps } from "@/types/admin/admin";
 
@@ -70,21 +70,33 @@ function StatCard({ label, value, icon, isLoading, accent }: StatCardProps) {
  * Admin Dashboard page
  */
 export default function AdminDashboard() {
-  const { data, isLoading } = useAdminOverview();
+  const { data, isLoading, isError } = useAdminOverview();
   const stats = buildStats(data);
 
+  if (isError) {
   return (
-    <section className="space-y-6">
+    <section className="space-y-6 md:px-6 md:m-4">
+      <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">Dashboard</h1>
+      <div className="flex flex-col items-center justify-center py-20 gap-3 text-red-500">
+        <AlertCircle size={40} />
+        <p className="text-sm font-semibold">Failed to load dashboard. Please try again.</p>
+      </div>
+    </section>
+  );
+}
+
+  return (
+    <section className="space-y-6 md:px-6 md:m-4">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 md:text-3xl md:font-extrabold">
+        <h1 className="text-2xl font-bold text-gray-900 md:text-3xl md:font-extrabold md:pt-5">
           Dashboard
         </h1>
-        <p className="text-sm text-gray-500 mt-1">Library overview at a glance</p>
+        <p className="text-sm text-neutral-950 mt-1 md:mt-4">Library overview at a glance</p>
       </div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:max-w-5xl md:pt-5">
         {stats.map((stat) => (
           <StatCard key={stat.label} {...stat} isLoading={isLoading} />
         ))}
