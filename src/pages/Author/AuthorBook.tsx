@@ -77,7 +77,7 @@ export default function BooksByAuthorPage() {
               <p className='text-gray-400'>No books found</p>
             </div>
           ) : (
-            <div className='grid grid-cols-2 md:grid-cols-5 gap-4'>
+            <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
               {books.map((book: any) => (
                 <BookCard
                   key={book.id}
