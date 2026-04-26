@@ -283,6 +283,7 @@ export default function AdminBookList() {
       </div>
 
       {/* Mobile Cards */}
+      {/* Mobile Cards */}
       <div className='md:hidden space-y-3'>
         {isLoading
           ? [...Array(3)].map((_, i) => (
@@ -294,33 +295,33 @@ export default function AdminBookList() {
           : filtered.map((book) => (
               <div key={book.id} className='bg-white rounded-xl p-4 shadow-sm'>
                 <div className='flex gap-3'>
-                  <div className='w-[92px] h-[138px] overflow-hidden'>
+                  <div className='w-[72px] h-[108px] overflow-hidden flex-shrink-0'>
                     {book.coverImage && (
                       <img
                         src={book.coverImage}
                         alt={book.title}
-                        className='w-[92px] h-[140px] object-cover mt-2'
+                        className='w-full h-full object-cover'
                       />
                     )}
                   </div>
-                  <div className='flex-1 p-2'>
-                    <span className='text-xs font-bold border border-gray-300 rounded px-2 py-0.5 text-neutral-950'>
+                  <div className='flex-1 min-w-0 p-1'>
+                    <span className='text-xs font-bold border border-gray-300 rounded px-2 py-0.5 text-neutral-950 line-clamp-1 inline-block max-w-full whitespace-nowrap'>
                       {book.category?.name}
                     </span>
-                    <p className='font-bold text-gray-900 mt-2 line-clamp-2'>
+                    <p className='font-bold text-gray-900 mt-2 line-clamp-2 text-sm'>
                       {book.title}
                     </p>
-                    <p className='text-xs text-neutral-700 mt-3'>
+                    <p className='text-xs text-neutral-700 mt-1 line-clamp-1'>
                       {book.author?.name}
                     </p>
-                    <div className='flex items-center gap-1.5 mt-5'>
-                      <Star size={18} fill='#fdb022' color='#fdb022' />
-                      <span className='text-sm font-bold text-gray-800'>
+                    <div className='flex items-center gap-1.5 mt-2'>
+                      <Star size={14} fill='#fdb022' color='#fdb022' />
+                      <span className='text-xs font-bold text-gray-800'>
                         {book.rating}
                       </span>
                     </div>
                   </div>
-                  <div className='flex items-start'>
+                  <div className='flex items-start flex-shrink-0'>
                     <ActionDropdown
                       onPreview={() => navigate(`/admin/books/${book.id}`)}
                       onEdit={() => navigate(`/admin/books/${book.id}/edit`)}
