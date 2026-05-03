@@ -14,6 +14,7 @@ import BorrowModal from './BorrowModal';
 import ReviewModal from './ReviewModal';
 import BookCard from './BookCard';
 import { useIsBookBorrowed } from '@/hooks/useMe';
+import type { Book, BookReview } from '@/types/book';
 
 /**
  * BookDetail page — displays full book information including cover, stats,
@@ -32,7 +33,7 @@ export default function BookDetail() {
 
   // Data fetching
   const { data: book, isLoading } = useBookDetail(Number(id));
- 
+
   const { data: relatedBooks } = useRecommendedBooks({
     by: 'rating',
     categoryId: book?.categoryId,
@@ -205,7 +206,7 @@ export default function BookDetail() {
           {reviews.length === 0 ? (
             <p className='text-sm text-gray-400'>No reviews yet</p>
           ) : (
-            visibleReviews.map((review: any) => (
+            visibleReviews.map((review: BookReview) => (
               <div key={review.id} className='space-y-2 shadow rounded-2xl p-5'>
                 <div className='flex items-center gap-4'>
                   <img
@@ -222,7 +223,7 @@ export default function BookDetail() {
                     </p>
                   </div>
                 </div>
-                <StarRating rating={review.star ?? review.rating} />
+                <StarRating rating={review.star} />
                 <p className='text-sm text-gray-600 leading-relaxed'>
                   {review.comment}
                 </p>
@@ -255,9 +256,9 @@ export default function BookDetail() {
           </h2>
           <div className='grid grid-cols-2 md:grid-cols-5 gap-4'>
             {relatedBooks
-              .filter((b: any) => b.id !== book.id)
+              .filter((b: Book) => b.id !== book.id)
               .slice(0, 5)
-              .map((b: any) => (
+              .map((b: Book) => (
                 <BookCard
                   key={b.id}
                   book={b}
