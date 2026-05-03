@@ -7,6 +7,7 @@ import BookCard from '@/pages/user/BookCard';
 import FilterIcon from '@/assets/icon/Filter.svg';
 import StarIcon from '@/assets/icon/Star.svg';
 import { SkeletonBookCard } from '@/components/ui/skeleton';
+import type { Category } from '@/types/category';
 
 // Rating star options for filter
 const RATING_STARS = [5, 4, 3, 2, 1];
@@ -19,7 +20,7 @@ function FilterContent({
   onCategoryChange,
   onRatingChange,
 }: {
-  categories: any[];
+  categories: Category[];
   selectedCategoryId: number | undefined;
   minRating: number | undefined;
   onCategoryChange: (id: number) => void;
@@ -31,7 +32,7 @@ function FilterContent({
       <div>
         <p className='text-sm font-extrabold text-neutral-950 mb-3'>Category</p>
         <div className='space-y-2.5'>
-          {categories.map((cat: any) => (
+          {categories.map((cat) => (
             <label
               key={cat.id}
               className='flex items-center gap-2 cursor-pointer group'
