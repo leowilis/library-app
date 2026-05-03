@@ -6,6 +6,7 @@ import { EndPoints, ROUTES } from '@/constants';
 import { api } from '@/lib/api';
 import { toast } from 'sonner';
 import type { User } from '@/types/user';
+import type { AxiosError } from 'axios';
 
 // Types
 
@@ -66,7 +67,11 @@ export const useLogin = () => {
  * Caller handles success/error (toast, redirect, etc).
  */
 export const useRegister = () => {
-  return useMutation<AuthResult, Error, RegisterPayload>({
+  return useMutation<
+    AuthResult,
+    AxiosError<{ message?: string }>,
+    RegisterPayload
+  >({
     mutationFn: async (payload) => {
       const res = await api.post<{ data: AuthResult }>(
         EndPoints.Register,
