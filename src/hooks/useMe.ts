@@ -5,6 +5,7 @@ import { EndPoints, Query_Keys } from '@/constants';
 import type { UpdateProfilePayload } from '@/types/user';
 import { api } from '@/lib/api';
 import type { Loan } from '@/types/loan';
+import type { AxiosError } from 'axios';
 
 // Fetches the current authenticated user's profile
 export const useMe = () => {
@@ -22,8 +23,8 @@ export const useMe = () => {
 // Updates the current user's profile. Invalidates the user cache on success
 export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (payload: UpdateProfilePayload) => {
+  return useMutation<unknown, AxiosError<{ message?: string }>, UpdateProfilePayload>({
+    mutationFn: async (payload) => {
       const res = await api.patch(EndPoints.Me, payload);
       return res.data;
     },
