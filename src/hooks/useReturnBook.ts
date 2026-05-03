@@ -1,14 +1,17 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { AxiosError } from 'axios';
 import { toast } from 'sonner';
 import { api } from '@/lib/api';
 import { EndPoints, Query_Keys } from '@/constants';
 import type { Loan } from '@/types/loan';
 
-type LoansCache = {
-  data?: {
-    loans?: Loan[];
-  };
-};
+// Types
+
+interface ReturnContext {
+  previousLoans: Loan[] | undefined;
+}
+
+// Hook
 
 /**
  * Returns a borrowed book by loan ID.
@@ -18,39 +21,28 @@ type LoansCache = {
 export const useReturnBook = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (loanId: number) => {
-      const res = await api.patch(EndPoints.LoansReturn(loanId));
-      return res.data;
+  return useMutation<void, AxiosError, number, ReturnContext>({
+    mutationFn: async (loanId) => {
+      await api.patch(EndPoints.LoansReturn(loanId));
     },
 
-    onMutate: async (loanId: number) => {
+    onMutate: async (loanId) => {
       await queryClient.cancelQueries({ queryKey: [Query_Keys.MeLoans] });
 
-      const previousLoans = queryClient.getQueryData([Query_Keys.MeLoans]);
+      const previousLoans = queryClient.getQueryData<Loan[]>([
+        Query_Keys.MeLoans,
+      ]);
 
-      queryClient.setQueryData(
-        [Query_Keys.MeLoans],
-        (old: LoansCache | undefined) => {
-          if (!old) return old;
-          return {
-            ...old,
-            data: {
-              ...old.data,
-              loans: (old.data?.loans ?? []).map((loan) =>
-                loan.id === loanId
-                  ? { ...loan, status: 'RETURNED' as const }
-                  : loan,
-              ),
-            },
-          };
-        },
+      queryClient.setQueryData<Loan[]>([Query_Keys.MeLoans], (old) =>
+        old?.map((loan) =>
+          loan.id === loanId ? { ...loan, status: 'RETURNED' as const } : loan,
+        ),
       );
 
       return { previousLoans };
     },
 
-    onError: (_err, _loanId, context: any) => {
+    onError: (_err, _loanId, context) => {
       queryClient.setQueryData([Query_Keys.MeLoans], context?.previousLoans);
       toast.error('Failed to return book. Please try again.');
     },
