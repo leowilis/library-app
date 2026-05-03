@@ -141,14 +141,14 @@ export default function AdminLayout() {
       {/* Tabs - Hidden on Edit/Add AND Preview Pages */}
       {!isFormPage && !isPreviewPage && (
         <div className='px-4 pt-4 md:px-15 md:pt-12 md:m-4'>
-          <div className='flex bg-neutral-100 rounded-2xl p-2 md:max-w-3xl'>
+          <div className='flex bg-neutral-100 rounded-2xl p-1.5 md:max-w-3xl'>
             {TABS.map((tab) => {
               const active = location.pathname.startsWith(tab.path);
               return (
                 <button
                   key={tab.path}
                   onClick={() => navigate(tab.path)}
-                  className='flex-1 py-3 rounded-xl text-sm transition-all'
+                  className='flex-1 py-2.5 px-1 rounded-xl text-xs transition-all whitespace-nowrap'
                   style={{
                     backgroundColor: active ? 'white' : 'transparent',
                     color: active ? '#1c65da' : '#6b7280',
