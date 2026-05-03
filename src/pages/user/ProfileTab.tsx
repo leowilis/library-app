@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import AvatarIcon from '@/assets/avatar/avatar.svg';
 import { SkeletonProfileCard } from '@/components/ui/skeleton';
 import type { Loan } from '@/types/loan';
+import type { AxiosError } from 'axios';
 
 // Types
 
@@ -32,9 +33,24 @@ interface EditModalProps {
 // Constants
 
 const LOAN_STATS_CONFIG = [
-  { key: 'total', label: 'Total Loans', color: 'text-blue-600', bg: 'bg-blue-50' },
-  { key: 'active', label: 'Active', color: 'text-green-600', bg: 'bg-green-50' },
-  { key: 'returned', label: 'Returned', color: 'text-gray-600', bg: 'bg-gray-50' },
+  {
+    key: 'total',
+    label: 'Total Loans',
+    color: 'text-blue-600',
+    bg: 'bg-blue-50',
+  },
+  {
+    key: 'active',
+    label: 'Active',
+    color: 'text-green-600',
+    bg: 'bg-green-50',
+  },
+  {
+    key: 'returned',
+    label: 'Returned',
+    color: 'text-gray-600',
+    bg: 'bg-gray-50',
+  },
   { key: 'overdue', label: 'Overdue', color: 'text-red-600', bg: 'bg-red-50' },
 ] as const;
 
@@ -46,19 +62,50 @@ const inputClass =
 /**
  * Modal for editing user profile fields: name, email, and phone.
  */
-function EditModal({ formData, isPending, onChange, onSave, onClose }: EditModalProps) {
-  const fields: { key: keyof ProfileFormData; label: string; type: string; placeholder: string }[] = [
-    { key: 'name', label: 'Name', type: 'text', placeholder: 'Enter your name' },
-    { key: 'email', label: 'Email', type: 'email', placeholder: 'Enter your email' },
-    { key: 'phone', label: 'Phone Number', type: 'tel', placeholder: 'Enter your phone number' },
+function EditModal({
+  formData,
+  isPending,
+  onChange,
+  onSave,
+  onClose,
+}: EditModalProps) {
+  const fields: {
+    key: keyof ProfileFormData;
+    label: string;
+    type: string;
+    placeholder: string;
+  }[] = [
+    {
+      key: 'name',
+      label: 'Name',
+      type: 'text',
+      placeholder: 'Enter your name',
+    },
+    {
+      key: 'email',
+      label: 'Email',
+      type: 'email',
+      placeholder: 'Enter your email',
+    },
+    {
+      key: 'phone',
+      label: 'Phone Number',
+      type: 'tel',
+      placeholder: 'Enter your phone number',
+    },
   ];
 
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/40'>
       <div className='bg-white rounded-3xl p-6 w-full max-w-md space-y-5 md:max-w-lg md:p-8'>
         <div className='flex items-center justify-between'>
-          <h3 className='text-lg font-bold text-gray-900 md:text-xl'>Edit Profile</h3>
-          <button onClick={onClose} className='text-gray-400 hover:text-gray-600 text-2xl leading-none'>
+          <h3 className='text-lg font-bold text-gray-900 md:text-xl'>
+            Edit Profile
+          </h3>
+          <button
+            onClick={onClose}
+            className='text-gray-400 hover:text-gray-600 text-2xl leading-none'
+          >
             ×
           </button>
         </div>
@@ -66,7 +113,9 @@ function EditModal({ formData, isPending, onChange, onSave, onClose }: EditModal
         <div className='space-y-4'>
           {fields.map(({ key, label, type, placeholder }) => (
             <div key={key}>
-              <label className='block text-sm font-semibold text-gray-700 mb-2'>{label}</label>
+              <label className='block text-sm font-semibold text-gray-700 mb-2'>
+                {label}
+              </label>
               <input
                 type={type}
                 value={formData[key]}
@@ -114,7 +163,7 @@ export default function ProfileTab() {
   const { data: loansData } = useMyLoansProfile();
 
   const me = meData?.data?.user ?? user;
-  const loans: Loan[] = loansData?.data?.loans ?? loansData?.loans ?? [];
+  const loans: Loan[] = loansData ?? [];
 
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<ProfileFormData>({
@@ -158,8 +207,10 @@ export default function ProfileTab() {
         toast.success('Profile updated successfully!');
         setIsEditing(false);
       },
-      onError: (error: any) => {
-        toast.error(error?.response?.data?.message ?? 'Failed to update profile');
+      onError: (error: AxiosError<{ message?: string }>) => {
+        toast.error(
+          error.response?.data?.message ?? 'Failed to update profile',
+        );
       },
     });
   };
@@ -182,7 +233,7 @@ export default function ProfileTab() {
         {/* Avatar */}
         <div className='md:flex md:items-center md:gap-5'>
           <img
-            src={(me as any)?.profilePhoto ?? AvatarIcon}
+            src={me?.profilePhoto ?? AvatarIcon}
             alt={me?.name ?? 'avatar'}
             className='w-16 h-16 rounded-full object-cover md:w-20 md:h-20 md:flex-shrink-0'
           />
@@ -196,18 +247,24 @@ export default function ProfileTab() {
               className='flex items-center justify-between py-4 border-gray-100 md:px-4 md:py-3'
             >
               <span className='text-sm text-neutral-950'>{label}</span>
-              <span className='text-sm font-semibold text-gray-900'>{value}</span>
+              <span className='text-sm font-semibold text-gray-900'>
+                {value}
+              </span>
             </div>
           ))}
         </div>
 
         {/* Loan Statistics */}
         <div>
-          <p className='text-sm font-bold text-gray-700 mb-3'>Loan Statistics</p>
+          <p className='text-sm font-bold text-gray-700 mb-3'>
+            Loan Statistics
+          </p>
           <div className='grid grid-cols-2 gap-3'>
             {LOAN_STATS_CONFIG.map(({ key, label, color, bg }) => (
               <div key={key} className={`${bg} rounded-2xl p-4 text-center`}>
-                <p className={`text-2xl font-bold ${color}`}>{loanStats[key]}</p>
+                <p className={`text-2xl font-bold ${color}`}>
+                  {loanStats[key]}
+                </p>
                 <p className='text-xs text-gray-500 mt-1'>{label}</p>
               </div>
             ))}
