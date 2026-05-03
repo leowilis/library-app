@@ -1,20 +1,33 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
-import type { RootState } from '@/store'; 
+import type { RootState } from '@/store';
 import { EndPoints, Query_Keys } from '@/constants';
-import type { UpdateProfilePayload } from '@/types/user';
+import type { User, UpdateProfilePayload } from '@/types/user';
 import { api } from '@/lib/api';
 import type { Loan } from '@/types/loan';
+import type { Review } from '@/types/review';
 import type { AxiosError } from 'axios';
+
+// Types
+
+interface MeLoansResponse {
+  loans: Loan[];
+}
+
+interface MeReviewsResponse {
+  reviews: Review[];
+}
+
+// Hooks
 
 // Fetches the current authenticated user's profile
 export const useMe = () => {
   const token = useSelector((state: RootState) => state.auth.token);
-  return useQuery({
+  return useQuery<User>({
     queryKey: [Query_Keys.Me],
     queryFn: async () => {
-      const res = await api.get(EndPoints.Me);
-      return res.data;
+      const res = await api.get<{ data: { user: User } }>(EndPoints.Me);
+      return res.data.data.user;
     },
     enabled: !!token,
   });
@@ -41,13 +54,13 @@ export const useMyLoansProfile = (params?: {
   limit?: number;
 }) => {
   const token = useSelector((state: RootState) => state.auth.token);
-  return useQuery({
+  return useQuery<Loan[]>({
     queryKey: [Query_Keys.MeLoans, params],
     queryFn: async () => {
-      const res = await api.get(EndPoints.MeLoans, { params });
-      return res.data;
+      const res = await api.get<{ data: MeLoansResponse }>(EndPoints.MeLoans, { params });
+      return res.data.data.loans;
     },
-    enabled: !!token, 
+    enabled: !!token,
   });
 };
 
@@ -58,23 +71,22 @@ export const useMyReviews = (params?: {
   limit?: number;
 }) => {
   const token = useSelector((state: RootState) => state.auth.token);
-  return useQuery({
+  return useQuery<Review[]>({
     queryKey: [Query_Keys.MeReviews, params],
     queryFn: async () => {
-      const res = await api.get(EndPoints.MeReviews, { params });
-      return res.data;
+      const res = await api.get<{ data: MeReviewsResponse }>(EndPoints.MeReviews, { params });
+      return res.data.data.reviews;
     },
     enabled: !!token,
   });
 };
 
 /**
- * Checks whether the current user has an active loan for a specific book
- * Reuses `useMyLoansProfile` with status 'BORROWED' — no extra API call
+ * Checks whether the current user has an active loan for a specific book.
+ * Reuses `useMyLoansProfile` with status 'BORROWED' — no extra API call.
  */
 export const useIsBookBorrowed = (bookId: number) => {
-  const { data } = useMyLoansProfile({ status: 'BORROWED' });
-  const loans: Loan[] = data?.data?.loans ?? data?.loans ?? [];
+  const { data: loans = [] } = useMyLoansProfile({ status: 'BORROWED' });
   return loans.some(
     (loan) => loan.book?.id === bookId && loan.status === 'BORROWED',
   );
