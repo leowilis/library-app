@@ -131,8 +131,8 @@ export default function AdminLayout() {
 
         {/* Profile Dropdown */}
         <ProfileDropdown
-          avatar={(user as any)?.profilePhoto ?? AvatarIcon}
-          name={(user as any)?.name ?? 'Admin'}
+          avatar={user?.profilePhoto ?? AvatarIcon}
+          name={user?.name ?? 'Admin'}
           onNavigate={navigate}
           onLogout={logout}
         />
