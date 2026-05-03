@@ -57,7 +57,7 @@ export default function AdminBorrowedList() {
 
   const { data, isLoading, isError } = useAdminLoans(page, status);
 
-  const loans: AdminLoan[] = data?.loans ?? (data as any)?.overdue ?? [];
+  const loans: AdminLoan[] = data?.loans ?? [];
   const total: number = data?.pagination?.total ?? loans.length;
   const totalPages = Math.ceil(total / 15);
   const isOverdue = status === 'overdue';
