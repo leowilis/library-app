@@ -15,6 +15,31 @@ interface BooksResponse {
   };
 }
 
+// Helpers
+
+function extractBooks(data: unknown): Book[] {
+  if (!data || typeof data !== 'object') return [];
+  const d = data as Record<string, unknown>;
+  const nested = d?.data as Record<string, unknown> | undefined;
+  return (
+    (nested?.data as { books?: Book[] })?.books ??
+    (nested?.books as Book[]) ??
+    (d?.books as Book[]) ??
+    []
+  );
+}
+
+function extractPagination(data: unknown): BooksResponse['pagination'] {
+  if (!data || typeof data !== 'object') return undefined;
+  const d = data as Record<string, unknown>;
+  const nested = d?.data as Record<string, unknown> | undefined;
+  return (
+    (nested?.data as BooksResponse)?.pagination ??
+    (nested?.pagination as BooksResponse['pagination']) ??
+    (d?.pagination as BooksResponse['pagination'])
+  );
+}
+
 // useBooks
 
 /**
@@ -35,9 +60,9 @@ export const useBooks = (params?: {
       const res = await api.get(EndPoints.Book, { params });
       return res.data;
     },
-    select: (data: any) => ({
-      books: data?.data?.data?.books ?? data?.data?.books ?? data?.books ?? [],
-      pagination: data?.data?.data?.pagination ?? data?.data?.pagination ?? data?.pagination,
+    select: (data) => ({
+      books: extractBooks(data),
+      pagination: extractPagination(data),
     }),
   });
 };
@@ -50,14 +75,19 @@ export const useBooks = (params?: {
  * Response is normalized via `select` to always return a `Book` object.
  */
 export const useBookDetail = (id: number) => {
-  return useQuery<Book>({
+  return useQuery<unknown, Error, Book>({
     queryKey: [Query_Keys.BooksDetail, id],
     queryFn: async () => {
       const res = await api.get(EndPoints.BooksDetail(id));
       return res.data;
     },
     enabled: !!id,
-    select: (data: any) => data?.data?.book ?? data?.data ?? data,
+    select: (data) => {
+      if (!data || typeof data !== 'object') return data as Book;
+      const d = data as Record<string, unknown>;
+      const nested = d?.data as Record<string, unknown> | undefined;
+      return (nested?.book ?? nested ?? data) as Book;
+    },
   });
 };
 
@@ -79,10 +109,13 @@ export const useRecommendedBooks = (params?: {
       const res = await api.get(EndPoints.BooksRecommend, { params });
       return res.data;
     },
-    select: (data: any) => {
-      if (Array.isArray(data)) return data;
-      if (Array.isArray(data?.books)) return data.books;
-      if (Array.isArray(data?.data?.books)) return data.data.books;
+    select: (data): Book[] => {
+      if (Array.isArray(data)) return data as Book[];
+      if (!data || typeof data !== 'object') return [];
+      const d = data as Record<string, unknown>;
+      if (Array.isArray(d?.books)) return d.books as Book[];
+      const nested = d?.data as Record<string, unknown> | undefined;
+      if (Array.isArray(nested?.books)) return nested.books as Book[];
       return [];
     },
   });
