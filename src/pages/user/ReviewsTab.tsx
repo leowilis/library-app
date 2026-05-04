@@ -22,7 +22,7 @@ export default function ReviewsTab() {
   const { data: reviewsData, isLoading, isError } = useMyReviews({ q: search });
   const { mutate: deleteReview, isPending: isDeleting } = useDeleteReview();
 
-  const reviews: Review[] = reviewsData?.data?.reviews ?? [];
+  const reviews: Review[] = reviewsData ?? [];
 
   // Confirms and submits delete, closes modal on success
   const handleConfirmDelete = () => {
