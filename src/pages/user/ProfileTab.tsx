@@ -162,7 +162,7 @@ export default function ProfileTab() {
   const { mutate: updateProfile, isPending } = useUpdateProfile();
   const { data: loansData } = useMyLoansProfile();
 
-  const me = meData?.data?.user ?? user;
+  const me = meData ?? user;
   const loans: Loan[] = loansData ?? [];
 
   const [isEditing, setIsEditing] = useState(false);
