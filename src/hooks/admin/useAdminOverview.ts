@@ -13,8 +13,10 @@ export function useAdminOverview() {
   return useQuery<AdminOverview>({
     queryKey: [Query_Keys.AdminOverview],
     queryFn: async () => {
-      const res = await api.get(EndPoints.AdminOverview);
-      return res.data?.data ?? res.data;
+      const res = await api.get<{ data: AdminOverview }>(
+        EndPoints.AdminOverview,
+      );
+      return res.data.data;
     },
   });
 }

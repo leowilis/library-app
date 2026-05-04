@@ -14,10 +14,13 @@ export function useAdminUsers(page: number) {
   return useQuery<AdminUsersResponse>({
     queryKey: [Query_Keys.AdminUsers, page],
     queryFn: async () => {
-      const res = await api.get(EndPoints.AdminUsers, {
-        params: { page, limit: PAGE_SIZE },
-      });
-      return res.data?.data ?? res.data;
+      const res = await api.get<{ data: AdminUsersResponse }>(
+        EndPoints.AdminUsers,
+        {
+          params: { page, limit: PAGE_SIZE },
+        },
+      );
+      return res.data.data;
     },
   });
 }
