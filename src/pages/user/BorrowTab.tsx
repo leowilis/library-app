@@ -143,7 +143,7 @@ export default function BorrowedTab() {
   } = useMyLoansProfile({ status, limit: 20 });
   const { mutate: returnBook, isPending: isReturning } = useReturnBook();
 
-  const loans: Loan[] = loansData?.data?.loans ?? loansData?.loans ?? [];
+  const loans: Loan[] = loansData ?? [];
 
   const filtered = loans.filter((loan) =>
     loan.book?.title?.toLowerCase().includes(search.toLowerCase()),
