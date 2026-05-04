@@ -36,7 +36,11 @@ export const useMe = () => {
 // Updates the current user's profile. Invalidates the user cache on success
 export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
-  return useMutation<unknown, AxiosError<{ message?: string }>, UpdateProfilePayload>({
+  return useMutation<
+    unknown,
+    AxiosError<{ message?: string }>,
+    UpdateProfilePayload
+  >({
     mutationFn: async (payload) => {
       const res = await api.patch(EndPoints.Me, payload);
       return res.data;
@@ -57,7 +61,9 @@ export const useMyLoansProfile = (params?: {
   return useQuery<Loan[]>({
     queryKey: [Query_Keys.MeLoans, params],
     queryFn: async () => {
-      const res = await api.get<{ data: MeLoansResponse }>(EndPoints.MeLoans, { params });
+      const res = await api.get<{ data: MeLoansResponse }>(EndPoints.MeLoans, {
+        params,
+      });
       return res.data.data.loans;
     },
     enabled: !!token,
@@ -74,7 +80,10 @@ export const useMyReviews = (params?: {
   return useQuery<Review[]>({
     queryKey: [Query_Keys.MeReviews, params],
     queryFn: async () => {
-      const res = await api.get<{ data: MeReviewsResponse }>(EndPoints.MeReviews, { params });
+      const res = await api.get<{ data: MeReviewsResponse }>(
+        EndPoints.MeReviews,
+        { params },
+      );
       return res.data.data.reviews;
     },
     enabled: !!token,
