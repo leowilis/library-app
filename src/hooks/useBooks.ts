@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { EndPoints, Query_Keys } from '@/constants';
 import type { Book, CreateBookPayload, UpdateBookPayload } from '@/types/book';
 import { api } from '@/lib/api';
+import { bookKeys, type BooksParams } from '@/lib/queryKeys';
 
 // Types
 
@@ -40,22 +41,23 @@ function extractPagination(data: unknown): BooksResponse['pagination'] {
   );
 }
 
+// Unwraps a single-resource API envelope down to the resource itself.
+function extractResource<T>(data: unknown, resourceKey: string): T {
+  if (!data || typeof data !== 'object') return data as T;
+  const d = data as Record<string, unknown>;
+  const nested = d?.data as Record<string, unknown> | undefined;
+  return (nested?.[resourceKey] as T) ?? (nested as T) ?? (data as T);
+}
+
 // useBooks
 
 /**
  * Fetches a paginated, filterable list of books.
  * Response is normalized via `select` to always return `BooksResponse`.
  */
-export const useBooks = (params?: {
-  q?: string;
-  categoryId?: number;
-  authorId?: number;
-  minRating?: number;
-  page?: number;
-  limit?: number;
-}) => {
+export const useBooks = (params?: BooksParams) => {
   return useQuery<BooksResponse>({
-    queryKey: [Query_Keys.Books, params],
+    queryKey: bookKeys.list(params),
     queryFn: async () => {
       const res = await api.get(EndPoints.Book, { params });
       return res.data;
@@ -75,19 +77,13 @@ export const useBooks = (params?: {
  * Response is normalized via `select` to always return a `Book` object.
  */
 export const useBookDetail = (id: number) => {
-  return useQuery<unknown, Error, Book>({
-    queryKey: [Query_Keys.BooksDetail, id],
+  return useQuery<Book>({
+    queryKey: bookKeys.detail(id),
     queryFn: async () => {
       const res = await api.get(EndPoints.BooksDetail(id));
-      return res.data;
+      return extractResource<Book>(res.data, 'book');
     },
     enabled: !!id,
-    select: (data) => {
-      if (!data || typeof data !== 'object') return data as Book;
-      const d = data as Record<string, unknown>;
-      const nested = d?.data as Record<string, unknown> | undefined;
-      return (nested?.book ?? nested ?? data) as Book;
-    },
   });
 };
 
@@ -104,7 +100,7 @@ export const useRecommendedBooks = (params?: {
   limit?: number;
 }) => {
   return useQuery<Book[]>({
-    queryKey: [Query_Keys.BooksRecommend, params],
+    queryKey: bookKeys.recommend(params),
     queryFn: async () => {
       const res = await api.get(EndPoints.BooksRecommend, { params });
       return res.data;
@@ -132,7 +128,7 @@ export const useCreateBook = () => {
       return res.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [Query_Keys.Books] });
+      queryClient.invalidateQueries({ queryKey: bookKeys.lists() });
     },
   });
 };
@@ -151,8 +147,8 @@ export const useUpdateBook = (id: number) => {
       return res.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [Query_Keys.Books] });
-      queryClient.invalidateQueries({ queryKey: [Query_Keys.BooksDetail, id] });
+      queryClient.invalidateQueries({ queryKey: bookKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: bookKeys.detail(id) });
     },
   });
 };
@@ -168,7 +164,7 @@ export const useDeleteBook = () => {
       return res.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [Query_Keys.Books] });
+      queryClient.invalidateQueries({ queryKey: bookKeys.lists() });
     },
   });
 };
