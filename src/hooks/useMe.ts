@@ -92,7 +92,7 @@ export const useMyReviews = (params?: {
 };
 
 // Checks whether the current user has an active loan for a specific book.
-export const useIsBookBorrowed = (bookId: number): boolean => {
+export const useIsBookBorrowed = (bookId: number) => {
   const { data } = useMyLoansProfile(
     { status: 'BORROWED' },
     {
@@ -106,7 +106,7 @@ export const useIsBookBorrowed = (bookId: number): boolean => {
 };
 
 // Checks whether the current user has returned a loan for a specific book
-export const useHasReturnedBook = (bookId: number): boolean => {
+export const useHasReturnedBook = (bookId: number) => {
   const { data } = useMyLoansProfile(
     { status: 'RETURNED' },
     {
