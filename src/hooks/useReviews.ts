@@ -5,7 +5,6 @@ import { api } from '@/lib/api';
 import { toast } from 'sonner';
 
 // Types
-
 interface ReviewContext {
   previousReviews: Review[] | undefined;
 }
@@ -48,7 +47,9 @@ export const useCreateReview = () => {
     },
     onMutate: async (payload) => {
       await queryClient.cancelQueries({ queryKey: [Query_Keys.MeReviews] });
-      const previousReviews = queryClient.getQueryData<Review[]>([Query_Keys.MeReviews]);
+      const previousReviews = queryClient.getQueryData<Review[]>([
+        Query_Keys.MeReviews,
+      ]);
 
       const newReview: Review = {
         id: Date.now(),
@@ -65,20 +66,79 @@ export const useCreateReview = () => {
         },
       };
 
-      queryClient.setQueryData<Review[]>(
-        [Query_Keys.MeReviews],
-        (old) => [newReview, ...(old ?? [])],
-      );
+      queryClient.setQueryData<Review[]>([Query_Keys.MeReviews], (old) => [
+        newReview,
+        ...(old ?? []),
+      ]);
 
       return { previousReviews };
     },
     onError: (_err, _payload, context) => {
-      queryClient.setQueryData([Query_Keys.MeReviews], context?.previousReviews);
+      queryClient.setQueryData(
+        [Query_Keys.MeReviews],
+        context?.previousReviews,
+      );
       toast.error('Failed to submit review');
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: [Query_Keys.ReviewsBook, variables.bookId] });
-      queryClient.invalidateQueries({ queryKey: [Query_Keys.MeReviews], exact: false });
+      queryClient.invalidateQueries({
+        queryKey: [Query_Keys.ReviewsBook, variables.bookId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [Query_Keys.MeReviews],
+        exact: false,
+      });
+      queryClient.invalidateQueries({ queryKey: [Query_Keys.BooksDetail] });
+    },
+  });
+};
+
+// Update an existing review (star + comment) with optimistic UI.
+export const useUpdateReview = () => {
+  const queryClient = useQueryClient();
+  return useMutation<
+    unknown,
+    Error,
+    { id: number; bookId: number; star: number; comment?: string },
+    { previous: Array<[readonly unknown[], Review[] | undefined]> }
+  >({
+    mutationFn: async ({ id, star, comment }) => {
+      const res = await api.put(EndPoints.Review(id), { star, comment });
+      return res.data;
+    },
+    onMutate: async ({ id, star, comment }) => {
+      await queryClient.cancelQueries({ queryKey: [Query_Keys.MeReviews] });
+
+      // Snapshot every cached MeReviews entry (one per params variant) so we
+      // can roll back precisely on error.
+      const previous = queryClient.getQueriesData<Review[]>({
+        queryKey: [Query_Keys.MeReviews],
+      });
+
+      queryClient.setQueriesData<Review[]>(
+        { queryKey: [Query_Keys.MeReviews] },
+        (old) =>
+          old?.map((r) =>
+            r.id === id ? { ...r, star, comment: comment ?? r.comment } : r,
+          ),
+      );
+
+      return { previous };
+    },
+    onError: (_err, _payload, context) => {
+      context?.previous.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data);
+      });
+      toast.error('Failed to update review');
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [Query_Keys.ReviewsBook, variables.bookId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [Query_Keys.MeReviews],
+        exact: false,
+      });
       queryClient.invalidateQueries({ queryKey: [Query_Keys.BooksDetail] });
     },
   });
@@ -99,22 +159,32 @@ export const useDeleteReview = () => {
     },
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: [Query_Keys.MeReviews] });
-      const previousReviews = queryClient.getQueryData<Review[]>([Query_Keys.MeReviews]);
+      const previousReviews = queryClient.getQueryData<Review[]>([
+        Query_Keys.MeReviews,
+      ]);
 
-      queryClient.setQueryData<Review[]>(
-        [Query_Keys.MeReviews],
-        (old) => old?.filter((r) => r.id !== id),
+      queryClient.setQueryData<Review[]>([Query_Keys.MeReviews], (old) =>
+        old?.filter((r) => r.id !== id),
       );
 
       return { previousReviews };
     },
     onError: (_err, _id, context) => {
-      queryClient.setQueryData([Query_Keys.MeReviews], context?.previousReviews);
+      queryClient.setQueryData(
+        [Query_Keys.MeReviews],
+        context?.previousReviews,
+      );
       toast.error('Failed to delete review');
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [Query_Keys.ReviewsBook], exact: false });
-      queryClient.invalidateQueries({ queryKey: [Query_Keys.MeReviews], exact: false });
+      queryClient.invalidateQueries({
+        queryKey: [Query_Keys.ReviewsBook],
+        exact: false,
+      });
+      queryClient.invalidateQueries({
+        queryKey: [Query_Keys.MeReviews],
+        exact: false,
+      });
     },
   });
 };
