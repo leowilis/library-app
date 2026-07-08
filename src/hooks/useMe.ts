@@ -1,12 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/store';
-import { EndPoints, Query_Keys } from '@/constants';
+import { EndPoints } from '@/constants';
 import type { User, UpdateProfilePayload } from '@/types/user';
 import { api } from '@/lib/api';
 import type { Loan } from '@/types/loan';
 import type { Review } from '@/types/review';
 import type { AxiosError } from 'axios';
+import { meKeys, reviewKeys, type LoansParams } from '@/lib/queryKeys';
 
 // Types
 
@@ -24,7 +25,7 @@ interface MeReviewsResponse {
 export const useMe = () => {
   const token = useSelector((state: RootState) => state.auth.token);
   return useQuery<User>({
-    queryKey: [Query_Keys.Me],
+    queryKey: meKeys.profile(),
     queryFn: async () => {
       const res = await api.get<{ data: { user: User } }>(EndPoints.Me);
       return res.data.data.user;
@@ -46,20 +47,19 @@ export const useUpdateProfile = () => {
       return res.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [Query_Keys.Me] });
+      queryClient.invalidateQueries({ queryKey: meKeys.profile() });
     },
   });
 };
 
-// Fetches the current user's loan history with optional status filter
-export const useMyLoansProfile = (params?: {
-  status?: 'BORROWED' | 'LATE' | 'RETURNED';
-  page?: number;
-  limit?: number;
-}) => {
+// Fetches the current user's loan history with optional status filter.
+export const useMyLoansProfile = <TData = Loan[]>(
+  params?: LoansParams,
+  options?: { select?: (data: Loan[]) => TData },
+) => {
   const token = useSelector((state: RootState) => state.auth.token);
-  return useQuery<Loan[]>({
-    queryKey: [Query_Keys.MeLoans, params],
+  return useQuery<Loan[], AxiosError, TData>({
+    queryKey: meKeys.loans(params),
     queryFn: async () => {
       const res = await api.get<{ data: MeLoansResponse }>(EndPoints.MeLoans, {
         params,
@@ -67,6 +67,7 @@ export const useMyLoansProfile = (params?: {
       return res.data.data.loans;
     },
     enabled: !!token,
+    ...options,
   });
 };
 
@@ -78,7 +79,7 @@ export const useMyReviews = (params?: {
 }) => {
   const token = useSelector((state: RootState) => state.auth.token);
   return useQuery<Review[]>({
-    queryKey: [Query_Keys.MeReviews, params],
+    queryKey: reviewKeys.me(params),
     queryFn: async () => {
       const res = await api.get<{ data: MeReviewsResponse }>(
         EndPoints.MeReviews,
@@ -90,13 +91,30 @@ export const useMyReviews = (params?: {
   });
 };
 
-/**
- * Checks whether the current user has an active loan for a specific book.
- * Reuses `useMyLoansProfile` with status 'BORROWED' — no extra API call.
- */
-export const useIsBookBorrowed = (bookId: number) => {
-  const { data: loans = [] } = useMyLoansProfile({ status: 'BORROWED' });
-  return loans.some(
-    (loan) => loan.book?.id === bookId && loan.status === 'BORROWED',
+// Checks whether the current user has an active loan for a specific book.
+export const useIsBookBorrowed = (bookId: number): boolean => {
+  const { data } = useMyLoansProfile(
+    { status: 'BORROWED' },
+    {
+      select: (loans) =>
+        loans.some(
+          (loan) => loan.book?.id === bookId && loan.status === 'BORROWED',
+        ),
+    },
   );
+  return data ?? false;
+};
+
+// Checks whether the current user has returned a loan for a specific book
+export const useHasReturnedBook = (bookId: number): boolean => {
+  const { data } = useMyLoansProfile(
+    { status: 'RETURNED' },
+    {
+      select: (loans) =>
+        loans.some(
+          (loan) => loan.book?.id === bookId && loan.status === 'RETURNED',
+        ),
+    },
+  );
+  return data ?? false;
 };
