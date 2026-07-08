@@ -61,7 +61,7 @@ export const useBookReviews = (
 };
 
 // Submits a new review with optimistic UI.
-export const useCreateReview = () => {
+export const useSubmitReview = () => {
   const queryClient = useQueryClient();
   return useMutation<unknown, Error, CreateReviewPayload, ReviewContext>({
     mutationFn: async (payload) => {
@@ -92,7 +92,27 @@ export const useCreateReview = () => {
 
       queryClient.setQueriesData<Review[]>(
         { queryKey: reviewKeys.meAll() },
-        (old) => [newReview, ...(old ?? [])],
+        (old) => {
+          if (!old) return [newReview];
+
+          const existingIndex = old.findIndex(
+            (review) => review.bookId === payload.bookId,
+          );
+
+          if (existingIndex === -1) {
+            return [newReview, ...old];
+          }
+
+          return old.map((review) =>
+            review.bookId === payload.bookId
+              ? {
+                  ...review,
+                  star: payload.star,
+                  comment: payload.comment ?? '',
+                }
+              : review,
+          );
+        },
       );
 
       return { previous };
@@ -100,46 +120,6 @@ export const useCreateReview = () => {
     onError: (_err, _payload, context) => {
       if (context) rollbackReviews(queryClient, context.previous);
       toast.error('Failed to submit review');
-    },
-    onSuccess: (_, variables) => {
-      invalidateAfterReviewChange(queryClient, variables.bookId);
-    },
-  });
-};
-
-// Update an existing review (star + comment) with optimistic UI.
-export const useUpdateReview = () => {
-  const queryClient = useQueryClient();
-  return useMutation<
-    unknown,
-    Error,
-    { id: number; bookId: number; star: number; comment?: string },
-    ReviewContext
-  >({
-    mutationFn: async ({ id, star, comment }) => {
-      const res = await api.put(EndPoints.Review(id), { star, comment });
-      return res.data;
-    },
-    onMutate: async ({ id, star, comment }) => {
-      await queryClient.cancelQueries({ queryKey: reviewKeys.meAll() });
-
-      const previous = queryClient.getQueriesData<Review[]>({
-        queryKey: reviewKeys.meAll(),
-      });
-
-      queryClient.setQueriesData<Review[]>(
-        { queryKey: reviewKeys.meAll() },
-        (old) =>
-          old?.map((r) =>
-            r.id === id ? { ...r, star, comment: comment ?? r.comment } : r,
-          ),
-      );
-
-      return { previous };
-    },
-    onError: (_err, _payload, context) => {
-      if (context) rollbackReviews(queryClient, context.previous);
-      toast.error('Failed to update review');
     },
     onSuccess: (_, variables) => {
       invalidateAfterReviewChange(queryClient, variables.bookId);
