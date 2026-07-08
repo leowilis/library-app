@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import UserLayout from '@/components/layout/user/Layout';
 import Home from '@/pages/user/Home';
 import ProfilePage from '@/pages/user/ProfilePage';
@@ -14,6 +14,12 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
   return token ? <>{children}</> : <Navigate to='/login' replace />;
 }
 
+// Router Wrapper For Re-Mounting Search
+function SearchRouterWrapper() {
+  const location = useLocation();
+  return <SearchPage key={location.pathname + location.search} />;
+}
+
 export default function UserRoutes() {
   return (
     <UserLayout>
@@ -27,10 +33,10 @@ export default function UserRoutes() {
             </PrivateRoute>
           }
         />
-        <Route path='/search' element={<SearchPage />} />
-        <Route path='/books/:id' element={<BookDetail />} />
-        <Route path='/category/:id' element={<SearchPage />} />
-        <Route path='/authors/:id/books' element={<BooksByAuthorPage />} />
+        <Route path='search' element={<SearchRouterWrapper />} />
+        <Route path='books/:id' element={<BookDetail />} />
+        <Route path='category/:id' element={<SearchRouterWrapper />} />
+        <Route path='authors/:id/books' element={<BooksByAuthorPage />} />
       </Routes>
     </UserLayout>
   );
