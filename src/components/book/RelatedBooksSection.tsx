@@ -1,16 +1,16 @@
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/constants';
-import BookCard from '@/pages/user/BookCard';
 import type { Book } from '@/types/book';
+import BookCard from './BookCard';
 
 interface RelatedBooksSectionProps {
   currentBookId: number;
-  books: Book[];
+  books?: Book[];
 }
 
 export default function RelatedBooksSection({
   currentBookId,
-  books,
+  books = [],
 }: RelatedBooksSectionProps) {
   const navigate = useNavigate();
 
