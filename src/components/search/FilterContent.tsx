@@ -21,7 +21,7 @@ export default function FilterContent({
   return (
     <div className='space-y-5'>
       {/* Category */}
-      <section aria-labelledby='filter-category-heading'>
+      <section aria-label='Category Filter'>
         <h3 className='mb-3 text-sm font-extrabold text-neutral-950'>
           Category
         </h3>
@@ -51,7 +51,7 @@ export default function FilterContent({
       <hr className='border-gray-100' />
 
       {/* Rating */}
-      <section aria-labelledby='filter-rating-heading'>
+      <section aria-label='Rating Filter'>
         <h3 className='mb-3 text-sm font-extrabold text-neutral-950'>Rating</h3>
 
         <div className='space-y-2.5'>
