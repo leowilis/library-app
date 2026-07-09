@@ -51,3 +51,11 @@ export const reviewKeys = {
   meAll: () => [Query_Keys.MeReviews] as const,
   me: (params?: ReviewsParams) => [...reviewKeys.meAll(), params] as const,
 };
+
+// Cart
+export const cartKeys = {
+  all: [Query_Keys.Cart] as const,
+  lists: () => [...cartKeys.all, 'list'] as const,
+  detail: () => [...cartKeys.all, 'detail'] as const,
+  checkout: () => [...cartKeys.all, 'checkout'] as const,
+};
