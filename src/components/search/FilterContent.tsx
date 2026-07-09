@@ -1,7 +1,7 @@
 import StarIcon from '@/assets/icon/Star.svg';
 import type { Category } from '@/types/category';
 
-const RATING_STARS = [5, 4, 3, 2, 1];
+const RATING_STARS = [5, 4, 3, 2, 1] as const;
 
 interface FilterContentProps {
   categories: Category[];
@@ -21,7 +21,7 @@ export default function FilterContent({
   return (
     <div className='space-y-5'>
       {/* Category */}
-      <section>
+      <section aria-labelledby='filter-category-heading'>
         <h3 className='mb-3 text-sm font-extrabold text-neutral-950'>
           Category
         </h3>
@@ -33,10 +33,11 @@ export default function FilterContent({
               className='group flex cursor-pointer items-center gap-2'
             >
               <input
-                type='checkbox'
+                type='radio'
+                name='category-filter'
                 checked={selectedCategoryId === category.id}
                 onChange={() => onCategoryChange(category.id)}
-                className='h-4 w-4 flex-shrink-0 rounded accent-blue-600'
+                className='h-4 w-4 flex-shrink-0 cursor-pointer accent-blue-600'
               />
 
               <span className='text-sm text-neutral-800 transition-colors group-hover:text-blue-600'>
@@ -50,10 +51,8 @@ export default function FilterContent({
       <hr className='border-gray-100' />
 
       {/* Rating */}
-      <section>
-        <h3 className='mb-3 text-sm font-extrabold text-neutral-950'>
-          Rating
-        </h3>
+      <section aria-labelledby='filter-rating-heading'>
+        <h3 className='mb-3 text-sm font-extrabold text-neutral-950'>Rating</h3>
 
         <div className='space-y-2.5'>
           {RATING_STARS.map((rating) => (
@@ -62,13 +61,19 @@ export default function FilterContent({
               className='group flex cursor-pointer items-center gap-2'
             >
               <input
-                type='checkbox'
+                type='radio'
+                name='rating-filter'
                 checked={minRating === rating}
                 onChange={() => onRatingChange(rating)}
                 className='h-4 w-4 flex-shrink-0 accent-blue-600'
               />
 
-              <img src={StarIcon} alt='' aria-hidden='true' className='h-5 w-5' />
+              <img
+                src={StarIcon}
+                alt=''
+                aria-hidden='true'
+                className='h-5 w-5'
+              />
 
               <span className='text-sm text-neutral-950 transition-colors group-hover:text-blue-600'>
                 {rating}
