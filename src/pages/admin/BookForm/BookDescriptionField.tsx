@@ -17,20 +17,18 @@ export default function BookDescriptionField({
 }: BookDescriptionFieldProps) {
   return (
     <FormField id='description' label='Description' required>
-      <>
-        <textarea
-          name='description'
-          rows={5}
-          value={form.description}
-          onChange={onChange}
-          placeholder='Enter book description'
-          className={`${inputClass} resize-none`}
-        />
+      <textarea
+        name='description'
+        rows={5}
+        value={form.description}
+        onChange={onChange}
+        placeholder='Enter book description'
+        className={`${inputClass} resize-none`}
+      />
 
-        {errors.description && (
-          <p className='text-sm text-red-500'>{errors.description}</p>
-        )}
-      </>
+      {errors.description && (
+        <p className='text-sm text-red-500'>{errors.description}</p>
+      )}
     </FormField>
   );
 }
