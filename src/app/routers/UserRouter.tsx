@@ -1,9 +1,9 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import UserLayout from '@/components/layout/user/Layout';
-import Home from '@/pages/user/Home';
+import Home from '@/pages/user/Home/Home';
 import ProfilePage from '@/pages/user/ProfilePage';
 import SearchPage from '@/pages/user/SearchPage';
-import BookDetail from '@/pages/user/BookDetail';
+import BookDetail from '@/pages/user/BookDetail/BookDetail';
 import BooksByAuthorPage from '@/pages/Author/AuthorBook';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/store';
