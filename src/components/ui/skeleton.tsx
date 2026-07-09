@@ -53,3 +53,13 @@ export function SkeletonCategoryCard() {
 export function SkeletonAuthorCard() {
   return <div className='h-40 rounded-2xl bg-gray-100 animate-pulse' />
 }
+
+export function SkeletonBookDetail() {
+  return (
+    <div className='space-y-4 px-4 py-4 animate-pulse'>
+      <div className='h-64 rounded-2xl bg-gray-100' />
+      <div className='h-6 w-2/3 rounded bg-gray-100' />
+      <div className='h-4 w-1/3 rounded bg-gray-100' />
+    </div>
+  );
+}
