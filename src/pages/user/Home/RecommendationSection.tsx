@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 
 import { ROUTES } from '@/constants';
-import BookCard from '@/components/book/BookCard';
+import BookCard from '@/pages/user/BookDetail/BookCard';
 import EmptyState from '@/common/EmptyState';
 import LoadMoreButton from '@/common/LoadMoreButton';
 import { SkeletonBookCard } from '@/components/ui/skeleton';
