@@ -1,16 +1,19 @@
-interface Props {
+interface BookSubmitButtonProps {
+  loading: boolean;
   isEdit: boolean;
-  isPending: boolean;
 }
 
-export default function BookSubmitButton({ isEdit, isPending }: Props) {
+export default function BookSubmitButton({
+  loading,
+  isEdit,
+}: BookSubmitButtonProps) {
   return (
     <button
       type='submit'
-      disabled={isPending}
+      disabled={loading}
       className='w-full rounded-full bg-[#1c65da] py-3.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-60'
     >
-      {isPending ? 'Saving...' : isEdit ? 'Update Book' : 'Add Book'}
+      {loading ? 'Saving...' : isEdit ? 'Update Book' : 'Add Book'}
     </button>
   );
 }
