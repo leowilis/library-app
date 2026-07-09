@@ -71,6 +71,7 @@ export const Query_Keys = {
   AdminUsers: 'adminUsers',
 };
 
+
 export const ROUTES = {
   // Auth
   Login: '/login',
@@ -99,6 +100,7 @@ export const ROUTES = {
   AdminBookAdd: '/admin/books/add',
   AdminBookEdit: (id: number | string) => `/admin/books/${id}/edit`,
   AdminBookPreview: (id: number | string) => `/admin/books/${id}`,
+  
   // Other
   NotFound: '*',
 };
