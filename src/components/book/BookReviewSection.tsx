@@ -3,6 +3,7 @@ import StarRating from '@/components/ui/starRating';
 import { formatDate } from '@/lib/utils';
 import AvatarIcon from '@/assets/avatar/avatar.svg';
 import type { BookReview } from '@/types/book';
+import LoadMoreButton from '@/common/LoadMoreButton';
 
 interface BookReviewSectionProps {
   rating: number;
@@ -91,17 +92,7 @@ export default function BookReviewSection({
         )}
       </div>
 
-      {hasMore && (
-        <div className='flex justify-center'>
-          <Button
-            variant='outline'
-            onClick={onLoadMore}
-            className='rounded-full border border-gray-300 px-8 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50'
-          >
-            Load More
-          </Button>
-        </div>
-      )}
+      <LoadMoreButton show={hasMore} onClick={onLoadMore} />
     </section>
   );
 }
