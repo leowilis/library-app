@@ -26,31 +26,38 @@ export default function BookReviewSection({
 }: BookReviewSectionProps) {
   return (
     <section className='mt-8 space-y-5'>
-      <div className='flex items-center justify-between gap-3'>
+      <div className='flex items-center justify-between gap-4'>
         <div>
           <h2
             id='review-section-title'
             className='mb-2 text-2xl font-extrabold text-gray-900'
           >
-            Review
+            Reviews
           </h2>
 
-          <div className='flex items-center gap-1'>
+          <div className='flex items-center gap-2'>
             <StarRating rating={rating} showValue />
+
             <span className='text-xs font-extrabold text-neutral-950'>
               ({reviewCount} Reviews)
             </span>
           </div>
+          {/* Messages to guide users */}
+          {!hasReturnedBook && (
+            <p className='mt-2 text-sm text-neutral-500'>
+              Return this book first to write a review.
+            </p>
+          )}
         </div>
 
-        {hasReturnedBook && (
-          <Button
-            onClick={onGiveReview}
-            className='flex-shrink-0 rounded-full bg-[#1C65DA] px-6 py-5 font-semibold text-white hover:bg-[#1550b8]'
-          >
-            Give Review
-          </Button>
-        )}
+        <Button
+          onClick={onGiveReview}
+          disabled={!hasReturnedBook}
+          aria-disabled={!hasReturnedBook}
+          className='flex-shrink-0 rounded-full bg-[#1C65DA] px-6 py-5 font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-300'
+        >
+          Give Reviews
+        </Button>
       </div>
 
       <div className='grid grid-cols-1 gap-5 md:grid-cols-2'>
