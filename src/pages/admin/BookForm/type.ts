@@ -15,3 +15,10 @@ export interface FormErrors {
   totalPages?: string;
   coverImage?: string;
 }
+
+export type BookFormChangeEvent =
+  React.ChangeEvent<
+    HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+  >;
+
+export type BookFormChangeHandler = (e: BookFormChangeEvent) => void;
