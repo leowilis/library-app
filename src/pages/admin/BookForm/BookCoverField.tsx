@@ -1,12 +1,12 @@
 import { ImageIcon, Trash2 } from 'lucide-react';
 import FormField from './FormField';
-import type { BookFormState, FormErrors } from './type';
+import type { BookFormChangeHandler, BookFormState, FormErrors } from './type';
 import type { Dispatch, SetStateAction } from 'react';
 
 interface BookCoverFieldProps {
   form: BookFormState;
   errors: FormErrors;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange: BookFormChangeHandler;
   setForm: Dispatch<SetStateAction<BookFormState>>;
 }
 
