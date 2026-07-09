@@ -1,10 +1,10 @@
 import FormField from './FormField';
-import type { BookFormState, FormErrors } from './type';
+import type { BookFormChangeHandler, BookFormState, FormErrors } from './type';
 
 interface BookDescriptionFieldProps {
   form: BookFormState;
   errors: FormErrors;
-  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  onChange: BookFormChangeHandler;
 }
 
 const inputClass =
