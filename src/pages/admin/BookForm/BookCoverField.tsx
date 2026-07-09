@@ -1,12 +1,13 @@
 import { ImageIcon, Trash2 } from 'lucide-react';
 import FormField from './FormField';
 import type { BookFormState, FormErrors } from './type';
+import type { Dispatch, SetStateAction } from 'react';
 
 interface BookCoverFieldProps {
   form: BookFormState;
   errors: FormErrors;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onRemoveImage: () => void;
+  setForm: Dispatch<SetStateAction<BookFormState>>;
 }
 
 const inputClass =
@@ -16,7 +17,7 @@ export default function BookCoverField({
   form,
   errors,
   onChange,
-  onRemoveImage,
+  setForm,
 }: BookCoverFieldProps) {
   return (
     <FormField id='coverImage' label='Cover Image'>
@@ -31,7 +32,12 @@ export default function BookCoverField({
 
             <button
               type='button'
-              onClick={onRemoveImage}
+              onClick={() =>
+                setForm((prev) => ({
+                  ...prev,
+                  coverImage: '',
+                }))
+              }
               className='flex items-center gap-2 rounded-xl border border-neutral-300 px-4 py-2 text-sm text-red-500 transition-colors hover:bg-red-50'
             >
               <Trash2 size={15} />
