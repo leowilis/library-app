@@ -32,12 +32,13 @@ export const bookKeys = {
   list: (params?: BooksParams) => [...bookKeys.lists(), params] as const,
   details: () => [Query_Keys.BooksDetail] as const,
   detail: (id: number) => [...bookKeys.details(), id] as const,
+  recommendAll: () => [Query_Keys.BooksRecommend] as const,
   recommend: (params?: {
     by?: 'rating' | 'popular';
     categoryId?: number;
     page?: number;
     limit?: number;
-  }) => [Query_Keys.BooksRecommend, params] as const,
+  }) => [...bookKeys.recommendAll(), params] as const,
 };
 
 // Me Keys (Profile / Loans)
