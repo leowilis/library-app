@@ -6,8 +6,9 @@ import { toast } from 'sonner';
 import { ROUTES } from '@/constants';
 import type { RootState } from '@/store';
 
-import { useBookDetail, useRecommendedBooks } from '@/hooks/useBooks';
 import { useHasReturnedBook, useIsBookBorrowed } from '@/hooks/useMe';
+import { useBookDetail } from '@/hooks/useBookDetail';
+import { useRecommendedBooks } from '@/hooks/useRecommendedBooks';
 
 import { RELATED_BOOK_LIMIT, REVIEWS_PER_PAGE } from './constants';
 
@@ -76,6 +77,16 @@ export function useBookDetailPage() {
     setShowBorrow(true);
   };
 
+  const handleGiveReview = () => {
+    if (!token) {
+      toast.error('Please login first');
+      navigate(ROUTES.Login);
+      return;
+    }
+
+    setShowReview(true);
+  };
+
   const handleLoadMore = () => {
     setReviewPage((prev) => prev + 1);
   };
@@ -103,6 +114,7 @@ export function useBookDetailPage() {
     hasReturnedBook,
 
     handleBorrow,
+    handleGiveReview,
     handleLoadMore,
   };
 }
