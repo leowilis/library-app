@@ -116,28 +116,15 @@ export default function Navbar() {
                 onLogout={handleLogout}
               />
             ) : (
-              <button
-                type='button'
-                aria-label='Open navigation menu'
-                aria-haspopup='menu'
-                aria-expanded={menuOpen}
-                onClick={() => setMenuOpen((prev) => !prev)}
-                className='transition-transform active:scale-95'
-              >
-                <img src={Menubar} width={28} height={28} alt='Menu' />
-              </button>
+              <GuestMenu
+                menuOpen={menuOpen}
+                onToggle={() => setMenuOpen((prev) => !prev)}
+                onNavigate={handleNavigate}
+              />
             )}
           </div>
         )}
       </div>
-
-      {/* Guest Menu Popover Context */}
-      {!token && menuOpen && (
-        <GuestMenu
-          onLogin={() => handleNavigate(ROUTES.Login)}
-          onRegister={() => handleNavigate(ROUTES.Register)}
-        />
-      )}
     </nav>
   );
 }
