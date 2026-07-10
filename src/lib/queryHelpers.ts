@@ -20,6 +20,10 @@ export async function invalidateBorrow(
     queryClient.invalidateQueries({
       queryKey: bookKeys.detail(bookId),
     }),
+
+    queryClient.invalidateQueries({
+      queryKey: cartKeys.checkout(),
+    }),
   ]);
 }
 
@@ -50,17 +54,25 @@ export async function invalidateReview(
   queryClient: QueryClient,
   bookId?: number,
 ) {
-  if (bookId) {
-    await queryClient.invalidateQueries({
-      queryKey: reviewKeys.book(bookId),
-    });
+  const tasks = [
+    queryClient.invalidateQueries({
+      queryKey: meKeys.reviewsAll(),
+    }),
+  ];
 
-    await queryClient.invalidateQueries({
-      queryKey: bookKeys.detail(bookId),
-    });
+  if (bookId) {
+    tasks.push(
+      queryClient.invalidateQueries({
+        queryKey: reviewKeys.book(bookId),
+      }),
+    );
+
+    tasks.push(
+      queryClient.invalidateQueries({
+        queryKey: bookKeys.detail(bookId),
+      }),
+    );
   }
 
-  await queryClient.invalidateQueries({
-    queryKey: meKeys.reviewsAll(),
-  });
+  await Promise.all(tasks);
 }
