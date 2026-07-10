@@ -22,7 +22,7 @@ export default function MobileSearch({
 
   return (
     <div className='flex flex-1 items-center gap-2 mx-3 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 md:hidden'>
-      <Search size={18} className='text-gray-400' />
+      <Search size={18} className='text-gray-400' aria-hidden='true' />
 
       <input
         ref={searchRef}
