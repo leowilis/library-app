@@ -13,7 +13,7 @@ export default function SearchBar({
 }: SearchBarProps) {
   return (
     <div className='hidden flex-1 items-center gap-2 mx-6 max-w-2xl rounded-full border border-gray-200 px-6 py-2 md:flex'>
-      <Search size={18} className='text-gray-400' />
+      <Search size={18} className='text-gray-400' aria-hidden='true' />
 
       <input
         aria-label='Search books'
