@@ -16,6 +16,8 @@ import type {
   ActionDropdownProps,
   DeleteModalProps,
 } from '@/types/admin/admin';
+import EmptyState from '@/common/EmptyState';
+import ErrorState from '@/common/ErrorState';
 
 const TABLE_HEADERS = [
   'Cover',
@@ -160,19 +162,18 @@ export default function AdminBookList() {
   );
 
   // ── Error State ──
-  if (isError) {
+  <ErrorState
+    title='Failed to load books'
+    description='Please try again later.'
+  />;
+
+  // Empty State
+  if (!books?.length) {
     return (
-      <section className='space-y-4 md:px-4 md:m-4'>
-        <h1 className='text-2xl font-bold text-gray-900 md:text-3xl'>
-          Book List
-        </h1>
-        <div className='flex flex-col items-center justify-center py-20 gap-3 text-red-500'>
-          <AlertCircle size={40} />
-          <p className='text-sm font-semibold'>
-            Failed to load books. Please try again.
-          </p>
-        </div>
-      </section>
+      <EmptyState
+        title='No authors found'
+        description='There are no popular authors available.'
+      />
     );
   }
 
@@ -195,7 +196,7 @@ export default function AdminBookList() {
 
       {/* Search */}
       <div className='flex items-center gap-2 bg-white rounded-full px-4 py-2.5 border border-gray-200 w-full md:max-w-[750px] md:mb-10'>
-        <Search size={20} className='text-neutral-600' />
+        <Search size={20} className='text-neutral-600' aria-hidden='true' />
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
