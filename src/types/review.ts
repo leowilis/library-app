@@ -35,3 +35,7 @@ export interface CreateReviewPayload {
 export interface UpdateReviewPayload extends CreateReviewPayload {
   id: number;
 }
+
+export type SubmitReviewPayload =
+  | CreateReviewPayload
+  | UpdateReviewPayload;
