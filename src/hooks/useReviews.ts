@@ -12,7 +12,7 @@ import { invalidateReview, rollbackReviews } from '@/lib/queryHelpers';
 import { meKeys, reviewKeys } from '@/lib/queryKeys';
 import { createOptimisticReview } from '@/lib/reviewHelpers';
 
-import type { Review, SubmitReviewPayload } from '@/types/review';
+import type { CreateReviewPayload, Review } from '@/types/review';
 
 interface ReviewContext {
   previous: Array<[QueryKey, Review[] | undefined]>;
@@ -57,7 +57,7 @@ export const useBookReviews = (
 export const useSubmitReview = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<unknown, Error, SubmitReviewPayload, ReviewContext>({
+  return useMutation<unknown, Error, CreateReviewPayload, ReviewContext>({
     mutationFn: async (payload) => {
       const { data } = await api.post(EndPoints.Reviews, payload);
       return data;
