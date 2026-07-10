@@ -16,24 +16,33 @@ import EmptyState from '@/common/EmptyState';
 import { SkeletonBookDetail } from '@/components/ui/skeleton';
 
 import { useBookDetailPage } from './useBookDetailPage';
+import ErrorState from '@/common/ErrorState';
 
 export default function BookDetail() {
   const {
     book,
     isLoading,
     isError,
+
     relatedBooks,
+
     showBorrow,
     setShowBorrow,
+
     showReview,
     setShowReview,
+
     visibleReviews,
     hasMore,
+
     borrowButtonLabel,
+
     isAlreadyBorrowed,
     isOutOfStock,
     hasReturnedBook,
+
     handleBorrow,
+    handleGiveReview,
     handleLoadMore,
   } = useBookDetailPage();
 
@@ -43,7 +52,7 @@ export default function BookDetail() {
 
   if (isError) {
     return (
-      <EmptyState
+      <ErrorState
         title='Failed to load book'
         description='Please try again later.'
       />
@@ -98,7 +107,7 @@ export default function BookDetail() {
           reviewCount={book.reviewCount}
           visibleReviews={visibleReviews}
           hasReturnedBook={hasReturnedBook}
-          onGiveReview={() => setShowReview(true)}
+          onGiveReview={handleGiveReview}
           hasMore={hasMore}
           onLoadMore={handleLoadMore}
         />
