@@ -42,7 +42,7 @@ export default function UserMenu({
           className='h-10 w-10 rounded-full object-cover'
         />
 
-        <span className='text-sm font-semibold'>{user?.name}</span>
+        <span className='text-sm font-semibold'>{user?.name ?? 'User'}</span>
 
         <button
           type='button'
