@@ -6,8 +6,6 @@ import { logout } from '@/store/authSlice';
 import { ROUTES } from '@/constants';
 import { Search } from 'lucide-react';
 
-import Menubar from '@/assets/icon/Menu.svg';
-
 import NavbarLogo from './NavbarLogo';
 import SearchBar from './SearchBar';
 import MobileSearch from './MobileSearch';
