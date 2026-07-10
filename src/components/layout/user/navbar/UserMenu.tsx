@@ -1,14 +1,10 @@
 import AvatarIcon from '@/assets/avatar/avatar.svg';
 import { ROUTES } from '@/constants';
+import type { User } from '@/types/user';
 
 interface UserMenuProps {
-  user?: {
-    name?: string | null;
-    profilePhoto?: string | null;
-  };
-
+  user: User | null;
   menuOpen: boolean;
-
   onToggle: () => void;
   onNavigate: (route: string) => void;
   onLogout: () => void;
