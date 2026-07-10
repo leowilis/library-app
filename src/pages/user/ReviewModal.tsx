@@ -7,7 +7,7 @@ import StarPicker from '@/components/ui/starPicker';
 
 import { useSubmitReview } from '@/hooks/useReviews';
 
-import type { Review, SubmitReviewPayload } from '@/types/review';
+import type { CreateReviewPayload, Review } from '@/types/review';
 
 type ReviewModalProps =
   | {
@@ -35,7 +35,7 @@ export default function ReviewModal(props: ReviewModalProps) {
   const { mutate: submitReview, isPending } = useSubmitReview();
 
   const handleSubmit = () => {
-    if (!rating) {
+    if (rating === 0) {
       toast.error('Please give a rating.');
       return;
     }
@@ -45,7 +45,7 @@ export default function ReviewModal(props: ReviewModalProps) {
       return;
     }
 
-    const payload: SubmitReviewPayload =
+    const payload: CreateReviewPayload =
       mode === 'create'
         ? {
             bookId: props.bookId,
@@ -53,7 +53,6 @@ export default function ReviewModal(props: ReviewModalProps) {
             comment: comment.trim(),
           }
         : {
-            id: props.review.id,
             bookId: props.review.bookId,
             star: rating,
             comment: comment.trim(),
@@ -76,16 +75,20 @@ export default function ReviewModal(props: ReviewModalProps) {
     >
       <div className='absolute inset-0 bg-black/40' onClick={onClose} />
 
-      <div className='relative w-full max-w-md space-y-5 rounded-3xl bg-white p-6'>
+      <div className='relative w-full max-w-md rounded-3xl bg-white p-6 space-y-5'>
         {/* Header */}
         <div className='flex items-center justify-between'>
-          <h2 className='text-lg font-bold text-gray-900'>
+          <h2
+            id='review-modal-title'
+            className='text-lg font-bold text-gray-900'
+          >
             {mode === 'create' ? 'Give Review' : 'Edit Your Review'}
           </h2>
 
           <button
             type='button'
             onClick={onClose}
+            disabled={isPending}
             className='text-gray-400 transition-colors hover:text-gray-700'
           >
             <X size={24} />
@@ -128,7 +131,7 @@ export default function ReviewModal(props: ReviewModalProps) {
           >
             {isPending
               ? mode === 'create'
-                ? 'Sending...'
+                ? 'Submitting...'
                 : 'Saving...'
               : mode === 'create'
                 ? 'Submit'
