@@ -9,7 +9,7 @@ import { api } from '@/lib/api';
 import { EndPoints } from '@/constants';
 import { meKeys } from '@/lib/queryKeys';
 import type { Loan } from '@/types/loan';
-import { invalidateBorrow } from '@/lib/queryHelpers';
+import { invalidateBorrow, invalidateCart } from '@/lib/queryHelpers';
 
 // Types
 export interface ReturnBookPayload {
@@ -69,10 +69,13 @@ export const useReturnBook = () => {
     },
 
     // Sync server state after success
-    onSettled: async (_data, _error, variables) => {
-      if (!variables) return;
+    onSettled: async (_data, _error, payload) => {
+      if (!payload) return;
 
-      await invalidateBorrow(queryClient, variables.bookId);
+      await Promise.all([
+        invalidateBorrow(queryClient, payload.bookId),
+        invalidateCart(queryClient),
+      ]);
     },
   });
 };
