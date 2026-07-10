@@ -1,4 +1,4 @@
-import type { CreateReviewPayload, Review } from '@/types/review';
+import type { Review, SubmitReviewPayload } from '@/types/review';
 
 interface OptimisticUserParams {
   name: string;
@@ -6,7 +6,7 @@ interface OptimisticUserParams {
 }
 
 export function createOptimisticReview(
-  payload: CreateReviewPayload,
+  payload: SubmitReviewPayload,
   user: OptimisticUserParams,
 ): Review {
   return {
