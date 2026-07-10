@@ -4,8 +4,8 @@ import { api } from '@/lib/api';
 import { EndPoints } from '@/constants';
 import type { CreateLoanPayload } from '@/types/loan';
 import type { Book } from '@/types/book';
-import { bookKeys, meKeys } from '@/lib/queryKeys';
-import { invalidateCart } from '@/lib/queryHelpers';
+import { bookKeys } from '@/lib/queryKeys';
+import { invalidateBorrow, invalidateCart } from '@/lib/queryHelpers';
 
 interface BorrowContext {
   previousBook?: Book;
@@ -67,18 +67,7 @@ export const useBorrowBook = () => {
     // Sync server state after success
     onSettled: async (_data, _error, payload) => {
       await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: bookKeys.lists(),
-        }),
-
-        queryClient.invalidateQueries({
-          queryKey: bookKeys.detail(payload.bookId),
-        }),
-
-        queryClient.invalidateQueries({
-          queryKey: meKeys.loansAll(),
-        }),
-
+        invalidateBorrow(queryClient, payload.bookId),
         invalidateCart(queryClient),
       ]);
     },
