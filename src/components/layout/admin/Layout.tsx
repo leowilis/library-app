@@ -51,8 +51,12 @@ function ProfileDropdown({
     <div className='relative' ref={ref}>
       {/* Trigger */}
       <button
+        type='button'
         onClick={() => setIsOpen((prev) => !prev)}
         className='flex items-center gap-3 cursor-pointer'
+        aria-label='Open profile menu'
+        aria-haspopup='menu'
+        aria-expanded={isOpen}
       >
         <img
           src={avatar}
@@ -64,10 +68,15 @@ function ProfileDropdown({
 
       {/* Dropdown */}
       {isOpen && (
-        <div className='absolute -right-4 mt-3 w-50 bg-white rounded-2xl shadow-lg border border-gray-100 py-1 z-50'>
+        <div
+          role='menu'
+          className='absolute -right-4 mt-3 w-50 bg-white rounded-2xl shadow-lg border border-gray-100 py-1 z-50'
+        >
           {/* Dropdown list */}
           {TABS.map((item) => (
             <button
+              type='button'
+              role='menuitem'
               key={item.path}
               onClick={() => {
                 onNavigate(item.path);
@@ -78,9 +87,12 @@ function ProfileDropdown({
               {item.label}
             </button>
           ))}
+
           {/* Logout */}
           <div className='border-t border-gray-100 mt-1 pt-1'>
             <button
+              type='button'
+              role='menuitem'
               onClick={() => {
                 onLogout();
                 setIsOpen(false);
@@ -121,13 +133,15 @@ export default function AdminLayout() {
       {/* Navbar */}
       <nav className='w-full bg-white shadow-sm px-6 py-4 flex items-center justify-between'>
         {/* Logo */}
-        <div
-          className='flex items-center gap-2 cursor-pointer'
+        <button
+          type='button'
           onClick={() => navigate('/admin/dashboard')}
+          aria-label='Go to dashboard'
+          className='flex items-center gap-2 cursor-pointer'
         >
           <img src={Logo} alt='logo' className='w-8 h-8' />
           <span className='text-xl font-bold text-gray-900'>Booky</span>
-        </div>
+        </button>
 
         {/* Profile Dropdown */}
         <ProfileDropdown
@@ -146,7 +160,9 @@ export default function AdminLayout() {
               const active = location.pathname.startsWith(tab.path);
               return (
                 <button
+                  type='button'
                   key={tab.path}
+                  aria-current={active ? 'page' : undefined}
                   onClick={() => navigate(tab.path)}
                   className='flex-1 py-2.5 px-1 rounded-xl text-xs transition-all whitespace-nowrap'
                   style={{
