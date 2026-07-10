@@ -12,9 +12,7 @@ export function useBookDetail(id: number) {
     queryKey: bookKeys.detail(id),
 
     queryFn: async () => {
-      const { data } = await api.get(
-        EndPoints.BooksDetail(id),
-      );
+      const { data } = await api.get(EndPoints.BooksDetail(id));
 
       return extractResource<Book>(data, 'book');
     },
