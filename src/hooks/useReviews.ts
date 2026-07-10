@@ -1,110 +1,101 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { EndPoints } from '@/constants';
-import type { CreateReviewPayload, Review } from '@/types/review';
-import { api } from '@/lib/api';
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  type QueryKey,
+} from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { bookKeys, reviewKeys } from '@/lib/queryKeys';
 
-// Types
+import { EndPoints } from '@/constants';
+import { api } from '@/lib/api';
+import { invalidateReview, rollbackReviews } from '@/lib/queryHelpers';
+import { meKeys, reviewKeys } from '@/lib/queryKeys';
+import { createOptimisticReview } from '@/lib/reviewHelpers';
+
+import type { Review, SubmitReviewPayload } from '@/types/review';
+
 interface ReviewContext {
-  previous: Array<[readonly unknown[], Review[] | undefined]>;
+  previous: Array<[QueryKey, Review[] | undefined]>;
 }
 
-// Helper
-
-// Rolls back every snapshotted MeReviews cache entry (used by all 3 mutations below).
-function rollbackReviews(
-  queryClient: ReturnType<typeof useQueryClient>,
-  previous: ReviewContext['previous'],
-) {
-  previous.forEach(([key, data]) => {
-    queryClient.setQueryData(key, data);
-  });
-}
-
-/**
- * Invalidation shared by create/update/delete: book's own reviews, every
- * cached "my reviews" variant, and book detail (rating/reviewCount change).
- */
-function invalidateAfterReviewChange(
-  queryClient: ReturnType<typeof useQueryClient>,
-  bookId?: number,
-) {
-  if (bookId) {
-    queryClient.invalidateQueries({ queryKey: reviewKeys.book(bookId) });
-  }
-  queryClient.invalidateQueries({ queryKey: reviewKeys.meAll() });
-  queryClient.invalidateQueries({ queryKey: bookKeys.details() });
-}
-
-// Hooks
-
-/**
- * Fetches paginated reviews for a specific book.
- * Query is disabled until a valid `bookId` is provided.
- */
+// Fetch reviews of a book.
 export const useBookReviews = (
   bookId: number,
-  params?: { page?: number; limit?: number },
+  params?: {
+    page?: number;
+    limit?: number;
+  },
 ) => {
   return useQuery<Review[]>({
     queryKey: [...reviewKeys.book(bookId), params],
+
     queryFn: async () => {
-      const res = await api.get<{ data: { reviews: Review[] } }>(
-        EndPoints.ReviewsBook(bookId),
-        { params },
-      );
-      return res.data.data.reviews;
+      const { data } = await api.get<{
+        data: {
+          reviews: Review[];
+        };
+      }>(EndPoints.ReviewsBook(bookId), {
+        params,
+      });
+
+      return data.data.reviews;
     },
+
     enabled: !!bookId,
   });
 };
 
-// Submits a new review with optimistic UI.
+// Create / Update Review
 export const useSubmitReview = () => {
   const queryClient = useQueryClient();
-  return useMutation<unknown, Error, CreateReviewPayload, ReviewContext>({
-    mutationFn: async (payload) => {
-      const res = await api.post(EndPoints.Reviews, payload);
-      return res.data;
-    },
-    onMutate: async (payload) => {
-      await queryClient.cancelQueries({ queryKey: reviewKeys.meAll() });
 
-      const previous = queryClient.getQueriesData<Review[]>({
-        queryKey: reviewKeys.meAll(),
+  return useMutation<unknown, Error, SubmitReviewPayload, ReviewContext>({
+    mutationFn: async (payload) => {
+      const { data } = await api.post(EndPoints.Reviews, payload);
+
+      return data;
+    },
+
+    onMutate: async (payload) => {
+      await queryClient.cancelQueries({
+        queryKey: meKeys.reviewsAll(),
       });
 
-      const newReview: Review = {
-        id: Date.now(),
-        star: payload.star,
-        comment: payload.comment ?? '',
-        bookId: payload.bookId,
-        createdAt: new Date().toISOString(),
-        book: {
-          id: payload.bookId,
-          title: '',
-          coverImage: '',
-          author: { name: '' },
-          category: { name: '' },
-        },
-      };
+      const previous = queryClient.getQueriesData<Review[]>({
+        queryKey: meKeys.reviewsAll(),
+      });
+
+      const newReview = createOptimisticReview(payload, {
+        name: 'You',
+      });
 
       queryClient.setQueriesData<Review[]>(
-        { queryKey: reviewKeys.meAll() },
+        {
+          queryKey: meKeys.reviewsAll(),
+        },
         (old) => {
-          if (!old) return [newReview];
+          // CREATE
+          if (!('id' in payload)) {
+            if (!old) {
+              return [newReview];
+            }
 
-          const existingIndex = old.findIndex(
-            (review) => review.bookId === payload.bookId,
-          );
+            const exists = old.some(
+              (review) => review.bookId === payload.bookId,
+            );
 
-          if (existingIndex === -1) {
-            return [newReview, ...old];
+            if (!exists) {
+              return [newReview, ...old];
+            }
+
+            return old;
           }
 
+          // UPDATE
+          if (!old) return old;
+
           return old.map((review) =>
-            review.bookId === payload.bookId
+            review.id === payload.id
               ? {
                   ...review,
                   star: payload.star,
@@ -115,46 +106,77 @@ export const useSubmitReview = () => {
         },
       );
 
-      return { previous };
+      return {
+        previous,
+      };
     },
-    onError: (_err, _payload, context) => {
-      if (context) rollbackReviews(queryClient, context.previous);
+
+    onError: (_error, _payload, context) => {
+      if (context) {
+        rollbackReviews(queryClient, context.previous);
+      }
+
       toast.error('Failed to submit review');
     },
-    onSuccess: (_, variables) => {
-      invalidateAfterReviewChange(queryClient, variables.bookId);
+
+    onSuccess: () => {
+      toast.success('Review submitted successfully!');
+    },
+
+    onSettled: async (_data, _error, variables) => {
+      if (!variables) return;
+
+      await invalidateReview(queryClient, variables.bookId);
     },
   });
 };
 
-// Deletes a review with optimistic UI.
+// Delete Review
 export const useDeleteReview = () => {
   const queryClient = useQueryClient();
+
   return useMutation<unknown, Error, number, ReviewContext>({
-    mutationFn: async (id) => {
-      const res = await api.delete(EndPoints.Review(id));
-      return res.data;
+    mutationFn: async (reviewId) => {
+      const { data } = await api.delete(EndPoints.Review(reviewId));
+
+      return data;
     },
-    onMutate: async (id) => {
-      await queryClient.cancelQueries({ queryKey: reviewKeys.meAll() });
+
+    onMutate: async (reviewId) => {
+      await queryClient.cancelQueries({
+        queryKey: meKeys.reviewsAll(),
+      });
 
       const previous = queryClient.getQueriesData<Review[]>({
-        queryKey: reviewKeys.meAll(),
+        queryKey: meKeys.reviewsAll(),
       });
 
       queryClient.setQueriesData<Review[]>(
-        { queryKey: reviewKeys.meAll() },
-        (old) => old?.filter((r) => r.id !== id),
+        {
+          queryKey: meKeys.reviewsAll(),
+        },
+        (old) => old?.filter((review) => review.id !== reviewId),
       );
 
-      return { previous };
+      return {
+        previous,
+      };
     },
-    onError: (_err, _id, context) => {
-      if (context) rollbackReviews(queryClient, context.previous);
+
+    onError: (_error, _reviewId, context) => {
+      if (context) {
+        rollbackReviews(queryClient, context.previous);
+      }
+
       toast.error('Failed to delete review');
     },
+
     onSuccess: () => {
-      invalidateAfterReviewChange(queryClient);
+      toast.success('Review deleted successfully!');
+    },
+
+    onSettled: async () => {
+      await invalidateReview(queryClient);
     },
   });
 };
