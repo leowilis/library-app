@@ -6,11 +6,7 @@ import { logout } from '@/store/authSlice';
 import { ROUTES } from '@/constants';
 import { Search } from 'lucide-react';
 
-import NavbarLogo from './NavbarLogo';
-import SearchBar from './SearchBar';
-import MobileSearch from './MobileSearch';
-import GuestMenu from './GuestMenu';
-import UserMenu from './UserMenu';
+import { NavbarLogo, SearchBar, MobileSearch, GuestMenu, UserMenu } from './';
 
 export default function Navbar() {
   const navigate = useNavigate();
