@@ -18,7 +18,12 @@ interface ReviewContext {
   previous: Array<[QueryKey, Review[] | undefined]>;
 }
 
-// Fetch reviews of a book.
+interface DeleteReviewPayload {
+  reviewId: number;
+  bookId: number;
+}
+
+// Fetch reviews of a specific book.
 export const useBookReviews = (
   bookId: number,
   params?: {
@@ -27,7 +32,7 @@ export const useBookReviews = (
   },
 ) => {
   return useQuery<Review[]>({
-    queryKey: [...reviewKeys.book(bookId), params],
+    queryKey: reviewKeys.book(bookId, params),
 
     queryFn: async () => {
       const { data } = await api.get<{
@@ -45,14 +50,16 @@ export const useBookReviews = (
   });
 };
 
-// Create / Update Review
+/**
+ * Create / Update review.
+ * Backend uses a single POST endpoint for review submission.
+ */
 export const useSubmitReview = () => {
   const queryClient = useQueryClient();
 
   return useMutation<unknown, Error, SubmitReviewPayload, ReviewContext>({
     mutationFn: async (payload) => {
       const { data } = await api.post(EndPoints.Reviews, payload);
-
       return data;
     },
 
@@ -65,7 +72,7 @@ export const useSubmitReview = () => {
         queryKey: meKeys.reviewsAll(),
       });
 
-      const newReview = createOptimisticReview(payload, {
+      const optimisticReview = createOptimisticReview(payload, {
         name: 'You',
       });
 
@@ -74,28 +81,20 @@ export const useSubmitReview = () => {
           queryKey: meKeys.reviewsAll(),
         },
         (old) => {
-          // CREATE
-          if (!('id' in payload)) {
-            if (!old) {
-              return [newReview];
-            }
-
-            const exists = old.some(
-              (review) => review.bookId === payload.bookId,
-            );
-
-            if (!exists) {
-              return [newReview, ...old];
-            }
-
-            return old;
+          if (!old) {
+            return [optimisticReview];
           }
 
-          // UPDATE
-          if (!old) return old;
+          const existingIndex = old.findIndex(
+            (review) => review.bookId === payload.bookId,
+          );
+
+          if (existingIndex === -1) {
+            return [optimisticReview, ...old];
+          }
 
           return old.map((review) =>
-            review.id === payload.id
+            review.bookId === payload.bookId
               ? {
                   ...review,
                   star: payload.star,
@@ -124,25 +123,23 @@ export const useSubmitReview = () => {
     },
 
     onSettled: async (_data, _error, variables) => {
-      if (!variables) return;
-
       await invalidateReview(queryClient, variables.bookId);
     },
   });
 };
 
-// Delete Review
+// Delete review.
 export const useDeleteReview = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<unknown, Error, number, ReviewContext>({
-    mutationFn: async (reviewId) => {
+  return useMutation<unknown, Error, DeleteReviewPayload, ReviewContext>({
+    mutationFn: async ({ reviewId }) => {
       const { data } = await api.delete(EndPoints.Review(reviewId));
 
       return data;
     },
 
-    onMutate: async (reviewId) => {
+    onMutate: async ({ reviewId }) => {
       await queryClient.cancelQueries({
         queryKey: meKeys.reviewsAll(),
       });
@@ -163,7 +160,7 @@ export const useDeleteReview = () => {
       };
     },
 
-    onError: (_error, _reviewId, context) => {
+    onError: (_error, _variables, context) => {
       if (context) {
         rollbackReviews(queryClient, context.previous);
       }
@@ -175,8 +172,8 @@ export const useDeleteReview = () => {
       toast.success('Review deleted successfully!');
     },
 
-    onSettled: async () => {
-      await invalidateReview(queryClient);
+    onSettled: async (_data, _error, variables) => {
+      await invalidateReview(queryClient, variables.bookId);
     },
   });
 };
