@@ -66,6 +66,8 @@ export const useBorrowBook = () => {
 
     // Sync server state after success
     onSettled: async (_data, _error, payload) => {
+      if (!payload) return;
+
       await Promise.all([
         invalidateBorrow(queryClient, payload.bookId),
         invalidateCart(queryClient),
