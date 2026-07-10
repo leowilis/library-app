@@ -14,7 +14,6 @@ export default function AdminLayout() {
   const location = useLocation();
 
   const logout = useLogout();
-
   const { user } = useSelector((state: RootState) => state.auth);
 
   const isFormPage =
