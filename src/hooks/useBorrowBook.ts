@@ -1,13 +1,14 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { api } from '@/lib/api';
-import { EndPoints, Query_Keys } from '@/constants';
+import { EndPoints } from '@/constants';
 import type { CreateLoanPayload } from '@/types/loan';
 import type { Book } from '@/types/book';
 import { bookKeys, meKeys } from '@/lib/queryKeys';
+import { invalidateCart } from '@/lib/queryHelpers';
 
 interface BorrowContext {
-  previousDetail: Book | undefined;
+  previousBook?: Book;
 }
 
 /**
@@ -21,8 +22,8 @@ export const useBorrowBook = () => {
 
   return useMutation<unknown, Error, CreateLoanPayload, BorrowContext>({
     mutationFn: async (payload) => {
-      const res = await api.post(EndPoints.Loans, payload);
-      return res.data;
+      const { data } = await api.post(EndPoints.Loans, payload);
+      return data;
     },
 
     onMutate: async (payload) => {
@@ -30,40 +31,56 @@ export const useBorrowBook = () => {
         queryKey: bookKeys.detail(payload.bookId),
       });
 
-      const previousDetail = queryClient.getQueryData<Book>(
+      const previousBook = queryClient.getQueryData<Book>(
         bookKeys.detail(payload.bookId),
       );
 
       // Optimistically decrement available copies
       queryClient.setQueryData<Book>(bookKeys.detail(payload.bookId), (old) => {
         if (!old) return old;
+
         return {
           ...old,
-          availableCopies: Math.max(0, (old.availableCopies ?? 1) - 1),
+          availableCopies: Math.max(0, (old.availableCopies ?? 0) - 1),
         };
       });
-      return { previousDetail };
+
+      return { previousBook };
     },
 
     // Rollback on failure
-    onError: (_err, payload, context) => {
-      if (context) {
+    onError: (_error, payload, context) => {
+      if (context?.previousBook) {
         queryClient.setQueryData(
           bookKeys.detail(payload.bookId),
-          context.previousDetail,
+          context.previousBook,
         );
       }
-      toast.error('Failed to borrow the book. Please try again.');
+
+      toast.error('Failed to borrow the book.');
+    },
+
+    onSuccess: () => {
+      toast.success('Book borrowed successfully!');
     },
 
     // Sync server state after success
-    onSuccess: (_data, payload) => {
-      queryClient.invalidateQueries({ queryKey: bookKeys.lists() });
-      queryClient.invalidateQueries({
-        queryKey: bookKeys.detail(payload.bookId),
-      });
-      queryClient.invalidateQueries({ queryKey: meKeys.loansAll() });
-      toast.success('Book borrowed successfully!');
+    onSettled: async (_data, _error, payload) => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: bookKeys.lists(),
+        }),
+
+        queryClient.invalidateQueries({
+          queryKey: bookKeys.detail(payload.bookId),
+        }),
+
+        queryClient.invalidateQueries({
+          queryKey: meKeys.loansAll(),
+        }),
+
+        invalidateCart(queryClient),
+      ]);
     },
   });
 };
