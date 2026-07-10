@@ -55,8 +55,11 @@ export const meKeys = {
 // Review Keys
 export const reviewKeys = {
   all: [Query_Keys.Reviews] as const,
-  book: (bookId: number) => [...reviewKeys.all, 'book', bookId] as const,
-  detail: (reviewId: number) => [...reviewKeys.all, reviewId] as const,
+  books: () => [...reviewKeys.all, 'book'] as const,
+  book: (bookId: number, params?: ReviewsParams) =>
+    [...reviewKeys.books(), bookId, params] as const,
+  details: () => [...reviewKeys.all, 'detail'] as const,
+  detail: (id: number) => [...reviewKeys.details(), id] as const,
 };
 
 // Cart Keys
@@ -79,7 +82,7 @@ export const authorKeys = {
     [Query_Keys.AuthorsBook, authorId, params] as const,
 };
 
-// Admin Keys
+// Admin Book Keys
 export const adminBookKeys = {
   all: [Query_Keys.AdminBooks] as const,
   list: () => [...adminBookKeys.all, 'list'] as const,
