@@ -4,8 +4,8 @@ import Background from '@/components/user/Background';
 
 import { useCategories } from '@/hooks/useCategories';
 import { usePopularAuthors } from '@/hooks/useAuthors';
-import { useRecommendedBooks } from '@/hooks/useBooks';
 import { PAGE_SIZE } from './constants';
+import { useRecommendedBooks } from '@/hooks/useRecommendedBooks';
 
 import CategorySection from './CategorySection';
 import RecommendationSection from './RecommendationSection';
