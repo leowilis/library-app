@@ -1,20 +1,24 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  useMutation,
+  useQueryClient,
+  type QueryKey,
+} from '@tanstack/react-query';
 import type { AxiosError } from 'axios';
 import { toast } from 'sonner';
 import { api } from '@/lib/api';
 import { EndPoints } from '@/constants';
-import { bookKeys, meKeys } from '@/lib/queryKeys';
+import { meKeys } from '@/lib/queryKeys';
 import type { Loan } from '@/types/loan';
+import { invalidateBorrow } from '@/lib/queryHelpers';
 
 // Types
-
 export interface ReturnBookPayload {
   loanId: number;
   bookId: number;
 }
 
 interface ReturnContext {
-  previousLoans: Array<[readonly unknown[], Loan[] | undefined]>;
+  previousLoans: Array<[QueryKey, Loan[] | undefined]>;
 }
 
 // Hook
@@ -43,13 +47,16 @@ export const useReturnBook = () => {
         { queryKey: meKeys.loansAll() },
         (old) =>
           old?.map((loan) =>
-            loan.id === loanId ? { ...loan, status: 'RETURNED' as const } : loan,
+            loan.id === loanId
+              ? { ...loan, status: 'RETURNED' as const }
+              : loan,
           ),
       );
 
       return { previousLoans };
     },
 
+    // Rollback on failure
     onError: (_err, _payload, context) => {
       context?.previousLoans.forEach(([key, data]) => {
         queryClient.setQueryData(key, data);
@@ -57,14 +64,15 @@ export const useReturnBook = () => {
       toast.error('Failed to return book. Please try again.');
     },
 
-    // `variables` here is the same `{ loanId, bookId }` passed to mutate(),
-    // so we can target exactly the book that was returned instead of
-    // invalidating every cached book detail.
-    onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: meKeys.loansAll() });
-      queryClient.invalidateQueries({ queryKey: bookKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: bookKeys.detail(variables.bookId) });
+    onSuccess: () => {
       toast.success('Book returned successfully!');
+    },
+
+    // Sync server state after success
+    onSettled: async (_data, _error, variables) => {
+      if (!variables) return;
+
+      await invalidateBorrow(queryClient, variables.bookId);
     },
   });
 };
