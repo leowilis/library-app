@@ -1,4 +1,5 @@
 import { Query_Keys } from '@/constants';
+import type { LoanStatusFilter } from '@/types/admin/admin';
 
 // Parameters Interface
 export interface BooksParams {
@@ -90,8 +91,9 @@ export const adminBookKeys = {
 
 // Admin Loan Keys
 export const adminLoanKeys = {
-  all: [Query_Keys.AdminLoans] as const,
-  list: () => [...adminLoanKeys.all, 'list'] as const,
+  all: ['adminLoans'] as const,
+  list: (page: number, status?: LoanStatusFilter, q = '') =>
+    [...adminLoanKeys.all, page, status, q] as const,
 };
 
 // Admin User Keys
