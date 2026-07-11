@@ -1,23 +1,24 @@
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import type { PropsWithChildren } from 'react';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import type { RootState } from '@/store';
+import { ROUTES } from '@/constants';
 import UserLayout from '@/components/layout/user/Layout';
 import Home from '@/pages/user/Home/Home';
 import ProfilePage from '@/pages/user/ProfilePage';
 import SearchPage from '@/pages/user/SearchPage';
 import BookDetail from '@/pages/user/BookDetail/BookDetail';
-import BooksByAuthorPage from '@/pages/Author/AuthorBook';
-import { useSelector } from 'react-redux';
-import type { RootState } from '@/store';
+import BooksByAuthorPage from '@/pages/Author/BooksByAuthorPage';
 
-// Auth Guard
-function PrivateRoute({ children }: { children: React.ReactNode }) {
+function PrivateRoute({ children }: PropsWithChildren) {
   const { token } = useSelector((state: RootState) => state.auth);
-  return token ? <>{children}</> : <Navigate to='/login' replace />;
+  return token ? children : <Navigate to={ROUTES.Login} replace />;
 }
 
-// Router Wrapper For Re-Mounting Search
 function SearchRouterWrapper() {
   const location = useLocation();
-  return <SearchPage key={location.pathname + location.search} />;
+  const key = `${location.pathname}${location.search}`;
+  return <SearchPage key={key} />;
 }
 
 export default function UserRoutes() {
@@ -25,6 +26,7 @@ export default function UserRoutes() {
     <UserLayout>
       <Routes>
         <Route path='/' element={<Home />} />
+
         <Route
           path='profile'
           element={
@@ -33,10 +35,12 @@ export default function UserRoutes() {
             </PrivateRoute>
           }
         />
+
         <Route path='search' element={<SearchRouterWrapper />} />
         <Route path='books/:id' element={<BookDetail />} />
         <Route path='category/:id' element={<SearchRouterWrapper />} />
         <Route path='authors/:id/books' element={<BooksByAuthorPage />} />
+        <Route path='*' element={<Navigate to='/' replace />} />
       </Routes>
     </UserLayout>
   );
