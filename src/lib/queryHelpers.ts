@@ -2,6 +2,7 @@ import type { QueryClient, QueryKey } from '@tanstack/react-query';
 import type { Review } from '@/types/review';
 
 import { bookKeys, cartKeys, meKeys, reviewKeys } from './queryKeys';
+import type { AdminLoan } from '@/types/admin/admin';
 
 // Invalidate all queries related to borrowing/returning books.
 export async function invalidateBorrow(
@@ -75,4 +76,20 @@ export async function invalidateReview(
   }
 
   await Promise.all(tasks);
+}
+
+export function getBorrowerName(loan: AdminLoan): string {
+  return loan.borrower?.name ?? loan.user?.name ?? '-';
+}
+
+export function filterLoans(loans: AdminLoan[], search: string) {
+  const keyword = search.trim().toLowerCase();
+
+  if (!keyword) return loans;
+
+  return loans.filter(
+    (loan) =>
+      loan.book?.title?.toLowerCase().includes(keyword) ||
+      getBorrowerName(loan).toLowerCase().includes(keyword),
+  );
 }
