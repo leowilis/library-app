@@ -7,36 +7,24 @@ import { api } from '@/lib/api';
 import { EndPoints, Query_Keys, ROUTES } from '@/constants';
 import { bookKeys } from '@/lib/queryKeys';
 
-import { useBookDetail } from '@/hooks/useBooks';
+import { useBookDetail } from '@/hooks/useBookDetail';
 import { useCategories } from '@/hooks/useCategories';
 
 import { INITIAL_FORM } from './constant';
 import { buildBookPayload } from './helpers';
 import { validateBookForm } from './validation';
 
-import type {
-  BookFormState,
-  FormErrors,
-  BookFormChangeHandler,
-} from './type';
+import type { BookFormState, FormErrors, BookFormChangeHandler } from './type';
 
 export function useBookForm() {
   const { id } = useParams<{ id: string }>();
-
   const isEdit = Boolean(id);
-
   const navigate = useNavigate();
-
   const queryClient = useQueryClient();
-
   const [form, setForm] = useState<BookFormState>(INITIAL_FORM);
-
   const [errors, setErrors] = useState<FormErrors>({});
-
   const { data: categoriesData } = useCategories();
-
   const categories = categoriesData ?? [];
-
   const { data: book } = useBookDetail(Number(id));
 
   useEffect(() => {
@@ -66,7 +54,9 @@ export function useBookForm() {
     },
 
     onSuccess: () => {
-      toast.success(isEdit ? 'Book updated successfully.' : 'Book added successfully.');
+      toast.success(
+        isEdit ? 'Book updated successfully.' : 'Book added successfully.',
+      );
 
       queryClient.invalidateQueries({
         queryKey: [Query_Keys.AdminBooks],
@@ -87,11 +77,7 @@ export function useBookForm() {
     },
 
     onError: () => {
-      toast.error(
-        isEdit
-          ? 'Failed to update book.'
-          : 'Failed to add book.',
-      );
+      toast.error(isEdit ? 'Failed to update book.' : 'Failed to add book.');
     },
   });
 
@@ -109,9 +95,7 @@ export function useBookForm() {
     }));
   };
 
-  const handleSubmit = (
-    e: React.FormEvent<HTMLFormElement>,
-  ) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const validationErrors = validateBookForm(form);
