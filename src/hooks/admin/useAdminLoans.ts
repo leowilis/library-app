@@ -1,30 +1,51 @@
 import { useQuery } from '@tanstack/react-query';
+
+import { EndPoints } from '@/constants';
 import { api } from '@/lib/api';
-import { EndPoints, Query_Keys } from '@/constants';
+import { adminLoanKeys } from '@/lib/queryKeys';
+
 import type { AdminLoansResponse, LoanStatusFilter } from '@/types/admin/admin';
 
 const PAGE_SIZE = 15;
 
 /**
- * Fetches paginated loans from the admin loans endpoint.
- * When `status` is `"overdue"`, uses the dedicated overdue endpoint
- * and normalizes the response to always return `AdminLoansResponse`.
+ * Fetch paginated admin loans.
+ * Supports:
+ * - pagination
+ * - status filter
+ * - search
+ * - overdue endpoint normalization
  */
-export function useAdminLoans(page: number, status: LoanStatusFilter) {
+export function useAdminLoans(page: number, status?: LoanStatusFilter, q = '') {
+  const normalizedQuery = q.trim();
   const isOverdue = status === 'overdue';
 
   return useQuery<AdminLoansResponse>({
-    queryKey: [Query_Keys.AdminLoans, page, status],
+    queryKey: adminLoanKeys.list(page, status, normalizedQuery),
+
     queryFn: async () => {
-      const res = await api.get<{
-        data: AdminLoansResponse & { overdue?: AdminLoansResponse['loans'] };
+      const { data } = await api.get<{
+        data: AdminLoansResponse & {
+          overdue?: AdminLoansResponse['loans'];
+        };
       }>(isOverdue ? EndPoints.AdminLoansOverdue : EndPoints.AdminLoans, {
-        params: { page, limit: PAGE_SIZE, ...(!isOverdue && { status }) },
+        params: {
+          page,
+          limit: PAGE_SIZE,
+
+          ...(!isOverdue &&
+            status && {
+              status,
+            }),
+
+          ...(normalizedQuery && {
+            q: normalizedQuery,
+          }),
+        },
       });
 
-      const payload = res.data.data;
+      const payload = data.data;
 
-      // Overdue endpoint returns { overdue: AdminLoan[] } — normalize to AdminLoansResponse
       if (isOverdue && Array.isArray(payload.overdue)) {
         return {
           loans: payload.overdue,
@@ -39,5 +60,7 @@ export function useAdminLoans(page: number, status: LoanStatusFilter) {
 
       return payload;
     },
+
+    placeholderData: (previous) => previous,
   });
 }
