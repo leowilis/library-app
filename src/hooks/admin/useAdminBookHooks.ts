@@ -1,11 +1,12 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { AxiosError } from 'axios';
 import { toast } from 'sonner';
-import { api } from '@/lib/api';
-import { EndPoints, Query_Keys } from '@/constants';
-import type { AdminBook, AdminBooksResponse } from '@/types/admin/admin';
 
-// Types
+import { EndPoints } from '@/constants';
+import { adminBookKeys } from '@/lib/queryKeys';
+import { api } from '@/lib/api';
+
+import type { AdminBook, AdminBooksResponse } from '@/types/admin/admin';
 
 const PAGE_SIZE = 10;
 
@@ -13,30 +14,38 @@ interface DeleteContext {
   previous: AdminBooksResponse | undefined;
 }
 
-// Hooks
+// Fetch paginated admin books with optional server-side search.
+export function useAdminBooks(page: number, q = '') {
+  const normalizedQuery = q.trim();
 
-// Fetches a paginated list of books from `GET /api/admin/books`.
-export function useAdminBooks(page: number) {
   return useQuery<AdminBooksResponse>({
-    queryKey: [Query_Keys.AdminBooks, page],
+    queryKey: adminBookKeys.list(page, normalizedQuery),
+
     queryFn: async () => {
       const res = await api.get<{ data: AdminBooksResponse }>(
         EndPoints.AdminBooks,
         {
-          params: { page, limit: PAGE_SIZE },
+          params: {
+            page,
+            limit: PAGE_SIZE,
+            status: 'all',
+            ...(normalizedQuery && { q: normalizedQuery }),
+          },
         },
       );
+
       return res.data.data;
     },
+
+    // Prevent table flicker when page/search changes
+    placeholderData: (previous) => previous,
   });
 }
 
-/**
- * Deletes a book by ID with optimistic UI update.
- * Immediately removes the book from the cache and rolls back on failure.
- */
-export function useDeleteBook(page: number, onSuccess: () => void) {
+// Delete a book with optimistic cache update.
+export function useDeleteBook(page: number, q: string, onSuccess: () => void) {
   const queryClient = useQueryClient();
+  const normalizedQuery = q.trim();
 
   return useMutation<
     void,
@@ -47,41 +56,46 @@ export function useDeleteBook(page: number, onSuccess: () => void) {
     mutationFn: async (id) => {
       await api.delete(EndPoints.BooksDetail(id));
     },
+
     onMutate: async (id) => {
+      const queryKey = adminBookKeys.list(page, normalizedQuery);
+
       await queryClient.cancelQueries({
-        queryKey: [Query_Keys.AdminBooks, page],
+        queryKey,
       });
 
-      const previous = queryClient.getQueryData<AdminBooksResponse>([
-        Query_Keys.AdminBooks,
-        page,
-      ]);
+      const previous = queryClient.getQueryData<AdminBooksResponse>(queryKey);
 
-      queryClient.setQueryData<AdminBooksResponse>(
-        [Query_Keys.AdminBooks, page],
-        (old) => {
-          if (!old) return old;
-          return {
-            ...old,
-            books: old.books.filter((b: AdminBook) => b.id !== id),
-          };
-        },
-      );
+      queryClient.setQueryData<AdminBooksResponse>(queryKey, (old) => {
+        if (!old) return old;
+
+        return {
+          ...old,
+          books: old.books.filter((book: AdminBook) => book.id !== id),
+        };
+      });
 
       return { previous };
     },
-    onError: (err, _id, context) => {
+
+    onError: (error, _id, context) => {
       if (context?.previous) {
         queryClient.setQueryData(
-          [Query_Keys.AdminBooks, page],
+          adminBookKeys.list(page, normalizedQuery),
           context.previous,
         );
       }
-      toast.error(err.response?.data?.message ?? 'Failed to delete book');
+
+      toast.error(error.response?.data?.message ?? 'Failed to delete book.');
     },
+
     onSuccess: () => {
-      toast.success('Book deleted!');
-      queryClient.invalidateQueries({ queryKey: [Query_Keys.AdminBooks] });
+      toast.success('Book deleted successfully.');
+
+      queryClient.invalidateQueries({
+        queryKey: adminBookKeys.all,
+      });
+
       onSuccess();
     },
   });
