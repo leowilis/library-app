@@ -10,6 +10,8 @@ import LoadMoreButton from '@/common/LoadMoreButton';
 import useSearchFilters from '@/hooks/useSearchFilters';
 import { useBooks } from '@/hooks/useBooks';
 import { useCategories } from '@/hooks/useCategories';
+import EmptyState from '@/common/EmptyState';
+import ErrorState from '@/common/ErrorState';
 
 export default function SearchPage() {
   const navigate = useNavigate();
@@ -31,6 +33,7 @@ export default function SearchPage() {
     data: booksData,
     isLoading,
     isFetching,
+    isError,
   } = useBooks({
     q: search,
     categoryId: selectedCategoryId,
@@ -40,15 +43,16 @@ export default function SearchPage() {
   });
 
   const books = booksData?.books ?? [];
-  const pagination = booksData?.pagination;
+  const hasNextPage = booksData?.pagination?.hasNextPage ?? false;
 
-  const filterProps = {
-    categories,
-    selectedCategoryId,
-    minRating,
-    onCategoryChange: handleCategoryChange,
-    onRatingChange: handleRatingChange,
-  };
+  if (isError) {
+    return (
+      <ErrorState
+        title='Failed to load books'
+        description='Please try again later.'
+      />
+    );
+  }
 
   return (
     <section className='mt-2 md:mt-6'>
@@ -61,12 +65,24 @@ export default function SearchPage() {
 
       <div className='flex flex-col gap-8 md:flex-row'>
         {/* DESKTOP SIDEBAR */}
-        <FilterSidebar {...filterProps} />
+        <FilterSidebar
+          categories={categories}
+          selectedCategoryId={selectedCategoryId}
+          minRating={minRating}
+          onCategoryChange={handleCategoryChange}
+          onRatingChange={handleRatingChange}
+        />
 
         {/* MAIN CONTENT */}
         <div className='flex-1'>
           {/* Mobile filter bar */}
-          <MobileFilter {...filterProps} />
+          <MobileFilter
+            categories={categories}
+            selectedCategoryId={selectedCategoryId}
+            minRating={minRating}
+            onCategoryChange={handleCategoryChange}
+            onRatingChange={handleRatingChange}
+          />
           {/* Book grid */}
           <div className='space-y-8'>
             <BookGrid
@@ -75,10 +91,17 @@ export default function SearchPage() {
               onBookClick={(bookId) => navigate(ROUTES.BookDetail(bookId))}
             />
 
+            {!isLoading && books.length === 0 && (
+              <EmptyState
+                title='No books found'
+                description='Try changing the search keyword or filters.'
+              />
+            )}
+
             {/* Load more */}
             <LoadMoreButton
-              show={pagination?.hasNextPage ?? false}
-              loading={isFetching}
+              show={hasNextPage}
+              loading={isFetching && page > 1}
               onClick={() => setPage((prev) => prev + 1)}
             />
           </div>
