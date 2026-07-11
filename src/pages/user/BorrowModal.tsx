@@ -48,13 +48,28 @@ export default function BorrowModal({
       : 'bg-green-100 text-green-700';
 
   return (
-    <div className='fixed inset-0 z-50 flex items-end justify-center md:items-center'>
-      <div className='absolute inset-0 bg-black/40' onClick={onClose} />
+    <div
+      role='dialog'
+      aria-modal='true'
+      aria-labelledby='borrow-modal-title'
+      className='fixed inset-0 z-50 flex items-end justify-center md:items-center'
+    >
+      <div
+        aria-hidden='true'
+        className='absolute inset-0 bg-black/40'
+        onClick={isPending ? undefined : onClose}
+      />
       <div className='relative bg-white w-full md:w-[420px] rounded-t-3xl md:rounded-3xl p-6 space-y-5'>
         {/* Header */}
         <div className='flex items-center justify-between'>
-          <h3 className='text-lg font-bold text-gray-900'>Borrow Book</h3>
+          <h3
+            id='borrow-modal-title'
+            className='text-lg font-bold text-gray-900'
+          >
+            Borrow Book
+          </h3>
           <button
+            type='button'
             onClick={onClose}
             className='text-gray-400 text-2xl leading-none'
           >
@@ -79,14 +94,14 @@ export default function BorrowModal({
             {DAY_OPTIONS.map((d) => (
               <button
                 key={d}
+                type='button'
                 onClick={() => setDays(d)}
                 disabled={isOutOfStock}
-                className='py-2 rounded-xl text-sm font-semibold border-2 transition-all disabled:opacity-40'
-                style={{
-                  backgroundColor: days === d ? '#E0ECFF' : 'white',
-                  borderColor: days === d ? '#1c65da' : '#e5e7eb',
-                  color: days === d ? '#1c65da' : '#374151',
-                }}
+                className={`py-2 rounded-xl border-2 text-sm font-semibold transition-all disabled:opacity-40 ${
+                  days === d
+                    ? 'bg-[#E0ECFF] border-[#1c65da] text-[#1c65da]'
+                    : 'bg-white border-gray-200 text-gray-700'
+                }`}
               >
                 {d} days
               </button>
@@ -105,15 +120,20 @@ export default function BorrowModal({
             max={90}
             value={days}
             disabled={isOutOfStock}
-            onChange={(e) =>
-              setDays(Math.max(1, Math.min(90, Number(e.target.value))))
-            }
+            onChange={(e) => {
+              const value = Number(e.target.value);
+
+              if (!Number.isNaN(value)) {
+                setDays(Math.max(1, Math.min(90, value)));
+              }
+            }}
             className='w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-blue-400 disabled:opacity-40 disabled:bg-gray-50'
           />
         </div>
 
         {/* Submit button */}
         <button
+          type='button'
           onClick={handleBorrow}
           disabled={isOutOfStock || isPending}
           className='w-full py-3.5 rounded-full font-semibold text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed'
