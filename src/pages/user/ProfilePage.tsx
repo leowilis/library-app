@@ -3,9 +3,9 @@ import type { ReactNode } from 'react';
 
 import { cn } from '@/lib/utils';
 
-import ProfileTab from './ProfileTab';
-import ReviewsTab from './ReviewsTab';
+import ProfileTab from './ProfileTab/ProfileTab';
 import BorrowedTab from './BorrowedTab';
+import ReviewsTab from './ReviewsTab/ReviewsTab';
 
 type Tab = 'profile' | 'borrowed' | 'reviews';
 
