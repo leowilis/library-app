@@ -174,4 +174,14 @@ export function SkeletonBookPreview() {
   );
 }
 
+export function BorrowedSkeleton() {
+  return (
+    <div className='space-y-3'>
+      {Array.from({ length: 3 }).map((_, index) => (
+        <Skeleton key={index} className='h-32 rounded-2xl' />
+      ))}
+    </div>
+  );
+}
+
 export default Skeleton;
