@@ -4,6 +4,10 @@ interface SkeletonProps {
   className?: string;
 }
 
+/**
+ * Skeleton Atom Component — The baseline pulsating placeholder engine.
+ * Fully optimized with unified theme management classes.
+ */
 function Skeleton({ className }: SkeletonProps) {
   return (
     <div
@@ -13,7 +17,7 @@ function Skeleton({ className }: SkeletonProps) {
   );
 }
 
-// Reusable skeleton loader for loading states
+// Reusable skeleton variants for layout loading states
 export function SkeletonCard() {
   return (
     <div className='bg-white rounded-2xl p-4 shadow-sm animate-pulse'>
@@ -54,7 +58,10 @@ export function SkeletonProfileCard() {
       ))}
       <div className='grid grid-cols-2 gap-3'>
         {[1, 2, 3, 4].map((i) => (
-          <Skeleton key={i} className='h-20 bg-gray-100 rounded-2xl animate-pulse' />
+          <Skeleton
+            key={i}
+            className='h-20 bg-gray-100 rounded-2xl animate-pulse'
+          />
         ))}
       </div>
     </div>
@@ -98,6 +105,72 @@ export function SkeletonTable({
         </tr>
       ))}
     </>
+  );
+}
+
+export function SkeletonBookPreview() {
+  return (
+    <section aria-label='Loading book preview' className='max-w-5xl space-y-8'>
+      {/* Back Button */}
+      <Skeleton className='h-5 w-36' />
+
+      {/* Main Content */}
+      <div className='md:flex md:gap-10'>
+        {/* Cover */}
+        <Skeleton className='h-80 w-full md:w-56' />
+
+        {/* Book Information */}
+        <div className='mt-6 flex-1 space-y-4 md:mt-0'>
+          <Skeleton className='h-6 w-24' />
+          <Skeleton className='h-9 w-3/4' />
+          <Skeleton className='h-4 w-40' />
+          <Skeleton className='h-5 w-32' />
+
+          {/* Statistics */}
+          <div className='flex gap-8 border-y border-gray-100 py-4'>
+            {Array.from({ length: 4 }).map((_, index) => (
+              <div key={index} className='space-y-2'>
+                <Skeleton className='h-6 w-10' />
+                <Skeleton className='h-3 w-14' />
+              </div>
+            ))}
+          </div>
+
+          {/* Description */}
+          <div className='space-y-3'>
+            <Skeleton className='h-5 w-28' />
+
+            <div className='space-y-2'>
+              <Skeleton className='h-4' />
+              <Skeleton className='h-4' />
+              <Skeleton className='h-4 w-3/4' />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Reviews */}
+      <div className='space-y-4'>
+        <Skeleton className='h-6 w-32' />
+
+        <div className='grid gap-4 md:grid-cols-2'>
+          {Array.from({ length: 2 }).map((_, index) => (
+            <SkeletonReviewCard key={index} />
+          ))}
+        </div>
+      </div>
+
+      {/* Related Books */}
+      <div className='space-y-4'>
+        <Skeleton className='h-6 w-40' />
+
+        <div className='grid grid-cols-2 gap-4 md:grid-cols-5'>
+          {Array.from({ length: 5 }).map((_, index) => (
+            <SkeletonBookCard key={index} />
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
