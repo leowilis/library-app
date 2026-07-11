@@ -4,9 +4,9 @@ import { useSelector } from 'react-redux';
 import type { RootState } from '@/store';
 import { ROUTES } from '@/constants';
 import UserLayout from '@/components/layout/user/Layout';
+import SearchPage from '@/pages/user/SearchPage/SearchPage';
 import Home from '@/pages/user/Home/Home';
 import ProfilePage from '@/pages/user/ProfilePage';
-import SearchPage from '@/pages/user/SearchPage';
 import BookDetail from '@/pages/user/BookDetail/BookDetail';
 import BooksByAuthorPage from '@/pages/Author/BooksByAuthorPage';
 
