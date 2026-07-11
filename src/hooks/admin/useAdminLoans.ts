@@ -8,6 +8,12 @@ import type { AdminLoansResponse, LoanStatusFilter } from '@/types/admin/admin';
 
 const PAGE_SIZE = 15;
 
+interface AdminLoanApiResponse {
+  data: AdminLoansResponse & {
+    overdue?: AdminLoansResponse['loans'];
+  };
+}
+
 /**
  * Fetch paginated admin loans.
  * Supports:
@@ -24,25 +30,26 @@ export function useAdminLoans(page: number, status?: LoanStatusFilter, q = '') {
     queryKey: adminLoanKeys.list(page, status, normalizedQuery),
 
     queryFn: async () => {
-      const { data } = await api.get<{
-        data: AdminLoansResponse & {
-          overdue?: AdminLoansResponse['loans'];
-        };
-      }>(isOverdue ? EndPoints.AdminLoansOverdue : EndPoints.AdminLoans, {
-        params: {
-          page,
-          limit: PAGE_SIZE,
+      const params = {
+        page,
+        limit: PAGE_SIZE,
 
-          ...(!isOverdue &&
-            status && {
-              status,
-            }),
-
-          ...(normalizedQuery && {
-            q: normalizedQuery,
+        ...(!isOverdue &&
+          status && {
+            status,
           }),
+
+        ...(normalizedQuery && {
+          q: normalizedQuery,
+        }),
+      };
+
+      const { data } = await api.get<AdminLoanApiResponse>(
+        isOverdue ? EndPoints.AdminLoansOverdue : EndPoints.AdminLoans,
+        {
+          params,
         },
-      });
+      );
 
       const payload = data.data;
 
