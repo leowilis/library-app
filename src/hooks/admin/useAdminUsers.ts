@@ -1,26 +1,34 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api';
-import { EndPoints, Query_Keys } from '@/constants';
+import { EndPoints } from '@/constants';
 import type { AdminUsersResponse } from '@/types/admin/admin';
+import { adminUserKeys } from '@/lib/queryKeys';
 
 const PAGE_SIZE = 10;
 
-/**
- * Fetches a paginated list of users from `GET /api/admin/users`.
- *
- * Current page number (1-indexed).
- */
-export function useAdminUsers(page: number) {
+export function useAdminUsers(page: number, q = '') {
+  const normalizedQuery = q.trim();
+
   return useQuery<AdminUsersResponse>({
-    queryKey: [Query_Keys.AdminUsers, page],
+    queryKey: adminUserKeys.list(page, normalizedQuery),
+
     queryFn: async () => {
-      const res = await api.get<{ data: AdminUsersResponse }>(
+      const { data } = await api.get<{ data: AdminUsersResponse }>(
         EndPoints.AdminUsers,
         {
-          params: { page, limit: PAGE_SIZE },
+          params: {
+            page,
+            limit: PAGE_SIZE,
+
+            ...(normalizedQuery && {
+              q: normalizedQuery,
+            }),
+          },
         },
       );
-      return res.data.data;
+      return data.data;
     },
+
+    placeholderData: (previous) => previous,
   });
 }
