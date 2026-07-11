@@ -1,3 +1,5 @@
+import { cn } from '@/lib/utils';
+
 interface PaginationProps {
   page: number;
   total: number;
@@ -28,8 +30,8 @@ export default function Pagination({
         <button
           type='button'
           disabled={page === 1}
-          onClick={() => onPageChange(Math.max(1, page - 1))}
-          className='rounded-lg border border-gray-200 px-3 py-1.5 text-xs disabled:opacity-40'
+          onClick={() => onPageChange(page - 1)}
+          className='rounded-lg border border-gray-200 px-3 py-1.5 text-xs transition-colors hover:bg-gray-50 disabled:pointer-events-none disabled:opacity-40'
         >
           Previous
         </button>
@@ -46,11 +48,12 @@ export default function Pagination({
               type='button'
               aria-current={active ? 'page' : undefined}
               onClick={() => onPageChange(target)}
-              className={`h-8 w-8 rounded-lg border text-xs ${
+              className={cn(
+                'h-8 w-8 rounded-lg border text-xs transition-colors',
                 active
                   ? 'border-blue-600 bg-blue-600 text-white'
-                  : 'border-gray-200 bg-white text-gray-700'
-              }`}
+                  : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50',
+              )}
             >
               {target}
             </button>
@@ -60,8 +63,8 @@ export default function Pagination({
         <button
           type='button'
           disabled={page === totalPages}
-          onClick={() => onPageChange(Math.min(totalPages, page + 1))}
-          className='rounded-lg border border-gray-200 px-3 py-1.5 text-xs disabled:opacity-40'
+          onClick={() => onPageChange(page + 1)}
+          className='rounded-lg border border-gray-200 px-3 py-1.5 text-xs transition-colors hover:bg-gray-50 disabled:pointer-events-none disabled:opacity-40'
         >
           Next
         </button>
