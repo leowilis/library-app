@@ -84,8 +84,8 @@ export const authorKeys = {
 
 // Admin Book Keys
 export const adminBookKeys = {
-  all: [Query_Keys.AdminBooks] as const,
-  list: () => [...adminBookKeys.all, 'list'] as const,
+  all: ['adminBooks'] as const,
+  list: (page: number, q = '') => [...adminBookKeys.all, page, q] as const,
 };
 
 // Admin Loan Keys
