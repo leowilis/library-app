@@ -184,4 +184,17 @@ export function BorrowedSkeleton() {
   );
 }
 
+export function UserSkeleton() {
+  return (
+    <div className='space-y-3'>
+      {Array.from({ length: 10 }).map((_, index) => (
+        <Skeleton
+          key={index}
+          className='h-14 rounded-xl bg-gray-100 animate-pulse'
+        />
+      ))}
+    </div>
+  );
+}
+
 export default Skeleton;
