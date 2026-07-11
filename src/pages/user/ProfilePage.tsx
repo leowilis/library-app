@@ -1,45 +1,49 @@
-import { useSearchParams } from "react-router-dom"
-import type { JSX } from "react"
-import ProfileTab from "./ProfileTab"
-import BorrowedTab from "@/pages/user/BorrowTab"
-import ReviewsTab from "./ReviewsTab"
+import { useSearchParams } from 'react-router-dom';
+import type { ReactNode } from 'react';
 
-type Tab = "profile" | "borrowed" | "reviews"
+import { cn } from '@/lib/utils';
+
+import ProfileTab from './ProfileTab';
+import ReviewsTab from './ReviewsTab';
+import BorrowedTab from './BorrowedTab';
+
+type Tab = 'profile' | 'borrowed' | 'reviews';
 
 const TABS: { key: Tab; label: string }[] = [
-  { key: "profile", label: "Profile" },
-  { key: "borrowed", label: "Borrowed List" },
-  { key: "reviews", label: "Reviews" },
-]
+  { key: 'profile', label: 'Profile' },
+  { key: 'borrowed', label: 'Borrowed List' },
+  { key: 'reviews', label: 'Reviews' },
+];
 
-const TAB_COMPONENTS: Record<Tab, JSX.Element> = {
+const TAB_COMPONENTS: Record<Tab, ReactNode> = {
   profile: <ProfileTab />,
   borrowed: <BorrowedTab />,
   reviews: <ReviewsTab />,
-}
+};
 
 export default function ProfilePage() {
-  const [searchParams, setSearchParams] = useSearchParams()
-  const activeTab = (searchParams.get("tab") as Tab) ?? "profile"
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const handleTabChange = (tab: Tab) => {
-    setSearchParams({ tab })
-  }
+  const currentTab = searchParams.get('tab');
+
+  const activeTab: Tab = TABS.some((tab) => tab.key === currentTab)
+    ? (currentTab as Tab)
+    : 'profile';
 
   return (
-    <div className="px-2 pt-4 pb-10 space-y-7 md:py-3 md:px-10">
-      <div className="flex bg-neutral-100 rounded-2xl p-2 md:w-fit">
+    <div className='space-y-6 px-4 pt-4 pb-10 md:px-10 md:py-3'>
+      <div className='flex rounded-2xl bg-neutral-100 p-2 md:w-fit'>
         {TABS.map(({ key, label }) => (
           <button
             key={key}
-            onClick={() => handleTabChange(key)}
-            className="flex-1 py-3 rounded-xl text-sm font-bold transition-all md:flex-none md:px-20 md:py-3 md:text-sm"
-            style={{
-              backgroundColor: activeTab === key ? "white" : "transparent",
-              color: activeTab === key ? "var(--primary-600)" : "#535862",
-              fontWeight: activeTab === key ? 600 : 400,
-              boxShadow: activeTab === key ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
-            }}
+            type='button'
+            onClick={() => setSearchParams({ tab: key })}
+            className={cn(
+              'flex-1 rounded-xl py-3 text-sm transition-all md:flex-none md:px-20',
+              activeTab === key
+                ? 'bg-white font-semibold text-primary-600 shadow'
+                : 'bg-transparent font-normal text-neutral-600',
+            )}
           >
             {label}
           </button>
@@ -48,5 +52,5 @@ export default function ProfilePage() {
 
       {TAB_COMPONENTS[activeTab]}
     </div>
-  )
+  );
 }
