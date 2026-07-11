@@ -1,17 +1,19 @@
+import type { PropsWithChildren } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/store';
 import { ROUTES } from '@/constants';
-import AdminLayout from '@/components/layout/admin/Layout';
+import AdminLayout from '@/components/layout/admin/AdminLayout';
 import AdminDashboard from '@/pages/admin/Dashboard';
-import AdminBorrowedList from '@/pages/admin/BorrowedList';
-import AdminUserList from '@/pages/admin/UserList';
-import AdminBookList from '@/pages/admin/BookList';
-import AdminBookForm from '@/pages/admin/BookForm';
-import AdminBookPreview from '@/pages/admin/BookPreview';
+import AdminBorrowedList from '@/pages/admin/BorrowedList/AdminBorrowedList';
+import AdminUserList from '@/pages/admin/UserList/AdminUserList';
+import AdminBookList from '@/pages/admin/booklist/AdminBookList';
+import AdminBookForm from '@/pages/admin/BookForm/BookForm';
+import AdminBookPreview from '@/pages/admin/BookPreview/AdminBookPreview';
 
-// Admin Guard (Route Protection)
-function AdminGuard({ children }: { children: React.ReactNode }) {
+const adminPath = (path: string) => path.replace('/admin/', '');
+
+function AdminGuard({ children }: PropsWithChildren) {
   const { token, user } = useSelector((state: RootState) => state.auth);
 
   if (!token || user?.role !== 'ADMIN') {
@@ -21,50 +23,49 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-// Admin Router Configuration
 export default function AdminRouter() {
   return (
     <AdminGuard>
       <Routes>
         <Route element={<AdminLayout />}>
           <Route
-            path={ROUTES.AdminDashboard.replace('/admin/', '')}
+            path={adminPath(ROUTES.AdminDashboard)}
             element={<AdminDashboard />}
           />
 
           <Route
-            path={ROUTES.AdminBorrowed.replace('/admin/', '')}
+            path={adminPath(ROUTES.AdminBorrowed)}
             element={<AdminBorrowedList />}
           />
 
           <Route
-            path={ROUTES.AdminUsers.replace('/admin/', '')}
+            path={adminPath(ROUTES.AdminUsers)}
             element={<AdminUserList />}
           />
 
           <Route
-            path={ROUTES.AdminBooks.replace('/admin/', '')}
+            path={adminPath(ROUTES.AdminBooks)}
             element={<AdminBookList />}
           />
 
           <Route
-            path={ROUTES.AdminBookAdd.replace('/admin/', '')}
+            path={adminPath(ROUTES.AdminBookAdd)}
             element={<AdminBookForm />}
           />
 
           <Route
-            path={ROUTES.AdminBookEdit(':id').replace('/admin/', '')}
+            path={adminPath(ROUTES.AdminBookEdit(':id'))}
             element={<AdminBookForm />}
           />
 
           <Route
-            path={ROUTES.AdminBookPreview(':id').replace('/admin/', '')}
+            path={adminPath(ROUTES.AdminBookPreview(':id'))}
             element={<AdminBookPreview />}
           />
 
           <Route
-            path={ROUTES.NotFound}
-            element={<Navigate to={ROUTES.AdminBorrowed} replace />}
+            path='*'
+            element={<Navigate to={ROUTES.AdminDashboard} replace />}
           />
         </Route>
       </Routes>
