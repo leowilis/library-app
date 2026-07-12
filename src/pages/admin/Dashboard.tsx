@@ -3,7 +3,6 @@ import {
   Users,
   BookMarked,
   AlertTriangle,
-  AlertCircle,
 } from 'lucide-react';
 import { useAdminOverview } from '@/hooks/admin/useAdminOverview';
 import type { AdminOverview, StatCardProps } from '@/types/admin/admin';
