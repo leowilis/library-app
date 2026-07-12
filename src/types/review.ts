@@ -31,11 +31,3 @@ export interface CreateReviewPayload {
   star: number;
   comment?: string;
 }
-
-export interface UpdateReviewPayload extends CreateReviewPayload {
-  id: number;
-}
-
-export type SubmitReviewPayload =
-  | CreateReviewPayload
-  | UpdateReviewPayload;
