@@ -6,9 +6,14 @@ import type { CreateLoanPayload } from '@/types/loan';
 import type { Book } from '@/types/book';
 import { bookKeys } from '@/lib/queryKeys';
 import { invalidateBorrow, invalidateCart } from '@/lib/queryHelpers';
+import type { ApiResponse } from '@/types/api';
 
 interface BorrowContext {
   previousBook?: Book;
+}
+
+interface BorrowResponse {
+  loanId: number;
 }
 
 /**
@@ -20,9 +25,17 @@ interface BorrowContext {
 export const useBorrowBook = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<unknown, Error, CreateLoanPayload, BorrowContext>({
+  return useMutation<
+    ApiResponse<BorrowResponse>,
+    Error,
+    CreateLoanPayload,
+    BorrowContext
+  >({
     mutationFn: async (payload) => {
-      const { data } = await api.post(EndPoints.Loans, payload);
+      const { data } = await api.post<ApiResponse<BorrowResponse>>(
+        EndPoints.Loans,
+        payload,
+      );
       return data;
     },
 
