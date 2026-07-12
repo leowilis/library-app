@@ -48,7 +48,11 @@ export const useReturnBook = () => {
         (old) =>
           old?.map((loan) =>
             loan.id === loanId
-              ? { ...loan, status: 'RETURNED' as const }
+              ? {
+                  ...loan,
+                  status: 'RETURNED',
+                  displayStatus: 'Returned Successfully',
+                }
               : loan,
           ),
       );
