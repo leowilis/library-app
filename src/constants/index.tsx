@@ -71,7 +71,6 @@ export const Query_Keys = {
   AdminUsers: 'adminUsers',
 };
 
-
 export const ROUTES = {
   // Auth
   Login: '/login',
@@ -98,9 +97,15 @@ export const ROUTES = {
   AdminUsers: '/admin/users',
   AdminBooks: '/admin/books',
   AdminBookAdd: '/admin/books/add',
+
+  // Pattern for matchPath
+  AdminBookEditPattern: '/admin/books/:id/edit',
+  AdminBookPreviewPattern: '/admin/books/:id',
+
+  // Builder for navigate
   AdminBookEdit: (id: number | string) => `/admin/books/${id}/edit`,
   AdminBookPreview: (id: number | string) => `/admin/books/${id}`,
-  
+
   // Other
   NotFound: '*',
 };
