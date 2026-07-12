@@ -1,16 +1,27 @@
+import type {
+  BookFormChangeHandler,
+  BookFormState,
+  FormErrors,
+} from './type';
 import type { Category } from '@/types/category';
-import type { BookFormChangeHandler, BookFormState, FormErrors } from './type';
+
 import FormField from './FormField';
+
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface BookBasicFieldsProps {
   form: BookFormState;
   errors: FormErrors;
   categories: Category[];
-  onChange: BookFormChangeHandler
+  onChange: BookFormChangeHandler;
 }
-
-const inputClass =
-  'w-full rounded-xl border border-gray-200 px-4 py-3 text-sm font-medium text-gray-800 transition-colors placeholder:text-gray-400 focus:border-blue-500 focus:outline-none';
 
 export default function BookBasicFields({
   form,
@@ -20,82 +31,89 @@ export default function BookBasicFields({
 }: BookBasicFieldsProps) {
   return (
     <>
-      <FormField id='title' label='Title' required>
-        <input
-          name='title'
+      {/* Title */}
+      <FormField id="title" label="Title" required>
+        <Input
+          name="title"
           value={form.title}
           onChange={onChange}
-          placeholder='Enter book title'
-          className={inputClass}
+          placeholder="Enter book title"
         />
 
-        {errors.title && <p className='text-sm text-red-500'>{errors.title}</p>}
+        {errors.title && (
+          <p className="text-sm text-destructive">{errors.title}</p>
+        )}
       </FormField>
 
-      <FormField id='authorName' label='Author' required>
-        <input
-          name='authorName'
+      {/* Author */}
+      <FormField id="authorName" label="Author" required>
+        <Input
+          name="authorName"
           value={form.authorName}
           onChange={onChange}
-          placeholder='Enter author name'
-          className={inputClass}
+          placeholder="Enter author name"
         />
 
         {errors.authorName && (
-          <p className='text-sm text-red-500'>{errors.authorName}</p>
+          <p className="text-sm text-destructive">
+            {errors.authorName}
+          </p>
         )}
       </FormField>
 
-      <FormField id='categoryId' label='Category' required>
-        <div className='relative'>
-          <select
-            name='categoryId'
-            value={form.categoryId}
-            onChange={onChange}
-            className={`${inputClass} appearance-none pr-10`}
-          >
-            <option value=''>Select category</option>
+      {/* Category */}
+      <FormField id="categoryId" label="Category" required>
+        <Select
+          value={form.categoryId ? String(form.categoryId) : ''}
+          onValueChange={(value: string) =>
+            onChange({
+              target: {
+                name: 'categoryId',
+                value,
+              },
+            } as React.ChangeEvent<
+              HTMLInputElement | HTMLSelectElement
+            >)
+          }
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select category" />
+          </SelectTrigger>
 
+          <SelectContent>
             {categories.map((category) => (
-              <option key={category.id} value={category.id}>
+              <SelectItem
+                key={category.id}
+                value={String(category.id)}
+              >
                 {category.name}
-              </option>
+              </SelectItem>
             ))}
-          </select>
-
-          <svg
-            className='pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400'
-            fill='none'
-            stroke='currentColor'
-            strokeWidth='2'
-            viewBox='0 0 24 24'
-          >
-            <path
-              strokeLinecap='round'
-              strokeLinejoin='round'
-              d='M19 9l-7 7-7-7'
-            />
-          </svg>
-        </div>
+          </SelectContent>
+        </Select>
 
         {errors.categoryId && (
-          <p className='text-sm text-red-500'>{errors.categoryId}</p>
+          <p className="text-sm text-destructive">
+            {errors.categoryId}
+          </p>
         )}
       </FormField>
 
-      <FormField id='numberPages' label='Number of Pages' required>
-        <input
-          type='number'
-          name='totalPages'
+      {/* Pages */}
+      <FormField id="numberPages" label="Number of Pages" required>
+        <Input
+          type="number"
           min={1}
+          name="totalPages"
           value={form.totalPages}
           onChange={onChange}
-          placeholder='e.g. 320'
-          className={inputClass}
+          placeholder="e.g. 320"
         />
 
         {errors.totalPages && (
-          <p className='text-sm text-red-500'>{errors.totalPages}</p>
+          <p className="text-sm text-destructive">
+            {errors.totalPages}
+          </p>
         )}
       </FormField>
     </>
