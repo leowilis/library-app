@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { LoanStatusFilter } from '@/types/admin/admin';
 
@@ -34,21 +35,20 @@ export default function BorrowedFilter({
         const isActive = value === filter;
 
         return (
-          <button
+          <Button
             key={label}
             type='button'
             role='tab'
+            variant={isActive ? 'default' : 'outline'}
             aria-selected={isActive}
             onClick={() => onChange(filter)}
             className={cn(
-              'flex-shrink-0 cursor-pointer rounded-full border-2 px-4 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/20',
-              isActive
-                ? 'border-blue-600 bg-blue-50 text-blue-600'
-                : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+              'flex-shrink-0 rounded-full px-4',
+              !isActive && 'hover:bg-muted',
             )}
           >
             {label}
-          </button>
+          </Button>
         );
       })}
     </div>
