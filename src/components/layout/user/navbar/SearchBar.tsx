@@ -1,5 +1,7 @@
 import { Search } from 'lucide-react';
 
+import { Input } from '@/components/ui/input';
+
 interface SearchBarProps {
   query: string;
   onChange: (value: string) => void;
@@ -12,17 +14,17 @@ export default function SearchBar({
   onKeyDown,
 }: SearchBarProps) {
   return (
-    <div className='hidden flex-1 items-center gap-2 mx-6 max-w-2xl rounded-full border border-gray-200 px-6 py-2 md:flex'>
-      <Search size={18} className='text-gray-400' aria-hidden='true' />
+    <div className='mx-6 hidden max-w-2xl flex-1 items-center gap-2 rounded-full border bg-background px-6 py-2 md:flex'>
+      <Search size={18} aria-hidden='true' className='text-muted-foreground' />
 
-      <input
-        aria-label='Search books'
+      <Input
         type='text'
+        aria-label='Search books'
+        placeholder='Search book'
         value={query}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={onKeyDown}
-        placeholder='Search book'
-        className='flex-1 bg-transparent text-sm text-gray-700 outline-none placeholder:text-gray-400'
+        className='h-auto border-0 bg-transparent p-0 shadow-none focus-visible:ring-0'
       />
     </div>
   );
