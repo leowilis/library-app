@@ -1,58 +1,64 @@
+import type { ApiResponse, Pagination } from '@/types/api';
 import type { Book } from '@/types/book';
 
-interface BooksResponse {
+interface BooksPayload {
   books: Book[];
-  pagination?: {
-    total: number;
-    page: number;
-    limit: number;
-    hasNextPage: boolean;
-  };
+  pagination?: Pagination;
 }
 
-// Extract books array safely from multiple backend response shapes.
-export function extractBooks(data: unknown): Book[] {
-  if (!data || typeof data !== 'object') return [];
-
-  const root = data as Record<string, unknown>;
-  const nested = root.data as Record<string, unknown> | undefined;
-
-  return (
-    (nested?.data as { books?: Book[] })?.books ??
-    (nested?.books as Book[]) ??
-    (root.books as Book[]) ??
-    []
-  );
+interface NestedBooksPayload {
+  data: BooksPayload;
 }
 
-// Extract pagination contextual values safely from multiple backend response shapes.
-export function extractPagination(data: unknown): BooksResponse['pagination'] {
-  if (!data || typeof data !== 'object') return undefined;
+// Extract books array safely from supported backend response shapes.
+export function extractBooks(
+  response:
+    | ApiResponse<BooksPayload>
+    | ApiResponse<NestedBooksPayload>
+    | BooksPayload,
+): Book[] {
+  if ('books' in response) {
+    return response.books;
+  }
 
-  const root = data as Record<string, unknown>;
-  const nested = root.data as Record<string, unknown> | undefined;
+  if ('books' in response.data) {
+    return response.data.books;
+  }
 
-  return (
-    (nested?.data as BooksResponse)?.pagination ??
-    (nested?.pagination as BooksResponse['pagination']) ??
-    (root.pagination as BooksResponse['pagination'])
-  );
+  return response.data.data.books;
 }
 
-// Powerful generic data parsing layer to strip single/double wrapper objects safely.
-export function extractResource<T>(data: unknown, resourceKey: string): T {
-  if (!data || typeof data !== 'object') {
+// Extract pagination safely.
+export function extractPagination(
+  response:
+    | ApiResponse<BooksPayload>
+    | ApiResponse<NestedBooksPayload>
+    | BooksPayload,
+) {
+  if ('books' in response) {
+    return response.pagination;
+  }
+
+  if ('books' in response.data) {
+    return response.data.pagination;
+  }
+
+  return response.data.data.pagination;
+}
+
+// Extract any resource from backend wrapper.
+export function extractResource<T>(
+  response: ApiResponse<T> | ApiResponse<{ data: T }> | T,
+): T {
+  if (typeof response === 'object' && response !== null && 'data' in response) {
+    const data = response.data;
+
+    if (typeof data === 'object' && data !== null && 'data' in data) {
+      return data.data as T;
+    }
+
     return data as T;
   }
 
-  const root = data as Record<string, unknown>;
-  const nested = root.data as Record<string, unknown> | undefined;
-  const payload = nested?.data as Record<string, unknown> | undefined;
-
-  return (
-    (payload?.[resourceKey] as T) ??
-    (nested?.[resourceKey] as T) ??
-    (nested as T) ??
-    (data as T)
-  );
+  return response;
 }
