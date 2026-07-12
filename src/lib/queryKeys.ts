@@ -70,7 +70,7 @@ export const cartKeys = {
   checkout: () => [...cartKeys.all, 'checkout'] as const,
 };
 
-// 3. Category Keys
+// Category Keys
 export const categoryKeys = {
   all: [Query_Keys.Categories] as const,
 };
@@ -98,6 +98,6 @@ export const adminLoanKeys = {
 
 // Admin User Keys
 export const adminUserKeys = {
-  all: [Query_Keys.AdminUsers] as const,
-  list: () => [...adminUserKeys.all, 'list'] as const,
+  all: ['admin-users'] as const,
+  list: (page: number, q = '') => [...adminUserKeys.all, page, q] as const,
 };
