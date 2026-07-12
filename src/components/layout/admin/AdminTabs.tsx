@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/button";
+
 interface TabItem {
   label: string;
   path: string;
@@ -21,7 +23,7 @@ export default function AdminTabs({
           const active = pathname.startsWith(tab.path);
 
           return (
-            <button
+            <Button
               key={tab.path}
               type='button'
               aria-label={tab.label}
@@ -35,7 +37,7 @@ export default function AdminTabs({
               ].join(' ')}
             >
               {tab.label}
-            </button>
+            </Button>
           );
         })}
       </div>
