@@ -1,5 +1,7 @@
 import { ChevronLeft } from 'lucide-react';
 
+import { Button } from '@/components/ui/button';
+
 interface BookHeaderProps {
   isEdit: boolean;
   onBack: () => void;
@@ -8,15 +10,17 @@ interface BookHeaderProps {
 export default function BookHeader({ isEdit, onBack }: BookHeaderProps) {
   return (
     <div className='flex items-center gap-3'>
-      <button
+      <Button
         type='button'
+        variant='ghost'
+        size='icon'
+        aria-label='Go back'
         onClick={onBack}
-        className='rounded-xl p-2 transition-colors hover:bg-gray-100'
       >
-        <ChevronLeft size={22} className='text-neutral-700' />
-      </button>
+        <ChevronLeft className='h-5 w-5' />
+      </Button>
 
-      <h1 className='text-2xl font-bold text-gray-900'>
+      <h1 className='text-2xl font-bold text-foreground'>
         {isEdit ? 'Edit Book' : 'Add Book'}
       </h1>
     </div>
