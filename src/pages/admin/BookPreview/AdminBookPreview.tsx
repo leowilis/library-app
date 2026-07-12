@@ -9,6 +9,7 @@ import ErrorState from '@/common/ErrorState';
 import BookPreviewHeader from './BookPreviewHeader';
 import { useBookDetail } from '@/hooks/useBookDetail';
 import { useRecommendedBooks } from '@/hooks/useRecommendedBooks';
+import { ROUTES } from '@/constants';
 
 export default function AdminBookPreview() {
   const { id } = useParams<{ id: string }>();
@@ -46,7 +47,7 @@ export default function AdminBookPreview() {
 
   return (
     <section className='max-w-5xl space-y-10 pb-16'>
-      <BookPreviewHeader onBack={() => navigate('/admin/books')} />
+      <BookPreviewHeader onBack={() => navigate(ROUTES.AdminBooks)} />
 
       <BookPreviewInfo book={book} />
 
