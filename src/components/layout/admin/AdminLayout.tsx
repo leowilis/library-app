@@ -1,8 +1,9 @@
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate, matchPath } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 import type { RootState } from '@/store';
 
+import { ROUTES } from '@/constants';
 import { useLogout } from '@/hooks/useAuth';
 
 import AdminHeader from './AdminHeader';
@@ -16,10 +17,19 @@ export default function AdminLayout() {
   const logout = useLogout();
   const { user } = useSelector((state: RootState) => state.auth);
 
-  const isFormPage =
-    location.pathname.includes('/edit') || location.pathname.includes('/add');
+  const isAddPage = !!matchPath(ROUTES.AdminBookAdd, location.pathname);
 
-  const isPreviewPage = /\/admin\/books\/\d+$/.test(location.pathname);
+  const isEditPage = !!matchPath(
+    ROUTES.AdminBookEditPattern,
+    location.pathname,
+  );
+
+  const isPreviewPage = !!matchPath(
+    ROUTES.AdminBookPreviewPattern,
+    location.pathname,
+  );
+
+  const isFormPage = isAddPage || isEditPage;
 
   return (
     <div className='min-h-screen bg-gray-50'>
