@@ -1,10 +1,3 @@
-export interface AdminOverview {
-  totalBooks: number;
-  totalUsers: number;
-  activeLoans: number;
-  overdueLoans: number;
-}
-
 // Book
 
 /**
