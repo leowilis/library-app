@@ -45,6 +45,6 @@ export function useRecommendedBooks(params?: RecommendParams) {
       return data.data.books;
     },
 
-    enabled: !!normalizedParams.categoryId,
+    enabled: normalizedParams.by === 'rating' || !!normalizedParams.categoryId,
   });
 }
