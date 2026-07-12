@@ -83,7 +83,7 @@ export default function MobileFilter({
               <button
                 type='button'
                 onClick={() => setOpen(false)}
-                className='w-full rounded-full bg-[#1C65DA] py-2.5 text-sm font-bold text-white transition-all hover:bg-[#1550b8] active:scale-95'
+                className='w-full rounded-full bg-primary-300 py-2.5 text-sm font-bold text-white transition-all hover:bg-primary-400 active:scale-95'
               >
                 Apply Filter
               </button>
