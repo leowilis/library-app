@@ -6,6 +6,7 @@ import AuthorCard from '@/components/user/AuthorCard';
 import { SkeletonAuthorCard } from '@/components/ui/skeleton';
 
 import type { PopularAuthor } from '@/types/author';
+import ErrorState from '@/common/ErrorState';
 
 interface PopularAuthorSectionProps {
   authors?: PopularAuthor[];
@@ -16,7 +17,6 @@ interface PopularAuthorSectionProps {
 export default function PopularAuthorSection({
   authors,
   loading,
-  error,
 }: PopularAuthorSectionProps) {
   const navigate = useNavigate();
 
@@ -33,14 +33,10 @@ export default function PopularAuthorSection({
     }
 
     // Error State
-    if (error) {
-      return (
-        <EmptyState
-          title='Failed to load authors'
-          description='Please try again later.'
-        />
-      );
-    }
+    <ErrorState
+      title='Failed to load authors'
+      description='Please refresh the page.'
+    />;
 
     // Empty State
     if (!authors?.length) {
