@@ -1,7 +1,12 @@
-import { ImageIcon, Trash2 } from 'lucide-react';
-import FormField from './FormField';
-import type { BookFormChangeHandler, BookFormState, FormErrors } from './type';
 import type { Dispatch, SetStateAction } from 'react';
+import { ImageIcon, Trash2 } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+
+import FormField from './FormField';
+
+import type { BookFormChangeHandler, BookFormState, FormErrors } from './type';
 
 interface BookCoverFieldProps {
   form: BookFormState;
@@ -9,9 +14,6 @@ interface BookCoverFieldProps {
   onChange: BookFormChangeHandler;
   setForm: Dispatch<SetStateAction<BookFormState>>;
 }
-
-const inputClass =
-  'w-full rounded-xl border border-gray-200 px-4 py-3 text-sm font-medium text-gray-800 transition-colors placeholder:text-gray-400 focus:border-blue-500 focus:outline-none';
 
 export default function BookCoverField({
   form,
@@ -21,7 +23,7 @@ export default function BookCoverField({
 }: BookCoverFieldProps) {
   return (
     <FormField id='coverImage' label='Cover Image'>
-      <div className='space-y-4 rounded-2xl border-2 border-dashed border-gray-200 p-6'>
+      <div className='space-y-4 rounded-2xl border-2 border-dashed border-border p-6'>
         {form.coverImage ? (
           <div className='flex flex-col items-center gap-4'>
             <img
@@ -30,38 +32,38 @@ export default function BookCoverField({
               className='h-40 w-28 rounded-xl object-cover shadow-sm'
             />
 
-            <button
+            <Button
               type='button'
+              variant='outline'
               onClick={() =>
                 setForm((prev) => ({
                   ...prev,
                   coverImage: '',
                 }))
               }
-              className='flex items-center gap-2 rounded-xl border border-neutral-300 px-4 py-2 text-sm text-red-500 transition-colors hover:bg-red-50'
+              className='text-destructive hover:text-destructive'
             >
-              <Trash2 size={15} />
+              <Trash2 className='mr-2 h-4 w-4' />
               Remove Image
-            </button>
+            </Button>
           </div>
         ) : (
-          <div className='space-y-4 animate-in fade-in duration-300'>
+          <div className='animate-in fade-in space-y-4 duration-300'>
             <div className='flex justify-center'>
-              <div className='flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100'>
-                <ImageIcon size={22} className='text-gray-400' />
+              <div className='flex h-12 w-12 items-center justify-center rounded-xl bg-muted'>
+                <ImageIcon size={22} className='text-muted-foreground' />
               </div>
             </div>
 
-            <input
+            <Input
               id='coverImage'
               name='coverImage'
               value={form.coverImage}
               onChange={onChange}
               placeholder='Paste image URL here'
-              className={inputClass}
             />
 
-            <p className='text-center text-xs text-gray-400'>
+            <p className='text-center text-xs text-muted-foreground'>
               JPG, JPEG, PNG or WEBP image URL
             </p>
           </div>
@@ -69,7 +71,7 @@ export default function BookCoverField({
       </div>
 
       {errors.coverImage && (
-        <p className='text-sm text-red-500'>{errors.coverImage}</p>
+        <p className='text-sm text-destructive'>{errors.coverImage}</p>
       )}
     </FormField>
   );
