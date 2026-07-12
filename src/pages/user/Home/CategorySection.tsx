@@ -72,7 +72,7 @@ export default function CategorySection({
             onClick={() => navigate(ROUTES.Category(category.id))}
             className='flex flex-col items-start gap-5 rounded-2xl bg-white p-3 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md md:p-4'
           >
-            <div className='flex h-15 w-full items-center justify-center rounded-xl bg-[#E0ECFF] md:h-20'>
+            <div className='flex h-15 w-full items-center justify-center rounded-xl bg-neutral-80 md:h-20'>
               <img
                 src={CATEGORY_ICONS[category.name]}
                 alt={category.name}
