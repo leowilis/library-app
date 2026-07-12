@@ -1,6 +1,6 @@
-import type { PopularAuthor } from "@/types/author";
-import AvatarIcon from "@/assets/avatar/avatar.svg";
-import BookIcon from "@/assets/icon/Book.svg";
+import type { PopularAuthor } from '@/types/author';
+import AvatarIcon from '@/assets/avatar/avatar.svg';
+import BookIcon from '@/assets/icon/Book.svg';
 
 interface AuthorCardProps {
   author: PopularAuthor;
@@ -14,19 +14,26 @@ interface AuthorCardProps {
 export default function AuthorCard({ author, onClick }: AuthorCardProps) {
   return (
     <button
+      type='button'
       onClick={onClick}
-      className="flex items-center gap-3 w-full h-[84px] bg-white rounded-xl p-3 shadow-sm text-left"
+      aria-label={`View books by ${author.name}`}
+      className='flex h-20 w-full items-center gap-3 rounded-xl bg-white p-3 text-left shadow-sm transition hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary'
     >
       <img
         src={AvatarIcon}
         alt={author.name}
-        className="w-14 h-14 object-cover flex-shrink-0"
+        className='h-14 w-14 flex-shrink-0 object-cover'
       />
-      <div className="flex flex-col gap-3">
-        <p className="text-sm font-bold text-gray-900">{author.name}</p>
-        <div className="flex items-center gap-1">
-          <img src={BookIcon} alt="books" className="w-6 h-6" />
-          <span className="text-md text-neutral-950">
+
+      <div className='min-w-0 space-y-2'>
+        <p className='truncate text-sm font-bold text-foreground'>
+          {author.name}
+        </p>
+
+        <div className='flex items-center gap-1'>
+          <img src={BookIcon} alt='' aria-hidden='true' className='h-6 w-6' />
+
+          <span className='text-sm text-muted-foreground'>
             {author.bookCount} books
           </span>
         </div>
