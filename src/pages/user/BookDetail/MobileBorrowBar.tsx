@@ -21,7 +21,7 @@ export default function MobileBorrowBar({
         type='button'
         onClick={onBorrow}
         disabled={disabled}
-        className='w-full flex-1 rounded-full bg-[#1C65DA] py-6 font-semibold text-white transition-all duration-200 hover:bg-[#1550b8] active:scale-95 disabled:cursor-not-allowed disabled:opacity-60'
+        className='w-full flex-1 rounded-full bg-primary-300 py-6 font-semibold text-white transition-all duration-200 hover:bg-primary-400 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60'
       >
         {borrowButtonLabel}
       </Button>
