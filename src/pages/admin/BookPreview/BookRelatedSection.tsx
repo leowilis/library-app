@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import type { Book } from '@/types/book';
 import BookCard from '@/pages/user/BookDetail/BookCard';
+import { ROUTES } from '@/constants';
 
 interface BookRelatedSectionProps {
   currentBookId: number;
@@ -27,7 +28,7 @@ export default function BookRelatedSection({
             <BookCard
               key={book.id}
               book={book}
-              onClick={() => navigate(`/admin/books/${book.id}`)}
+              onClick={() => navigate(ROUTES.AdminBookPreview(book.id))}
             />
           ))}
       </div>
