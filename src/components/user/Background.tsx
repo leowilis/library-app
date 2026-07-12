@@ -25,7 +25,7 @@ export default function Background() {
     }, 3000);
 
     return () => window.clearInterval(timer);
-  }, [banners.length]);
+  }, []);
 
   return (
     <section aria-label='Book promotion banners' className='w-full'>
