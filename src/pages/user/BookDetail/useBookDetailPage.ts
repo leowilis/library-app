@@ -48,14 +48,13 @@ export function useBookDetailPage() {
     return 'Borrow Book';
   }, [isOutOfStock, isAlreadyBorrowed]);
 
-  const reviews = book?.reviews ?? [];
+  const visibleReviews = useMemo(() => {
+    const reviews = book?.reviews ?? [];
 
-  const visibleReviews = useMemo(
-    () => reviews.slice(0, reviewPage * REVIEWS_PER_PAGE),
-    [reviews, reviewPage],
-  );
+    return reviews.slice(0, reviewPage * REVIEWS_PER_PAGE);
+  }, [book?.reviews, reviewPage]);
 
-  const hasMore = visibleReviews.length < reviews.length;
+  const hasMore = visibleReviews.length < (book?.reviews?.length ?? 0);
 
   const handleBorrow = () => {
     if (isOutOfStock) {
