@@ -1,5 +1,7 @@
 import { Search } from 'lucide-react';
 
+import { Input } from '@/components/ui/input';
+
 interface BorrowedSearchProps {
   value: string;
   onChange: (value: string) => void;
@@ -12,14 +14,20 @@ export default function BorrowedSearch({
   placeholder = 'Search',
 }: BorrowedSearchProps) {
   return (
-    <div className='flex w-full items-center gap-2 rounded-full border border-neutral-300 bg-white px-4 py-2.5 md:max-w-[750px]'>
-      <Search size={20} className='text-neutral-600' />
+    <div className='relative w-full md:max-w-[750px]'>
+      <Search
+        size={20}
+        aria-hidden='true'
+        className='absolute left-4 top-1/2 z-10 -translate-y-1/2 text-muted-foreground'
+      />
 
-      <input
+      <Input
+        type='text'
+        aria-label={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className='flex-1 bg-transparent text-md text-neutral-600 outline-none'
+        className='pl-12'
       />
     </div>
   );
