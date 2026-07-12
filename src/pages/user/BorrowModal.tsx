@@ -99,7 +99,7 @@ export default function BorrowModal({
                 disabled={isOutOfStock}
                 className={`py-2 rounded-xl border-2 text-sm font-semibold transition-all disabled:opacity-40 ${
                   days === d
-                    ? 'bg-[#E0ECFF] border-[#1c65da] text-[#1c65da]'
+                    ? 'bg-neutral-80 border-primary-300 text-primary-300'
                     : 'bg-white border-gray-200 text-gray-700'
                 }`}
               >
@@ -136,8 +136,7 @@ export default function BorrowModal({
           type='button'
           onClick={handleBorrow}
           disabled={isOutOfStock || isPending}
-          className='w-full py-3.5 rounded-full font-semibold text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed'
-          style={{ backgroundColor: '#1c65da' }}
+          className='w-full py-3.5 rounded-full font-semibold bg-primary-300 text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed'
         >
           {isPending
             ? 'Borrow...'
