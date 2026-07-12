@@ -54,7 +54,7 @@ export default function BookReviewSection({
           onClick={onGiveReview}
           disabled={!hasReturnedBook}
           aria-disabled={!hasReturnedBook}
-          className='flex-shrink-0 rounded-full bg-[#1C65DA] px-6 py-5 font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-300'
+          className='flex-shrink-0 rounded-full bg-primary-300 px-6 py-5 font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-300'
         >
           Give Reviews
         </Button>
