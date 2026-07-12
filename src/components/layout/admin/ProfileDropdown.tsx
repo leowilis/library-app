@@ -1,4 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
+
+import { Button } from '@/components/ui/button';
 
 interface TabItem {
   label: string;
@@ -20,76 +28,41 @@ export default function ProfileDropdown({
   onNavigate,
   onLogout,
 }: ProfileDropdownProps) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleOutsideClick = (event: MouseEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleOutsideClick);
-
-    return () => document.removeEventListener('mousedown', handleOutsideClick);
-  }, []);
-
   return (
-    <div ref={ref} className='relative'>
-      <button
-        type='button'
-        aria-label='Open profile menu'
-        aria-haspopup='menu'
-        aria-expanded={isOpen}
-        onClick={() => setIsOpen((prev) => !prev)}
-        className='flex cursor-pointer items-center gap-3'
-      >
-        <img
-          src={avatar}
-          alt='Profile'
-          className='h-9 w-9 rounded-full object-cover'
-        />
-
-        <span className='text-sm font-semibold text-gray-900'>{name}</span>
-      </button>
-
-      {isOpen && (
-        <div
-          role='menu'
-          className='absolute -right-4 z-50 mt-3 w-52 rounded-2xl border border-gray-100 bg-white py-1 shadow-lg'
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          type='button'
+          variant='ghost'
+          aria-label='Open profile menu'
+          className='h-auto gap-3 p-0 hover:bg-transparent focus-visible:ring-2'
         >
-          {tabs.map((tab) => (
-            <button
-              key={tab.path}
-              type='button'
-              role='menuitem'
-              onClick={() => {
-                onNavigate(tab.path);
-                setIsOpen(false);
-              }}
-              className='relative w-full rounded-xl px-4 py-2.5 text-left text-sm transition-all after:absolute after:bottom-1 after:left-4 after:right-4 after:h-[2px] after:origin-left after:scale-x-0 after:bg-blue-500 after:transition-transform hover:after:scale-x-100'
-            >
-              {tab.label}
-            </button>
-          ))}
+          <img
+            src={avatar}
+            alt={`${name} profile`}
+            className='h-9 w-9 rounded-full object-cover'
+          />
 
-          <div className='mt-1 border-t border-gray-100 pt-1'>
-            <button
-              type='button'
-              role='menuitem'
-              onClick={() => {
-                onLogout();
-                setIsOpen(false);
-              }}
-              className='w-full rounded-xl px-4 py-2.5 text-left text-sm text-red-500 transition-colors hover:bg-red-50'
-            >
-              Logout
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
+          <span className='text-sm font-semibold text-neutral-900'>{name}</span>
+        </Button>
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent align='end' className='w-52'>
+        {tabs.map((tab) => (
+          <DropdownMenuItem key={tab.path} onClick={() => onNavigate(tab.path)}>
+            {tab.label}
+          </DropdownMenuItem>
+        ))}
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem
+          onClick={onLogout}
+          className='text-destructive focus:text-destructive'
+        >
+          Logout
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
