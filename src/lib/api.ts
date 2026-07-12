@@ -1,9 +1,10 @@
-import axios, { AxiosError } from 'axios';
 import { toast } from 'sonner';
 
 import { ROUTES } from '@/constants';
 import { store } from '@/store';
 import { logout } from '@/store/authSlice';
+import axios from 'axios';
+import type { AxiosError } from 'axios';
 
 /**
  * Axios instance configured with the API base URL.
