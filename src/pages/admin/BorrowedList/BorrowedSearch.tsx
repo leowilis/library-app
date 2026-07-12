@@ -14,7 +14,7 @@ export default function BorrowedSearch({
   placeholder = 'Search',
 }: BorrowedSearchProps) {
   return (
-    <div className='relative w-full md:max-w-[750px]'>
+    <div className='relative w-full md:max-w-2xl'>
       <Search
         size={20}
         aria-hidden='true'
