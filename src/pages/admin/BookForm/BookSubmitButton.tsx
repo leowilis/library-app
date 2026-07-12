@@ -1,3 +1,5 @@
+import { Button } from '@/components/ui/button';
+
 interface BookSubmitButtonProps {
   loading: boolean;
   isEdit: boolean;
@@ -8,12 +10,13 @@ export default function BookSubmitButton({
   isEdit,
 }: BookSubmitButtonProps) {
   return (
-    <button
+    <Button
       type='submit'
+      size='lg'
+      className='w-full rounded-full'
       disabled={loading}
-      className='w-full rounded-full bg-primary-300 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-60'
     >
       {loading ? 'Saving...' : isEdit ? 'Update Book' : 'Add Book'}
-    </button>
+    </Button>
   );
 }
