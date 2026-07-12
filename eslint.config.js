@@ -34,6 +34,9 @@ export default tseslint.config(
       // React Hooks
       ...reactHooks.configs.recommended.rules,
 
+      // Disable false positive on async form initialization
+      'react-hooks/set-state-in-effect': 'off',
+
       // React Refresh
       'react-refresh/only-export-components': [
         'warn',
@@ -42,7 +45,6 @@ export default tseslint.config(
         },
       ],
 
-      // TypeScript
       '@typescript-eslint/no-unused-vars': [
         'warn',
         {
