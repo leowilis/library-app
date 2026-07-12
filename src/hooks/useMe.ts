@@ -7,9 +7,14 @@ import { api } from '@/lib/api';
 import type { Loan } from '@/types/loan';
 import type { Review } from '@/types/review';
 import type { AxiosError } from 'axios';
-import { meKeys, reviewKeys, type LoansParams } from '@/lib/queryKeys';
+import { meKeys, type LoansParams } from '@/lib/queryKeys';
+import type { ApiResponse } from '@/types/api';
 
 // Types
+
+interface MeProfileResponse {
+  user: User;
+}
 
 interface MeLoansResponse {
   loans: Loan[];
@@ -17,6 +22,10 @@ interface MeLoansResponse {
 
 interface MeReviewsResponse {
   reviews: Review[];
+}
+
+interface UpdateProfileResponse {
+  user: User;
 }
 
 // Hooks
@@ -27,7 +36,8 @@ export const useMe = () => {
   return useQuery<User>({
     queryKey: meKeys.profile(),
     queryFn: async () => {
-      const res = await api.get<{ data: { user: User } }>(EndPoints.Me);
+      const res = await api.get<ApiResponse<MeProfileResponse>>(EndPoints.Me);
+
       return res.data.data.user;
     },
     enabled: !!token,
@@ -38,12 +48,16 @@ export const useMe = () => {
 export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
   return useMutation<
-    unknown,
+    ApiResponse<UpdateProfileResponse>,
     AxiosError<{ message?: string }>,
     UpdateProfilePayload
   >({
     mutationFn: async (payload) => {
-      const res = await api.patch(EndPoints.Me, payload);
+      const res = await api.patch<ApiResponse<UpdateProfileResponse>>(
+        EndPoints.Me,
+        payload,
+      );
+
       return res.data;
     },
     onSuccess: () => {
@@ -61,9 +75,12 @@ export const useMyLoansProfile = <TData = Loan[]>(
   return useQuery<Loan[], AxiosError, TData>({
     queryKey: meKeys.loans(params),
     queryFn: async () => {
-      const res = await api.get<{ data: MeLoansResponse }>(EndPoints.MeLoans, {
-        params,
-      });
+      const res = await api.get<ApiResponse<MeLoansResponse>>(
+        EndPoints.MeLoans,
+        {
+          params,
+        },
+      );
       return res.data.data.loans;
     },
     enabled: !!token,
@@ -79,9 +96,9 @@ export const useMyReviews = (params?: {
 }) => {
   const token = useSelector((state: RootState) => state.auth.token);
   return useQuery<Review[]>({
-    queryKey: reviewKeys.me(params),
+    queryKey: meKeys.reviews(params),
     queryFn: async () => {
-      const res = await api.get<{ data: MeReviewsResponse }>(
+      const res = await api.get<ApiResponse<MeReviewsResponse>>(
         EndPoints.MeReviews,
         { params },
       );
