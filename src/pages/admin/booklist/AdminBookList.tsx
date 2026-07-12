@@ -14,6 +14,7 @@ import BookPagination from './BookPagination';
 import BookSearch from './BookSearch';
 import BookTable from './BookTable';
 import { PAGE_SIZE } from '@/pages/user/Home/constants';
+import { ROUTES } from '@/constants';
 
 export default function AdminBookList() {
   const navigate = useNavigate();
@@ -64,7 +65,7 @@ export default function AdminBookList() {
 
   return (
     <section className='space-y-4 md:m-4 md:px-4'>
-      <BookListHeader onAddBook={() => navigate('/admin/books/add')} />
+      <BookListHeader onAddBook={() => navigate(ROUTES.AdminBookAdd)} />
 
       <BookSearch value={search} onChange={setSearch} />
 
@@ -84,16 +85,16 @@ export default function AdminBookList() {
           <BookTable
             books={books}
             isLoading={isLoading}
-            onPreview={(id) => navigate(`/admin/books/${id}`)}
-            onEdit={(id) => navigate(`/admin/books/${id}/edit`)}
+            onPreview={(id) => navigate(ROUTES.AdminBookPreview(id))}
+            onEdit={(id) => navigate(ROUTES.AdminBookEdit(id))}
             onDelete={setDeleteId}
           />
 
           <BookMobileCard
             books={books}
             isLoading={isLoading}
-            onPreview={(id) => navigate(`/admin/books/${id}`)}
-            onEdit={(id) => navigate(`/admin/books/${id}/edit`)}
+            onPreview={(id) => navigate(ROUTES.AdminBookPreview(id))}
+            onEdit={(id) => navigate(ROUTES.AdminBookEdit(id))}
             onDelete={setDeleteId}
           />
 
