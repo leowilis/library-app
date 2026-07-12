@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+import { cn } from '@/lib/utils';
+
 import bannerBg from '@/assets/background/background.svg';
 
 // Banner images to cycle through
@@ -23,36 +25,37 @@ export default function Background() {
     }, 3000);
 
     return () => window.clearInterval(timer);
-  }, []);
+  }, [banners.length]);
 
   return (
-    <section className='w-full' aria-label='Book promotion banners'>
-      {/* Banner */}
+    <section aria-label='Book promotion banners' className='w-full'>
       <div className='overflow-hidden rounded-2xl'>
         <img
           src={banners[current]}
           alt={`Book promotion banner ${current + 1}`}
+          loading='eager'
+          draggable={false}
           className='w-full object-cover'
         />
       </div>
 
-      {/* Pagination */}
       <div
-        className='mt-3 flex justify-center gap-1.5'
         aria-label='Banner navigation'
+        className='mt-3 flex justify-center gap-1.5'
       >
         {banners.map((_, index) => (
           <button
             key={index}
             type='button'
             aria-label={`Go to banner ${index + 1}`}
-            aria-current={index === current}
+            aria-current={index === current ? 'true' : undefined}
             onClick={() => setCurrent(index)}
-            className={`h-2 rounded-full transition-all duration-300 ${
+            className={cn(
+              'h-2 rounded-full transition-all duration-300',
               index === current
-                ? 'w-3 bg-blue-600'
-                : 'w-2 bg-blue-300 hover:bg-blue-400'
-            }`}
+                ? 'w-3 bg-primary'
+                : 'w-2 bg-primary/30 hover:bg-primary/50',
+            )}
           />
         ))}
       </div>
