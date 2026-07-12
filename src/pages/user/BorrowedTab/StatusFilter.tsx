@@ -39,7 +39,7 @@ export default function StatusFilter({ value, onChange }: StatusFilterProps) {
             className={cn(
               'flex-shrink-0 whitespace-nowrap rounded-full border px-4 py-2 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500/20',
               isActive
-                ? 'border-[#1c65da] bg-[#E0ECFF] text-[#1c65da]'
+                ? 'border-primary-300 bg-neutral-80 text-primary-300'
                 : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50 hover:text-gray-900',
             )}
           >
