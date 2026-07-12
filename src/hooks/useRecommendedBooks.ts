@@ -2,10 +2,15 @@ import { useQuery } from '@tanstack/react-query';
 
 import { EndPoints } from '@/constants';
 import { api } from '@/lib/api';
-import { extractBooks } from '@/lib/bookResponse';
 import { bookKeys } from '@/lib/queryKeys';
 
 import type { Book } from '@/types/book';
+import type { ApiResponse } from '@/types/api';
+
+interface RecommendPayload {
+  mode: string;
+  books: Book[];
+}
 
 interface RecommendParams {
   by?: 'rating' | 'popular';
@@ -30,11 +35,14 @@ export function useRecommendedBooks(params?: RecommendParams) {
     queryKey: bookKeys.recommend(normalizedParams),
 
     queryFn: async () => {
-      const { data } = await api.get(EndPoints.BooksRecommend, {
-        params: normalizedParams,
-      });
+      const { data } = await api.get<ApiResponse<RecommendPayload>>(
+        EndPoints.BooksRecommend,
+        {
+          params: normalizedParams,
+        },
+      );
 
-      return extractBooks(data);
+      return data.data.books;
     },
 
     enabled: !!normalizedParams.categoryId,
