@@ -1,5 +1,10 @@
-import StarIcon from '@/assets/icon/Star.svg';
+import { Star } from 'lucide-react';
+
 import type { Category } from '@/types/category';
+
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+
+import { Label } from '@/components/ui/label';
 
 const RATING_STARS = [5, 4, 3, 2, 1] as const;
 
@@ -19,68 +24,75 @@ export default function FilterContent({
   onRatingChange,
 }: FilterContentProps) {
   return (
-    <div className='space-y-5'>
+    <div className='space-y-6'>
       {/* Category */}
-      <section aria-label='Category Filter'>
-        <h3 className='mb-3 text-sm font-extrabold text-neutral-950'>
+      <section aria-labelledby='category-filter-title'>
+        <h3
+          id='category-filter-title'
+          className='mb-3 text-sm font-bold text-foreground'
+        >
           Category
         </h3>
 
-        <div className='space-y-2.5'>
+        <RadioGroup
+          value={selectedCategoryId?.toString()}
+          onValueChange={(value) => onCategoryChange(Number(value))}
+          className='space-y-3'
+        >
           {categories.map((category) => (
-            <label
-              key={category.id}
-              className='group flex cursor-pointer items-center gap-2'
-            >
-              <input
-                type='radio'
-                name='category-filter'
-                checked={selectedCategoryId === category.id}
-                onChange={() => onCategoryChange(category.id)}
-                className='h-4 w-4 flex-shrink-0 cursor-pointer accent-blue-600'
+            <div key={category.id} className='flex items-center space-x-3'>
+              <RadioGroupItem
+                value={category.id.toString()}
+                id={`category-${category.id}`}
               />
 
-              <span className='text-sm text-neutral-800 transition-colors group-hover:text-blue-600'>
+              <Label
+                htmlFor={`category-${category.id}`}
+                className='cursor-pointer text-sm font-normal'
+              >
                 {category.name}
-              </span>
-            </label>
+              </Label>
+            </div>
           ))}
-        </div>
+        </RadioGroup>
       </section>
 
-      <hr className='border-gray-100' />
+      <hr className='border-border' />
 
       {/* Rating */}
-      <section aria-label='Rating Filter'>
-        <h3 className='mb-3 text-sm font-extrabold text-neutral-950'>Rating</h3>
+      <section aria-labelledby='rating-filter-title'>
+        <h3
+          id='rating-filter-title'
+          className='mb-3 text-sm font-bold text-foreground'
+        >
+          Rating
+        </h3>
 
-        <div className='space-y-2.5'>
+        <RadioGroup
+          value={minRating?.toString()}
+          onValueChange={(value) => onRatingChange(Number(value))}
+          className='space-y-3'
+        >
           {RATING_STARS.map((rating) => (
-            <label
-              key={rating}
-              className='group flex cursor-pointer items-center gap-2'
-            >
-              <input
-                type='radio'
-                name='rating-filter'
-                checked={minRating === rating}
-                onChange={() => onRatingChange(rating)}
-                className='h-4 w-4 flex-shrink-0 accent-blue-600'
+            <div key={rating} className='flex items-center space-x-3'>
+              <RadioGroupItem
+                value={rating.toString()}
+                id={`rating-${rating}`}
               />
 
-              <img
-                src={StarIcon}
-                alt=''
-                aria-hidden='true'
-                className='h-5 w-5'
-              />
-
-              <span className='text-sm text-neutral-950 transition-colors group-hover:text-blue-600'>
+              <Label
+                htmlFor={`rating-${rating}`}
+                className='flex cursor-pointer items-center gap-2 text-sm font-normal'
+              >
+                <Star
+                  className='h-4 w-4 fill-yellow-400 text-yellow-400'
+                  aria-hidden='true'
+                />
                 {rating}
-              </span>
-            </label>
+              </Label>
+            </div>
           ))}
-        </div>
+        </RadioGroup>
       </section>
     </div>
   );
