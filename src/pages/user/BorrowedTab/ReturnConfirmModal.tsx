@@ -36,7 +36,7 @@ export default function ReturnConfirmModal({
           <div className='flex h-14 w-14 items-center justify-center rounded-full bg-blue-50'>
             <AlertTriangle
               size={28}
-              className='text-[#1c65da]'
+              className='text-primary-300'
               aria-hidden='true'
             />
           </div>
@@ -70,7 +70,7 @@ export default function ReturnConfirmModal({
             type='button'
             onClick={onConfirm}
             disabled={isLoading}
-            className='flex-1 rounded-full bg-[#1c65da] py-3 text-sm font-semibold text-white transition-all hover:bg-[#1550b8] disabled:opacity-50 disabled:cursor-not-allowed'
+            className='flex-1 rounded-full bg-primary-300 py-3 text-sm font-semibold text-white transition-all hover:bg-primary-300 disabled:opacity-50 disabled:cursor-not-allowed'
           >
             {isLoading ? 'Returning...' : 'Yes, Return'}
           </button>
