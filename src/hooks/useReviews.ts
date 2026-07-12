@@ -13,6 +13,7 @@ import { meKeys, reviewKeys } from '@/lib/queryKeys';
 import { createOptimisticReview } from '@/lib/reviewHelpers';
 
 import type { CreateReviewPayload, Review } from '@/types/review';
+import type { ApiResponse } from '@/types/api';
 
 interface ReviewContext {
   previous: Array<[QueryKey, Review[] | undefined]>;
@@ -21,6 +22,18 @@ interface ReviewContext {
 interface DeleteReviewPayload {
   reviewId: number;
   bookId: number;
+}
+
+interface BookReviewsResponse {
+  reviews: Review[];
+}
+
+interface SubmitReviewResponse {
+  review: Review;
+}
+
+interface DeleteReviewResponse {
+  success: boolean;
 }
 
 // Fetch reviews of a specific book.
@@ -35,13 +48,12 @@ export const useBookReviews = (
     queryKey: reviewKeys.book(bookId, params),
 
     queryFn: async () => {
-      const { data } = await api.get<{
-        data: {
-          reviews: Review[];
-        };
-      }>(EndPoints.ReviewsBook(bookId), {
-        params,
-      });
+      const { data } = await api.get<ApiResponse<BookReviewsResponse>>(
+        EndPoints.ReviewsBook(bookId),
+        {
+          params,
+        },
+      );
 
       return data.data.reviews;
     },
@@ -57,9 +69,18 @@ export const useBookReviews = (
 export const useSubmitReview = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<unknown, Error, CreateReviewPayload, ReviewContext>({
+  return useMutation<
+    ApiResponse<SubmitReviewResponse>,
+    Error,
+    CreateReviewPayload,
+    ReviewContext
+  >({
     mutationFn: async (payload) => {
-      const { data } = await api.post(EndPoints.Reviews, payload);
+      const { data } = await api.post<ApiResponse<SubmitReviewResponse>>(
+        EndPoints.Reviews,
+        payload,
+      );
+
       return data;
     },
 
@@ -132,9 +153,16 @@ export const useSubmitReview = () => {
 export const useDeleteReview = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<unknown, Error, DeleteReviewPayload, ReviewContext>({
+  return useMutation<
+    ApiResponse<DeleteReviewResponse>,
+    Error,
+    DeleteReviewPayload,
+    ReviewContext
+  >({
     mutationFn: async ({ reviewId }) => {
-      const { data } = await api.delete(EndPoints.Review(reviewId));
+      const { data } = await api.delete<ApiResponse<DeleteReviewResponse>>(
+        EndPoints.Review(reviewId),
+      );
 
       return data;
     },
