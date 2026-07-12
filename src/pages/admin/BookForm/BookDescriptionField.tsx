@@ -24,7 +24,7 @@ export default function BookDescriptionField({
         value={form.description}
         onChange={onChange}
         placeholder='Enter book description'
-        className='resize-none'
+        className={`${inputClass} resize-none`}
       />
 
       {errors.description && (
