@@ -1,5 +1,16 @@
 import { useState } from 'react';
+import { X } from 'lucide-react';
+
 import { useBorrowBook } from '@/hooks/useBorrowBook';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 // Props for the BorrowModal component
 interface BorrowModalProps {
@@ -40,111 +51,101 @@ export default function BorrowModal({
     );
   };
 
-  // Returns stock badge styles based on availability
-  const stockBadgeClass = isOutOfStock
-    ? 'bg-red-100 text-red-600'
-    : currentStock <= 3
-      ? 'bg-green-700 text-white'
-      : 'bg-green-100 text-green-700';
-
   return (
-    <div
-      role='dialog'
-      aria-modal='true'
-      aria-labelledby='borrow-modal-title'
-      className='fixed inset-0 z-50 flex items-end justify-center md:items-center'
-    >
-      <div
-        aria-hidden='true'
-        className='absolute inset-0 bg-black/40'
-        onClick={isPending ? undefined : onClose}
-      />
-      <div className='relative bg-white w-full md:w-[420px] rounded-t-3xl md:rounded-3xl p-6 space-y-5'>
-        {/* Header */}
-        <div className='flex items-center justify-between'>
-          <h3
-            id='borrow-modal-title'
-            className='text-lg font-bold text-gray-900'
-          >
-            Borrow Book
-          </h3>
-          <button
-            type='button'
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent className='max-w-md rounded-3xl p-6'>
+        <DialogHeader className='flex-row items-center justify-between space-y-0'>
+          <DialogTitle>Borrow Book</DialogTitle>
+
+          <Button
+            variant='ghost'
+            size='icon'
             onClick={onClose}
-            className='text-gray-400 text-2xl leading-none'
+            disabled={isPending}
           >
-            ×
-          </button>
+            <X className='h-5 w-5' />
+          </Button>
+        </DialogHeader>
+
+        {/* Book */}
+        <div className='space-y-3'>
+          <p className='line-clamp-2 text-sm text-muted-foreground'>
+            {bookTitle}
+          </p>
+
+          <span
+            className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+              isOutOfStock
+                ? 'bg-destructive/10 text-destructive'
+                : currentStock <= 3
+                  ? 'bg-amber-100 text-amber-700'
+                  : 'bg-green-100 text-green-700'
+            }`}
+          >
+            {isOutOfStock ? 'Out of stock' : `${currentStock} available`}
+          </span>
         </div>
 
-        {/* Book title */}
-        <p className='text-sm text-gray-500 line-clamp-2'>{bookTitle}</p>
+        {/* Preset Days */}
+        <div className='space-y-3'>
+          <p className='text-sm font-semibold'>Borrow Duration</p>
 
-        {/* Stock availability badge */}
-        <span
-          className={`text-xs font-semibold px-2.5 py-1 rounded-full ${stockBadgeClass}`}
-        >
-          {isOutOfStock ? 'Out of stock' : `${currentStock} available`}
-        </span>
-
-        {/* Predefined duration options */}
-        <div className='space-y-2 pt-3'>
-          <p className='text-sm font-semibold text-gray-700'>Borrow Duration</p>
           <div className='grid grid-cols-4 gap-2'>
-            {DAY_OPTIONS.map((d) => (
-              <button
-                key={d}
+            {DAY_OPTIONS.map((day) => (
+              <Button
+                key={day}
                 type='button'
-                onClick={() => setDays(d)}
+                variant={days === day ? 'default' : 'outline'}
                 disabled={isOutOfStock}
-                className={`py-2 rounded-xl border-2 text-sm font-semibold transition-all disabled:opacity-40 ${
-                  days === d
-                    ? 'bg-neutral-80 border-primary-300 text-primary-300'
-                    : 'bg-white border-gray-200 text-gray-700'
-                }`}
+                onClick={() => setDays(day)}
+                className='rounded-xl'
               >
-                {d} days
-              </button>
+                {day} days
+              </Button>
             ))}
           </div>
         </div>
 
-        {/* Custom duration input */}
+        {/* Custom Days */}
         <div className='space-y-2'>
-          <p className='text-sm font-semibold text-gray-700'>
-            Or enter custom days
-          </p>
-          <input
+          <p className='text-sm font-semibold'>Or enter custom days</p>
+
+          <Input
             type='number'
             min={1}
             max={90}
             value={days}
             disabled={isOutOfStock}
-            onChange={(e) => {
-              const value = Number(e.target.value);
-
-              if (!Number.isNaN(value)) {
-                setDays(Math.max(1, Math.min(90, value)));
-              }
-            }}
-            className='w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-blue-400 disabled:opacity-40 disabled:bg-gray-50'
+            onChange={(e) =>
+              setDays(Math.max(1, Math.min(90, Number(e.target.value) || 1)))
+            }
           />
         </div>
 
-        {/* Submit button */}
-        <button
-          type='button'
-          onClick={handleBorrow}
-          disabled={isOutOfStock || isPending}
-          className='w-full py-3.5 rounded-full font-semibold bg-primary-300 text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed'
-        >
-          {isPending
-            ? 'Borrow...'
-            : isOutOfStock
-              ? 'Out of stock'
-              : `Borrow for ${days} days`}
-        </button>
-      </div>
-    </div>
+        {/* Footer */}
+        <div className='flex gap-3'>
+          <Button
+            variant='outline'
+            className='flex-1 rounded-full'
+            onClick={onClose}
+            disabled={isPending}
+          >
+            Cancel
+          </Button>
+
+          <Button
+            className='flex-1 rounded-full'
+            onClick={handleBorrow}
+            disabled={isOutOfStock || isPending}
+          >
+            {isPending
+              ? 'Borrowing...'
+              : isOutOfStock
+                ? 'Out of Stock'
+                : `Borrow for ${days} days`}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
