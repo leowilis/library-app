@@ -1,6 +1,9 @@
 import { Search } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+
 interface MobileSearchProps {
   query: string;
   onChange: (value: string) => void;
@@ -21,28 +24,30 @@ export default function MobileSearch({
   }, []);
 
   return (
-    <div className='flex flex-1 items-center gap-2 mx-3 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 md:hidden'>
-      <Search size={18} className='text-gray-400' aria-hidden='true' />
+    <div className='mx-3 flex flex-1 items-center gap-2 rounded-full border bg-muted px-4 py-2 md:hidden'>
+      <Search size={18} aria-hidden='true' className='text-muted-foreground' />
 
-      <input
+      <Input
         ref={searchRef}
         type='text'
         aria-label='Search books'
+        placeholder='Search book'
         value={query}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={onKeyDown}
-        placeholder='Search book'
-        className='flex-1 bg-transparent text-sm text-gray-700 outline-none placeholder:text-gray-400'
+        className='h-auto flex-1 border-0 bg-transparent p-0 shadow-none focus-visible:ring-0'
       />
 
-      <button
+      <Button
         type='button'
-        aria-label='Close search'
+        variant='ghost'
+        size='icon'
         onClick={onClose}
-        className='text-xl leading-none text-gray-400 transition-colors hover:text-gray-600'
+        aria-label='Close search'
+        className='h-7 w-7 rounded-full'
       >
         ×
-      </button>
+      </Button>
     </div>
   );
 }
