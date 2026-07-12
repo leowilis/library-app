@@ -1,3 +1,4 @@
+import { Textarea } from '@/components/ui/textarea';
 import FormField from './FormField';
 import type { BookFormChangeHandler, BookFormState, FormErrors } from './type';
 
@@ -17,13 +18,13 @@ export default function BookDescriptionField({
 }: BookDescriptionFieldProps) {
   return (
     <FormField id='description' label='Description' required>
-      <textarea
+      <Textarea
         name='description'
         rows={5}
         value={form.description}
         onChange={onChange}
         placeholder='Enter book description'
-        className={`${inputClass} resize-none`}
+        className='resize-none'
       />
 
       {errors.description && (
