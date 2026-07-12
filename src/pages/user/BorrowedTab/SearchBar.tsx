@@ -1,20 +1,27 @@
 import { Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
-interface SearchBarProps {
+interface BookSearchProps {
   value: string;
   onChange: (value: string) => void;
 }
 
-export default function SearchBar({ value, onChange }: SearchBarProps) {
+export default function BookSearch({ value, onChange }: BookSearchProps) {
   return (
-    <div className='flex items-center gap-2 bg-white rounded-full px-4 py-3 border border-neutral-300 md:max-w-2xl'>
-      <Search size={20} className='text-neutral-600' />
+    <div className='relative mb-6 w-full md:max-w-sm'>
+      <Search
+        size={18}
+        aria-hidden='true'
+        className='absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground'
+      />
 
-      <input
+      <Input
+        type='text'
+        aria-label='Search books'
+        placeholder='Search book...'
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder='Search book'
-        className='flex-1 bg-transparent outline-none text-sm text-neutral-600'
+        className='pl-11'
       />
     </div>
   );
