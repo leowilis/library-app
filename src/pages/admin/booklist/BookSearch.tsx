@@ -1,5 +1,7 @@
 import { Search } from 'lucide-react';
 
+import { Input } from '@/components/ui/input';
+
 interface BookSearchProps {
   value: string;
   onChange: (value: string) => void;
@@ -11,16 +13,16 @@ export default function BookSearch({ value, onChange }: BookSearchProps) {
       <Search
         size={18}
         aria-hidden='true'
-        className='absolute left-4 top-1/2 -translate-y-1/2 text-gray-400'
+        className='absolute left-4 top-1/2 z-10 -translate-y-1/2 text-muted-foreground'
       />
 
-      <input
+      <Input
         type='text'
         aria-label='Search books'
         placeholder='Search book...'
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className='w-full rounded-xl border border-gray-200 py-3 pl-11 pr-4 text-sm outline-none transition focus:border-blue-500'
+        className='pl-11'
       />
     </div>
   );
