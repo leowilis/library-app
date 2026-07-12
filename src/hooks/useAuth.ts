@@ -50,7 +50,7 @@ export const useLogin = () => {
 
       if (user.role === 'ADMIN') {
         toast.success('Welcome, Admin!');
-        navigate('/admin/dashboard');
+        navigate(ROUTES.AdminDashboard);
       } else {
         toast.success('Welcome back!');
         navigate(ROUTES.Home);
