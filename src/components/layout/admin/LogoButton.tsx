@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 
 import Logo from '@/assets/logo/logo.svg';
+import { ROUTES } from '@/constants';
 
 export default function LogoButton() {
   const navigate = useNavigate();
@@ -9,7 +10,7 @@ export default function LogoButton() {
     <button
       type='button'
       aria-label='Go to admin dashboard'
-      onClick={() => navigate('/admin/dashboard')}
+      onClick={() => navigate(ROUTES.AdminDashboard)}
       className='flex items-center gap-2 cursor-pointer'
     >
       <img src={Logo} alt='Booky' className='h-8 w-8' />
