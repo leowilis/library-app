@@ -1,8 +1,16 @@
-import UserRow from './UserRow';
-
 import type { AdminUser } from '@/types/admin/admin';
 
-const TABLE_HEADERS = ['No', 'Name', 'Nomor Handphone', 'Email', 'Created At'];
+import UserRow from './UserRow';
+
+import {
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+
+const TABLE_HEADERS = ['No', 'Name', 'Phone Number', 'Email', 'Created At'];
 
 interface UserTableProps {
   users: AdminUser[];
@@ -12,22 +20,22 @@ interface UserTableProps {
 
 export default function UserTable({ users, page, pageSize }: UserTableProps) {
   return (
-    <div className='hidden overflow-hidden rounded-2xl border-2 border-gray-200 md:block md:max-w-5xl'>
-      <table className='w-full text-sm'>
-        <thead className='border-b border-gray-200 bg-neutral-50'>
-          <tr>
+    <div className='hidden overflow-hidden rounded-2xl border bg-card md:block md:max-w-5xl'>
+      <Table>
+        <TableHeader>
+          <TableRow>
             {TABLE_HEADERS.map((header) => (
-              <th
+              <TableHead
                 key={header}
-                className='px-4 py-5 text-left text-xs font-semibold uppercase tracking-wide text-neutral-950'
+                className='text-xs font-semibold uppercase tracking-wide'
               >
                 {header}
-              </th>
+              </TableHead>
             ))}
-          </tr>
-        </thead>
+          </TableRow>
+        </TableHeader>
 
-        <tbody className='divide-y divide-gray-100 bg-white'>
+        <TableBody>
           {users.map((user, index) => (
             <UserRow
               key={user.id}
@@ -35,8 +43,8 @@ export default function UserTable({ users, page, pageSize }: UserTableProps) {
               index={(page - 1) * pageSize + index + 1}
             />
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 }
