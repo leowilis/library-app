@@ -54,7 +54,7 @@ export default function BookHeader({
         <Button
           onClick={onBorrow}
           disabled={isAlreadyBorrowed || isOutOfStock}
-          className='rounded-full bg-[#1C65DA] px-8 py-5 font-semibold text-white transition-all duration-200 hover:-translate-y-1 hover:bg-[#1550b8] hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0'
+          className='rounded-full bg-primary-300 px-8 py-5 font-semibold text-white transition-all duration-200 hover:-translate-y-1 hover:bg-primary-400 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0'
         >
           {borrowButtonLabel}
         </Button>
