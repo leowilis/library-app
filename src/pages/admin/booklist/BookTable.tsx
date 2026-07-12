@@ -1,7 +1,17 @@
 import type { AdminBook } from '@/types/admin/admin';
 
 import BookTableRow from './BookTableRow';
+
 import { SkeletonTable } from '@/components/ui/skeleton';
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 
 interface BookTableProps {
   books: AdminBook[];
@@ -28,33 +38,33 @@ export default function BookTable({
   onDelete,
 }: BookTableProps) {
   return (
-    <div className='hidden overflow-hidden rounded-2xl bg-gray-50 md:block'>
-      <table className='w-full border-separate border-spacing-y-2 px-2 text-sm'>
-        <thead>
-          <tr>
+    <div className='hidden overflow-hidden rounded-2xl border bg-card md:block'>
+      <Table>
+        <TableHeader>
+          <TableRow>
             {TABLE_HEADERS.map((header) => (
-              <th
+              <TableHead
                 key={header}
-                className='px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500'
+                className='text-xs font-semibold uppercase tracking-wide'
               >
                 {header}
-              </th>
+              </TableHead>
             ))}
-          </tr>
-        </thead>
+          </TableRow>
+        </TableHeader>
 
-        <tbody>
+        <TableBody>
           {isLoading ? (
             <SkeletonTable rows={5} columns={6} />
           ) : books.length === 0 ? (
-            <tr>
-              <td
+            <TableRow>
+              <TableCell
                 colSpan={6}
-                className='rounded-2xl bg-white py-10 text-center text-gray-400'
+                className='h-32 text-center text-muted-foreground'
               >
                 No books found
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ) : (
             books.map((book) => (
               <BookTableRow
@@ -66,8 +76,8 @@ export default function BookTable({
               />
             ))
           )}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 }
