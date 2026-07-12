@@ -114,7 +114,7 @@ export default function RegisterForm({
           type='submit'
           disabled={isPending}
           size='xl'
-          className='w-full rounded-full bg-[#1C65DA] text-white hover:bg-[#1858bf]'
+          className='w-full rounded-full bg-primary-300 text-white hover:bg-primary-500'
         >
           {isPending ? 'Loading...' : 'Submit'}
         </Button>
