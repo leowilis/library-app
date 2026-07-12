@@ -6,44 +6,26 @@ interface BooksPayload {
   pagination?: Pagination;
 }
 
-interface NestedBooksPayload {
-  data: BooksPayload;
-}
-
 // Extract books array safely from supported backend response shapes.
 export function extractBooks(
-  response:
-    | ApiResponse<BooksPayload>
-    | ApiResponse<NestedBooksPayload>
-    | BooksPayload,
+  data: ApiResponse<BooksPayload> | ApiResponse<{ data: BooksPayload }>,
 ): Book[] {
-  if ('books' in response) {
-    return response.books;
+  if ('books' in data.data) {
+    return data.data.books;
   }
 
-  if ('books' in response.data) {
-    return response.data.books;
-  }
-
-  return response.data.data.books;
+  return data.data.data.books;
 }
 
 // Extract pagination safely.
 export function extractPagination(
-  response:
-    | ApiResponse<BooksPayload>
-    | ApiResponse<NestedBooksPayload>
-    | BooksPayload,
-) {
-  if ('books' in response) {
-    return response.pagination;
+  data: ApiResponse<BooksPayload> | ApiResponse<{ data: BooksPayload }>,
+): Pagination | undefined {
+  if ('books' in data.data) {
+    return data.data.pagination;
   }
 
-  if ('books' in response.data) {
-    return response.data.pagination;
-  }
-
-  return response.data.data.pagination;
+  return data.data.data.pagination;
 }
 
 // Extract any resource from backend wrapper.
