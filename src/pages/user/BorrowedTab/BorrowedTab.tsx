@@ -15,6 +15,7 @@ import LoanCard from './LoanCard';
 import ReturnConfirmModal from './ReturnConfirmModal';
 import SearchBar from './SearchBar';
 import StatusFilter from './StatusFilter';
+import { ROUTES } from '@/constants';
 
 /**
  * Borrowed books tab.
@@ -138,7 +139,7 @@ export default function BorrowedTab() {
           onClose={() => setReviewBookId(null)}
           onSuccess={() => {
             setReviewBookId(null);
-            navigate('/profile?tab=reviews');
+            navigate(`${ROUTES.Profile}?tab=reviews`);
           }}
         />
       )}
