@@ -1,3 +1,5 @@
+import type { ChangeEventHandler } from 'react';
+
 import EyeOpen from '@/assets/icon/eye.svg';
 import EyeOff from '@/assets/icon/eyeclose.svg';
 
@@ -10,7 +12,7 @@ interface PasswordFieldProps {
   label: string;
   value: string;
   show: boolean;
-  onChange: React.ChangeEventHandler<HTMLInputElement>;
+  onChange: ChangeEventHandler<HTMLInputElement>;
   onToggle: () => void;
 }
 
@@ -24,10 +26,8 @@ export default function PasswordField({
   onToggle,
 }: PasswordFieldProps) {
   return (
-    <div className='flex flex-col gap-1'>
-      <Label htmlFor={id} className='text-sm font-bold'>
-        {label}
-      </Label>
+    <div className='space-y-2'>
+      <Label htmlFor={id}>{label}</Label>
 
       <div className='relative'>
         <Input
@@ -37,19 +37,21 @@ export default function PasswordField({
           value={value}
           onChange={onChange}
           required
-          className='w-full rounded-xl border border-gray-300 px-3 py-5 text-sm focus:border-blue-500'
+          className='h-12 pr-11'
         />
 
         <button
           type='button'
+          aria-label={show ? 'Hide password' : 'Show password'}
           onClick={onToggle}
-          className='absolute right-3 top-1/2 -translate-y-1/2'
+          className='absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
         >
           <img
             src={show ? EyeOff : EyeOpen}
             width={20}
             height={20}
-            alt='Toggle password visibility'
+            alt=''
+            aria-hidden='true'
           />
         </button>
       </div>
