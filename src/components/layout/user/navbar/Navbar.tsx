@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { Search } from 'lucide-react';
@@ -16,12 +16,6 @@ export default function Navbar() {
   const { token, user } = useSelector((state: RootState) => state.auth);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState(() => searchParams.get('q') ?? '');
-
-  useEffect(() => {
-    if (location.pathname !== ROUTES.Search) return;
-
-    setQuery(searchParams.get('q') ?? '');
-  }, [location.pathname, searchParams]);
 
   const handleSearchSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key !== 'Enter') return;
