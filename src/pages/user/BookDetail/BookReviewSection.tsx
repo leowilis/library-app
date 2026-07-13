@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import StarRating from '@/components/ui/starRating';
 import { formatDate } from '@/lib/utils';
-import AvatarIcon from '@/assets/avatar/avatar.svg';
+import AvatarIcon from '@/assets/avatar/avatar.png';
 import type { BookReview } from '@/types/book';
 import LoadMoreButton from '@/common/LoadMoreButton';
 

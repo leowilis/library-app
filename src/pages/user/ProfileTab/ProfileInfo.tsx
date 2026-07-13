@@ -1,4 +1,4 @@
-import AvatarIcon from '@/assets/avatar/avatar.svg';
+import AvatarIcon from '@/assets/avatar/avatar.png';
 import { Button } from '@/components/ui/button';
 import type { User } from '@/types/user';
 

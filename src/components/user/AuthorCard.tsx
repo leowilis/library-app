@@ -1,5 +1,5 @@
 import type { PopularAuthor } from '@/types/author';
-import AvatarIcon from '@/assets/avatar/avatar.svg';
+import AvatarIcon from '@/assets/avatar/avatar.png';
 import BookIcon from '@/assets/icon/Book.svg';
 
 interface AuthorCardProps {
