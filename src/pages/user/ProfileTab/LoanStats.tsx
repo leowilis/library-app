@@ -43,7 +43,7 @@ export default function LoanStats({ loans }: LoanStatsProps) {
     <div>
       <p className='mb-3 text-sm font-bold text-gray-700'>Loan Statistics</p>
 
-      <div className='grid grid-cols-2 gap-3'>
+      <div className='grid grid-cols-2 gap-3 md:max-w-2xl'>
         {STATS.map(({ key, label, color, bg }) => (
           <div key={key} className={`${bg} rounded-2xl p-4 text-center`}>
             <p className={`text-2xl font-bold ${color}`}>{stats[key]}</p>
