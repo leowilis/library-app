@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -78,6 +79,12 @@ export default function ReviewModal(props: ReviewModalProps) {
           <DialogTitle>
             {mode === 'create' ? 'Give Review' : 'Edit Your Review'}
           </DialogTitle>
+
+          <DialogDescription className='sr-only'>
+            {mode === 'create'
+              ? 'Share your thoughts by giving a rating and writing a review.'
+              : 'Update your rating and review for this book.'}
+          </DialogDescription>
         </DialogHeader>
 
         {/* Rating */}
