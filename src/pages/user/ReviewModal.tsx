@@ -58,7 +58,7 @@ export default function ReviewModal(props: ReviewModalProps) {
             comment: comment.trim(),
           }
         : {
-            bookId: props.review.bookId,
+            bookId: props.review.book.id,
             star: rating,
             comment: comment.trim(),
           };
