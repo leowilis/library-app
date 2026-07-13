@@ -13,7 +13,13 @@ import type { ApiResponse } from '@/types/api';
 // Types
 
 interface MeProfileResponse {
-  user: User;
+  profile: User;
+  loanStats: {
+    borrowed: number;
+    returned: number;
+    overdue: number;
+  };
+  reviewsCount: number;
 }
 
 interface MeLoansResponse {
@@ -33,13 +39,16 @@ interface UpdateProfileResponse {
 // Fetches the current authenticated user's profile
 export const useMe = () => {
   const token = useSelector((state: RootState) => state.auth.token);
+
   return useQuery<User>({
     queryKey: meKeys.profile(),
+
     queryFn: async () => {
       const res = await api.get<ApiResponse<MeProfileResponse>>(EndPoints.Me);
 
-      return res.data.data.user;
+      return res.data.data.profile;
     },
+
     enabled: !!token,
   });
 };
