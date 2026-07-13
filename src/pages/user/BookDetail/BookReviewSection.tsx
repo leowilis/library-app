@@ -89,7 +89,7 @@ export default function BookReviewSection({
                 </div>
               </div>
 
-              <StarRating rating={review.star} />
+              <StarRating rating={rating} variant='five' showValue />
 
               <p className='text-sm leading-relaxed text-gray-600'>
                 {review.comment}
