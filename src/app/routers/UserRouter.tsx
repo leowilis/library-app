@@ -9,6 +9,9 @@ import Home from '@/pages/user/Home/Home';
 import ProfilePage from '@/pages/user/ProfilePage';
 import BookDetail from '@/pages/user/BookDetail/BookDetail';
 import BooksByAuthorPage from '@/pages/Author/BooksByAuthorPage';
+import CartPage from '@/pages/user/Cart/CartPage';
+import CheckoutPage from '@/pages/user/Checkout/CheckoutPage';
+import BorrowSuccessPage from '@/pages/user/BorrowSuccess/BorrowSuccessPage';
 
 function PrivateRoute({ children }: PropsWithChildren) {
   const { token } = useSelector((state: RootState) => state.auth);
@@ -40,6 +43,30 @@ export default function UserRoutes() {
         <Route path='books/:id' element={<BookDetail />} />
         <Route path='category/:id' element={<SearchRouterWrapper />} />
         <Route path='authors/:id/books' element={<BooksByAuthorPage />} />
+        <Route
+          path='cart'
+          element={
+            <PrivateRoute>
+              <CartPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path='checkout'
+          element={
+            <PrivateRoute>
+              <CheckoutPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path='borrow-success'
+          element={
+            <PrivateRoute>
+              <BorrowSuccessPage />
+            </PrivateRoute>
+          }
+        />
         <Route path='*' element={<Navigate to='/' replace />} />
       </Routes>
     </UserLayout>
