@@ -41,7 +41,7 @@ export default function ReviewsTab() {
     deleteReview(
       {
         reviewId: reviewToDelete.id,
-        bookId: reviewToDelete.bookId,
+        bookId: reviewToDelete.book.id,
       },
       {
         onSuccess: () => {
