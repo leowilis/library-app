@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { cn } from '@/lib/utils';
 
-import bannerBg from '@/assets/background/background.svg';
+import bannerBg from '@/assets/background/background.png';
 
 // Banner images to cycle through
 const banners = [bannerBg, bannerBg, bannerBg];
