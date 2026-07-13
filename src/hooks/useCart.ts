@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-
+import type { QueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { EndPoints } from '@/constants';
 import { cartKeys } from '@/lib/queryKeys';
@@ -14,15 +14,14 @@ import type {
 } from '@/types/cart';
 
 // Invalidates all cart-related queries.
-async function invalidateCart(queryClient: ReturnType<typeof useQueryClient>) {
-  await Promise.all([
-    queryClient.invalidateQueries({
-      queryKey: cartKeys.detail(),
-    }),
-    queryClient.invalidateQueries({
-      queryKey: cartKeys.checkout(),
-    }),
-  ]);
+async function invalidateCart(queryClient: QueryClient) {
+  await queryClient.invalidateQueries({
+    queryKey: cartKeys.all,
+  });
+
+  await queryClient.refetchQueries({
+    queryKey: cartKeys.all,
+  });
 }
 
 // Fetches the authenticated user's cart.
@@ -65,7 +64,14 @@ export function useAddToCart() {
 
     onSuccess: async () => {
       toast.success('Book added to cart');
-      await invalidateCart(queryClient);
+
+      await queryClient.invalidateQueries({
+        queryKey: cartKeys.all,
+      });
+
+      await queryClient.refetchQueries({
+        queryKey: cartKeys.all,
+      });
     },
 
     onError: (error) => {
