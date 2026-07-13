@@ -17,6 +17,7 @@ import { SkeletonBookDetail } from '@/components/ui/skeleton';
 
 import { useBookDetailPage } from './useBookDetailPage';
 import ErrorState from '@/common/ErrorState';
+import { useAddToCart } from '@/hooks/useCart';
 
 export default function BookDetail() {
   const {
@@ -45,6 +46,16 @@ export default function BookDetail() {
     handleGiveReview,
     handleLoadMore,
   } = useBookDetailPage();
+
+  const { mutate: addToCart } = useAddToCart();
+
+  const handleAddToCart = () => {
+    if (!book) return;
+
+    addToCart({
+      bookId: book.id,
+    });
+  };
 
   if (isLoading) {
     return <SkeletonBookDetail />;
@@ -89,6 +100,7 @@ export default function BookDetail() {
             isOutOfStock={isOutOfStock}
             borrowButtonLabel={borrowButtonLabel}
             onBorrow={handleBorrow}
+            onAddToCart={handleAddToCart}
           />
 
           <BookStats
