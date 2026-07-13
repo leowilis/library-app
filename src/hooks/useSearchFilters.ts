@@ -52,18 +52,12 @@ export default function useSearchFilters() {
     setSearchParams(params);
   };
 
-  const handleCategoryChange = (categoryId: number) => {
-    updateUrlParams(
-      'categoryId',
-      selectedCategoryId === categoryId ? undefined : String(categoryId),
-    );
+  const handleCategoryChange = (categoryId?: number) => {
+    updateUrlParams('categoryId', categoryId?.toString());
   };
 
-  const handleRatingChange = (rating: number) => {
-    updateUrlParams(
-      'minRating',
-      minRating === rating ? undefined : String(rating),
-    );
+  const handleRatingChange = (rating?: number) => {
+    updateUrlParams('minRating', rating?.toString());
   };
 
   return {
