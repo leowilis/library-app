@@ -1,4 +1,4 @@
-import AvatarIcon from '@/assets/avatar/avatar.svg';
+import AvatarIcon from '@/assets/avatar/avatar.png';
 
 import LogoButton from './LogoButton';
 import ProfileDropdown from './ProfileDropdown';
