@@ -12,6 +12,7 @@ interface BookHeaderProps {
 
   borrowButtonLabel: string;
   onBorrow: () => void;
+  onAddToCart: () => void;
 }
 
 export default function BookHeader({
@@ -23,6 +24,7 @@ export default function BookHeader({
   isAlreadyBorrowed,
   borrowButtonLabel,
   onBorrow,
+  onAddToCart,
 }: BookHeaderProps) {
   return (
     <div className='mt-4 flex-1 space-y-3 md:mt-0'>
@@ -51,6 +53,15 @@ export default function BookHeader({
       <StarRating rating={rating} showValue />
 
       <div className='hidden pt-4 md:flex'>
+        <Button
+          variant='outline'
+          className='flex-1 rounded-full'
+          onClick={onAddToCart}
+          disabled={isOutOfStock}
+        >
+          Add to Cart
+        </Button>
+
         <Button
           onClick={onBorrow}
           disabled={isAlreadyBorrowed || isOutOfStock}
