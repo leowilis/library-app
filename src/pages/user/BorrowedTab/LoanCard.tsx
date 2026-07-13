@@ -69,7 +69,7 @@ export default function LoanCard({
               type='button'
               onClick={onReturn}
               disabled={isReturning}
-              className='rounded-full border-2 border-primary-300 px-9 py-2.5 text-sm font-semibold text-primary-300 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed'
+              className='rounded-full border-2 bg-primary-300 px-13 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed'
             >
               {isReturning ? 'Returning...' : 'Return'}
             </button>
@@ -79,7 +79,7 @@ export default function LoanCard({
             <button
               type='button'
               onClick={onReview}
-              className='rounded-full bg-primary-300 px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-300 transition'
+              className='rounded-full bg-primary-300 px-8 py-2.5 text-sm font-semibold text-white hover:bg-primary-700 transition'
             >
               Give Review
             </button>
