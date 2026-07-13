@@ -136,6 +136,7 @@ export default function BookDetail() {
         borrowButtonLabel={borrowButtonLabel}
         disabled={isAlreadyBorrowed || isOutOfStock}
         onBorrow={handleBorrow}
+        onAddToCart={handleAddToCart}
       />
 
       {showReview && (
