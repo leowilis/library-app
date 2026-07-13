@@ -14,7 +14,7 @@ export function useBookDetail(id: number) {
     queryFn: async () => {
       const { data } = await api.get(EndPoints.BooksDetail(id));
 
-      return extractResource<Book>(data, 'book');
+      return extractResource<Book>(data);
     },
 
     enabled: !!id,
