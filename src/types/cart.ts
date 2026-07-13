@@ -10,7 +10,12 @@ export interface CartItem {
 
 export interface CartResponse {
   success: boolean;
-  data: CartItem[];
+  message: string;
+  data: {
+    cartId: number;
+    itemCount: number;
+    items: CartItem[];
+  };
 }
 
 export interface CheckoutResponse {

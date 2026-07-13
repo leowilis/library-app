@@ -33,7 +33,7 @@ export function useCart() {
     queryKey: cartKeys.detail(),
     queryFn: async () => {
       const { data } = await api.get<CartResponse>(EndPoints.Cart);
-      return data.data;
+      return data.data.items;
     },
     enabled: !!token,
   });
