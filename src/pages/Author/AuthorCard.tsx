@@ -1,4 +1,4 @@
-import AvatarIcon from '@/assets/avatar/avatar.svg';
+import AvatarIcon from '@/assets/avatar/avatar.png';
 import BookIcon from '@/assets/icon/Book.svg';
 import type { Author } from '@/types/author';
 
