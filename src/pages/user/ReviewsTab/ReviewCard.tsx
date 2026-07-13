@@ -49,7 +49,7 @@ export default function ReviewCard({
 
       <hr className='border-gray-300' />
 
-      <StarRating rating={review.star} />
+      <StarRating rating={review.star} variant='five' size={14} />
 
       <p className='leading-relaxed text-gray-950'>{review.comment}</p>
     </div>
