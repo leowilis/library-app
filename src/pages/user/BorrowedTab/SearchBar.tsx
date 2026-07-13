@@ -21,7 +21,7 @@ export default function BookSearch({ value, onChange }: BookSearchProps) {
         placeholder='Search book...'
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className='h-12 rounded-full pl-12 pr-4'
+        className='h-12 rounded-full pl-12 pr-4 md:max-w-5xl'
       />
     </div>
   );
