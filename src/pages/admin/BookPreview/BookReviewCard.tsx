@@ -28,7 +28,7 @@ export default function BookReviewCard({ review }: BookReviewCardProps) {
         </div>
       </div>
 
-      <StarRating rating={review.star} />
+      <StarRating rating={review.star} variant='five' size={16} />
 
       <p className='text-sm leading-relaxed text-gray-600'>{review.comment}</p>
     </div>
