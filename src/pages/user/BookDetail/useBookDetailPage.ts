@@ -34,8 +34,10 @@ export function useBookDetailPage() {
       return;
     }
 
-    if (!book) {
-      toast.error('Book not found');
+    if (!book) return;
+
+    if (isOutOfStock) {
+      toast.error('This book is out of stock');
       return;
     }
 
