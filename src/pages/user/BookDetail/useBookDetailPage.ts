@@ -2,26 +2,22 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { toast } from 'sonner';
-
 import { ROUTES } from '@/constants';
 import type { RootState } from '@/store';
-
 import { useHasReturnedBook, useIsBookBorrowed } from '@/hooks/useMe';
 import { useBookDetail } from '@/hooks/useBookDetail';
 import { useRecommendedBooks } from '@/hooks/useRecommendedBooks';
+import { useAddToCart } from '@/hooks/useCart';
 
 import { RELATED_BOOK_LIMIT, REVIEWS_PER_PAGE } from './constants';
 
 export function useBookDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-
   const { token } = useSelector((state: RootState) => state.auth);
-
   const [showBorrow, setShowBorrow] = useState(false);
   const [showReview, setShowReview] = useState(false);
   const [reviewPage, setReviewPage] = useState(1);
-
   const bookId = Number(id);
 
   useEffect(() => {
@@ -29,6 +25,24 @@ export function useBookDetailPage() {
   }, [bookId]);
 
   const { data: book, isLoading, isError } = useBookDetail(bookId);
+  const { mutate: addToCart } = useAddToCart();
+
+  const handleAddToCart = () => {
+    if (!token) {
+      toast.error('Please login first');
+      navigate(ROUTES.Login);
+      return;
+    }
+
+    if (!book) {
+      toast.error('Book not found');
+      return;
+    }
+
+    addToCart({
+      bookId: book.id,
+    });
+  };
 
   const { data: relatedBooks } = useRecommendedBooks({
     by: 'rating',
@@ -38,7 +52,6 @@ export function useBookDetailPage() {
 
   const isAlreadyBorrowed = useIsBookBorrowed(bookId);
   const hasReturnedBook = useHasReturnedBook(bookId);
-
   const isOutOfStock = (book?.availableCopies ?? 0) <= 0;
 
   const borrowButtonLabel = useMemo(() => {
@@ -113,6 +126,7 @@ export function useBookDetailPage() {
     hasReturnedBook,
 
     handleBorrow,
+    handleAddToCart,
     handleGiveReview,
     handleLoadMore,
   };
