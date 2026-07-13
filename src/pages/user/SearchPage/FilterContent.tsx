@@ -35,7 +35,7 @@ export default function FilterContent({
         </h3>
 
         <RadioGroup
-          value={selectedCategoryId?.toString()}
+          value={selectedCategoryId?.toString() ?? ''}
           onValueChange={(value) => onCategoryChange(Number(value))}
           className='space-y-3'
         >
@@ -69,7 +69,7 @@ export default function FilterContent({
         </h3>
 
         <RadioGroup
-          value={minRating?.toString()}
+          value={minRating?.toString() ?? ''}
           onValueChange={(value) => onRatingChange(Number(value))}
           className='space-y-3'
         >
