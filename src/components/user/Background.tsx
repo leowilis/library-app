@@ -29,7 +29,7 @@ export default function Background() {
 
   return (
     <section aria-label='Book promotion banners' className='w-full'>
-      <div className='overflow-hidden rounded-2xl'>
+      <div className='relative overflow-hidden rounded-2xl'>
         <img
           src={banners[current]}
           alt={`Book promotion banner ${current + 1}`}
@@ -37,27 +37,25 @@ export default function Background() {
           draggable={false}
           className='w-full object-cover'
         />
-      </div>
 
-      <div
-        aria-label='Banner navigation'
-        className='mt-3 flex justify-center gap-1.5'
-      >
-        {banners.map((_, index) => (
-          <button
-            key={index}
-            type='button'
-            aria-label={`Go to banner ${index + 1}`}
-            aria-current={index === current ? 'true' : undefined}
-            onClick={() => setCurrent(index)}
-            className={cn(
-              'h-2 rounded-full transition-all duration-300',
-              index === current
-                ? 'w-3 bg-primary'
-                : 'w-2 bg-primary/30 hover:bg-primary/50',
-            )}
-          />
-        ))}
+        <div
+          aria-label='Banner navigation'
+          className='absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2'
+        >
+          {banners.map((_, index) => (
+            <button
+              key={index}
+              type='button'
+              onClick={() => setCurrent(index)}
+              className={cn(
+                'h-2 rounded-full transition-all duration-300',
+                current === index
+                  ? 'w-8 bg-white'
+                  : 'w-2 bg-white/50 hover:bg-white/80',
+              )}
+            />
+          ))}
+        </div>
       </div>
     </section>
   );
