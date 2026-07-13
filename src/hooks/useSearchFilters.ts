@@ -47,11 +47,9 @@ export default function useSearchFilters() {
       params.delete(key);
     }
 
-    // Reset pagination whenever filters change
     params.set('page', '1');
 
     setSearchParams(params);
-    setPage(1);
   };
 
   const handleCategoryChange = (categoryId: number) => {
