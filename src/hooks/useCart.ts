@@ -6,7 +6,7 @@ import { api } from '@/lib/api';
 import { EndPoints } from '@/constants';
 import { cartKeys } from '@/lib/queryKeys';
 import type { RootState } from '@/store';
-
+import axios from 'axios';
 import type {
   AddToCartPayload,
   CartResponse,
@@ -59,25 +59,29 @@ export function useAddToCart() {
 
   return useMutation({
     mutationFn: async (payload: AddToCartPayload) => {
-      await api.post(EndPoints.CartItems, payload);
+      const { data } = await api.post(EndPoints.CartItems, payload);
+
+      return data;
     },
 
     onSuccess: async () => {
-      toast.success('Book added to cart');
-
       await queryClient.invalidateQueries({
-        queryKey: cartKeys.all,
+        queryKey: cartKeys.detail(),
       });
 
-      await queryClient.refetchQueries({
-        queryKey: cartKeys.all,
-      });
+      toast.success('Book added to cart');
     },
 
     onError: (error) => {
-      toast.error(
-        error instanceof Error ? error.message : 'Failed to add book to cart',
-      );
+      if (axios.isAxiosError(error)) {
+        toast.error(
+          error.response?.data?.message ?? 'Failed to add book to cart',
+        );
+
+        return;
+      }
+
+      toast.error('Failed to add book to cart');
     },
   });
 }
