@@ -5,6 +5,7 @@ import { Search } from 'lucide-react';
 import type { RootState } from '@/store';
 import { logout } from '@/store/authSlice';
 import { ROUTES } from '@/constants';
+import CartButton from '../CartButton';
 
 import { NavbarLogo, SearchBar, MobileSearch, GuestMenu, UserMenu } from './';
 
@@ -76,11 +77,15 @@ export default function Navbar() {
             </button>
 
             {token ? (
-              <UserMenu
-                user={user}
-                onNavigate={handleNavigate}
-                onLogout={handleLogout}
-              />
+              <>
+                <CartButton />
+
+                <UserMenu
+                  user={user}
+                  onNavigate={handleNavigate}
+                  onLogout={handleLogout}
+                />
+              </>
             ) : (
               <GuestMenu onNavigate={handleNavigate} />
             )}
