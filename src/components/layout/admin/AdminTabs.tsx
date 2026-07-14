@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 
 interface TabItem {
   label: string;
@@ -32,8 +32,8 @@ export default function AdminTabs({
               className={[
                 'flex-1 whitespace-nowrap rounded-xl px-1 py-2.5 text-xs transition-all',
                 active
-                  ? 'bg-white font-semibold text-blue-600 shadow-sm'
-                  : 'font-normal text-gray-500 hover:text-blue-600',
+                  ? 'bg-white font-semibold text-primary-600 shadow'
+                  : 'bg-transparent font-normal text-neutral-600',
               ].join(' ')}
             >
               {tab.label}
