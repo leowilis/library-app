@@ -54,17 +54,8 @@ export default function BorrowModal({
   return (
     <Dialog open onOpenChange={onClose}>
       <DialogContent className='max-w-md rounded-3xl p-6'>
-        <DialogHeader className='flex-row items-center justify-between space-y-0'>
+        <DialogHeader>
           <DialogTitle>Borrow Book</DialogTitle>
-
-          <Button
-            variant='ghost'
-            size='icon'
-            onClick={onClose}
-            disabled={isPending}
-          >
-            <X className='h-5 w-5' />
-          </Button>
         </DialogHeader>
 
         {/* Book */}
