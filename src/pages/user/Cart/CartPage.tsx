@@ -15,16 +15,15 @@ export default function CartPage() {
 
   const { data: cartItems = [], isLoading, isError } = useCart();
 
-  /**
-   * Stores selected cart item ids.
-   * Default: all items selected.
-   */
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [initialized, setInitialized] = useState(false);
 
-  // Keep selection synchronized whenever cart changes.
   useEffect(() => {
-    setSelectedIds(cartItems.map((item) => item.id));
-  }, [cartItems]);
+    if (!initialized && cartItems.length > 0) {
+      setSelectedIds(cartItems.map((item) => item.id));
+      setInitialized(true);
+    }
+  }, [initialized, cartItems]);
 
   const totalItems = cartItems.length;
 
