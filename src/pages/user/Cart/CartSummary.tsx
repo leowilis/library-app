@@ -6,6 +6,7 @@ import { ROUTES } from '@/constants';
 
 interface CartSummaryProps {
   totalBooks: number;
+  onCheckout: () => void;
 }
 
 /**
@@ -51,6 +52,7 @@ export default function CartSummary({ totalBooks }: CartSummaryProps) {
         <Button
           type='button'
           className='mt-2 w-full rounded-full'
+          disabled={totalBooks === 0}
           onClick={handleCheckout}
         >
           Continue Checkout
