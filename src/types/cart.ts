@@ -26,6 +26,7 @@ export interface CheckoutResponse {
       id: number;
       name: string;
       email: string;
+      nomorHandphone: string;
     };
     items: CartItem[];
     itemCount: number;
