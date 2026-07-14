@@ -9,7 +9,7 @@ interface BookSearchProps {
 
 export default function BookSearch({ value, onChange }: BookSearchProps) {
   return (
-    <div className='relative mb-6 w-full md:max-w-sm'>
+    <div className='relative mb-6 w-full md:max-w-3xl'>
       <Search
         size={18}
         aria-hidden='true'
