@@ -1,15 +1,17 @@
 import { CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ROUTES } from '@/constants';
+import { useNavigate } from 'react-router-dom';
 
 interface BorrowSuccessCardProps {
   returnDate?: string;
-  onBackHome: () => void;
 }
 
 export default function BorrowSuccessCard({
   returnDate,
-  onBackHome,
 }: BorrowSuccessCardProps) {
+  const navigate = useNavigate();
+
   return (
     <section
       aria-labelledby='borrow-success-title'
@@ -38,13 +40,22 @@ export default function BorrowSuccessCard({
         </span>
       </p>
 
-      <Button
-        type='button'
-        className='mt-8 w-full rounded-full'
-        onClick={onBackHome}
-      >
-        Back to Home
-      </Button>
+      <div className='space-y-4 mt-5'>
+        <Button
+          className='w-full rounded-full'
+          onClick={() => navigate(`${ROUTES.Profile}?tab=borrowed`)}
+        >
+          See Borrowed List
+        </Button>
+
+        <Button
+          variant='outline'
+          className='w-full rounded-full'
+          onClick={() => navigate(ROUTES.Home)}
+        >
+          Back to Home
+        </Button>
+      </div>
     </section>
   );
 }
