@@ -5,13 +5,14 @@ import { useNavigate } from 'react-router-dom';
 
 interface BorrowSuccessCardProps {
   returnDate?: string;
+  onBackHome: () => void;
 }
 
 export default function BorrowSuccessCard({
   returnDate,
 }: BorrowSuccessCardProps) {
   const navigate = useNavigate();
-
+  
   return (
     <section
       aria-labelledby='borrow-success-title'
