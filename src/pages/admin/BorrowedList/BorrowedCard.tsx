@@ -13,6 +13,10 @@ interface BorrowedCardProps {
 export default function BorrowedCard({ loan, isOverdue }: BorrowedCardProps) {
   const statusColor = getLoanStatusColor(loan, isOverdue);
   const statusLabel = getLoanStatusLabel(loan, isOverdue);
+  const category =
+    loan.book?.category?.name && loan.book.category.name !== 'string'
+      ? loan.book.category.name
+      : 'Uncategorized';
 
   return (
     <article className='rounded-2xl bg-white p-4 shadow-sm'>
@@ -44,7 +48,7 @@ export default function BorrowedCard({ loan, isOverdue }: BorrowedCardProps) {
       <div className='my-5 border-t border-neutral-300' />
 
       <div className='flex flex-col gap-3'>
-        <div className='h-30 w-24 overflow-hidden bg-gray-100'>
+        <div className='h-32 w-24 flex-shrink-0 overflow-hidden rounded-lg bg-neutral-100'>
           {loan.book?.coverImage ? (
             <img
               src={loan.book.coverImage}
@@ -52,21 +56,20 @@ export default function BorrowedCard({ loan, isOverdue }: BorrowedCardProps) {
               className='h-full w-full object-cover'
             />
           ) : (
-            <div className='h-full w-full bg-gray-200' />
+            <div className='flex h-full w-full items-center justify-center bg-neutral-100 text-3xl'>
+              📚
+            </div>
           )}
         </div>
 
         <div className='min-w-0 flex-1 space-y-3'>
           <span className='inline-block rounded-md border border-neutral-300 px-2 py-1 text-xs font-bold text-neutral-950'>
-            {loan.book?.category?.name ?? 'Category'}
+            {category}
           </span>
-
           <p className='line-clamp-1 text-md font-bold text-gray-950'>
             {loan.book?.title}
           </p>
-
           <p className='text-xs text-neutral-700'>{loan.book?.author?.name}</p>
-
           <p className='text-sm font-bold text-neutral-950'>
             {formatDate(loan.borrowedAt)} · Duration {loan.durationDays} Days
           </p>
