@@ -26,14 +26,17 @@ export default function AdminTabs({
             <Button
               key={tab.path}
               type='button'
+              variant='ghost'
               aria-label={tab.label}
               aria-current={active ? 'page' : undefined}
               onClick={() => onNavigate(tab.path)}
               className={[
-                'flex-1 whitespace-nowrap rounded-xl px-1 py-2.5 text-xs transition-all',
+                'flex-1 rounded-xl px-4 py-2.5 text-sm transition-none',
+                'hover:bg-transparent hover:text-inherit',
+                'focus-visible:ring-0 focus-visible:ring-offset-0',
                 active
-                  ? 'bg-white font-semibold text-primary-600 shadow'
-                  : 'bg-transparent font-normal text-neutral-600',
+                  ? 'bg-white font-semibold text-primary-600 shadow-sm'
+                  : 'bg-transparent font-medium text-neutral-600',
               ].join(' ')}
             >
               {tab.label}
