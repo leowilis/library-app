@@ -21,7 +21,7 @@ export default function Pagination({
   const end = Math.min(page * limit, total);
 
   return (
-    <div className='flex items-center justify-between pt-2'>
+    <div className='flex items-center justify-between pt-2 md:max-w-5xl'>
       <p className='text-xs text-gray-400'>
         Showing {start}-{end} of {total} items
       </p>
