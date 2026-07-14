@@ -35,6 +35,7 @@ export default function CartFooter({
         md:rounded-2xl
         md:border
         md:shadow-lg
+        md:hidden
       '
     >
       {/* Total */}
