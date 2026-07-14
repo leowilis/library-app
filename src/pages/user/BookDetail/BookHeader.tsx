@@ -52,10 +52,10 @@ export default function BookHeader({
       <p className='text-sm text-neutral-700'>{author ?? 'Unknown Author'}</p>
       <StarRating rating={rating} showValue />
 
-      <div className='hidden pt-4 md:flex'>
+      <div className='hidden gap-4 pt-4 md:flex'>
         <Button
           variant='outline'
-          className='flex-1 rounded-full'
+          className="h-10 min-w-40 rounded-full border-2 border-primary-300 px-8 font-semibold text-primary-300 transition-all duration-200 hover:-translate-y-1 hover:border-primary-400 hover:bg-primary-50 hover:text-primary-400 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
           onClick={onAddToCart}
           disabled={isOutOfStock}
         >
