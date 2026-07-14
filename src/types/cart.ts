@@ -20,13 +20,15 @@ export interface CartResponse {
 
 export interface CheckoutResponse {
   success: boolean;
+  message: string;
   data: {
     user: {
       id: number;
       name: string;
       email: string;
     };
-    books: CartItem[];
+    items: CartItem[];
+    itemCount: number;
   };
 }
 
